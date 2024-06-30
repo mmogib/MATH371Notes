@@ -25,6 +25,7 @@ begin
 	using LinearAlgebra, Random,  Printf
 	using Symbolics
 	using QRCoders
+	using PrettyTables
 	# using NonlinearSolve
 	# using ForwardDiff
 end
@@ -92,14 +93,6 @@ end
 # ╔═╡ b54035ab-2813-4cdc-887a-e11625ede4aa
 slider1h = @bind slider1 Slider(0:20, show_value=true);""
 
-# ╔═╡ e223e89c-af0c-44ed-bb83-fd51124c7899
-let
-	f(x)=cos(x)
-	P2(x)=1-0.5*x^2
-	x=3
-	f(x),P2(x)
-end
-
 # ╔═╡ 9e344be4-e96a-4b1f-9bac-52deb66c2658
 
 
@@ -109,70 +102,11 @@ md"n = $slider1h"
 # ╔═╡ 7e6509af-4072-45f4-a3cf-d2891c586d58
 L"$P_{%$slider1}(x)=$"
 
-# ╔═╡ ee13d4c2-edce-4d7c-8ace-103aab1f7ba0
-let
-	f(x) = cos(x)
-	x0=0
-	# slider1
-	
-	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
-	Pn = P(slider1)(x0) 
-	Pn	
-	
-end
-
 # ╔═╡ df80d1bc-1285-48f3-8de1-5bf9631f078c
 L"$R_{%$slider1}(x)=$"
 
-# ╔═╡ afbd4725-9c76-4453-a62a-ebac185655a2
-let
-	@syms ζ::Real
-	x0=0
-	n=slider1
-	f(x) = cos(x)
-	((x-x0)^(n+1))*df(f,n+1,ζ)/factorial(n+1)
-end
-
-# ╔═╡ 422a3ccc-1e62-407b-bd3e-0703f1a5a33d
-let
-	f(x)=cos(x)
-	x0=0
-	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
-	Pn = P(slider1)(x0) 
-	p1= plot(f;framestyle=:origin,label=L"f(x)",line=(1,:red))
-	labels = [L"P_{%$i}(x)" for i in 0:2:slider1]
-	plot(p1,[t->substitute(P(i)(x0),Dict(x=>t)) for i in 0:2:slider1];
-	label=reshape(labels,1,length(labels)),
-		xlimits=(-12,12),ylimits=(-1,1.5)
-	)
-end
-
 # ╔═╡ 2d460985-77a6-4453-b639-3312c98b742f
 md"When ``x_0=0.01``"
-
-# ╔═╡ 9b0cd30c-3162-4423-b32f-88c9a01c1cbd
-let
-	x1=0.01
-	n=slider1
-	f(x)=cos(x)
-	x0=0
-	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
-	vals = substitute(P(n)(x0),Dict(x=>x1)), f(x1)
-	Rn=((x-x0)^(n+1))/factorial(n+1) |> y -> substitute(y,Dict(x=>x1))
-	pntex = texeq("""
-	P_{$n}($x1) = $(vals[1])
-		""")
-	ftex=texeq("f($x1) = $(vals[2])") 
-	error=texeq("|\\textrm{Error}| \\leq $(Rn)")
-	md"""
-	$ftex
-	
-	$pntex
-	
-	$error
-	"""
-	
-end
 
 # ╔═╡ a4214d60-b66e-4819-84ad-37653e45184e
 cm"""
@@ -183,9 +117,6 @@ Previous Example illustrates __the two objectives of numerical analysis__:
 
 # ╔═╡ f610361d-e308-49be-8100-ad8b3882bac0
 md"# 1.2 Round-off Errors and Computer Arithmetic"
-
-# ╔═╡ 98652338-3d5c-40f9-9220-c4f6e94f532c
-sqrt(2)
 
 # ╔═╡ e4a92b5e-18a7-4007-aab3-3eeca447b8de
 md"""
@@ -218,6 +149,296 @@ The base for the exponent is 2 .
 
 """
 
+
+# ╔═╡ c9819b7f-4bf8-46e3-a4bc-e991bf26ce7a
+
+
+# ╔═╡ ed835d55-deaf-44b5-b360-f8eff7800f6d
+cm"""
+- What is the next smallest machine real number to the previous number ?
+- What is the next largest machine real number to the previous number ?
+"""
+
+# ╔═╡ 36211411-8f83-4373-8dd0-7b7f334f8bc1
+cm"""
+- What is the smallest real number can be represented ?
+- What is the largest real number can be represented?
+
+"""
+
+# ╔═╡ 66fa9c4b-f2f3-44a1-8755-bc13ffccaba1
+let
+	x =split("27.56640625",'.')
+	# sum(float(Int(x[2][i])//(2^(i))) for i in 1:length(x[2]))
+	bs=bitstring(parse(Float64,"27.56640625"))
+	reinterpret(Float64,parse(Int,"0100000000111011100100001111111111111111111111111111111111111111",base=2))
+	
+end
+
+# ╔═╡ ff2fe07a-d35b-4d5b-bf95-f669fafc2132
+md"## Decimal Machine Numbers"
+
+# ╔═╡ 9ddc2701-bf18-4f96-9394-36a95b399252
+cm"""
+We assume that machine numbers are represented in the normalized decimal floating-point form
+```math
+\pm 0 . d_1 d_2 \ldots d_k \times 10^n, \quad 1 \leq d_1 \leq 9, \quad \text { and } \quad 0 \leq d_i \leq 9,
+```
+for each ``i=2, \ldots, k``. Numbers of this form are called ``k``-digit decimal machine numbers.
+- Any positive real number within the numerical range of the machine can be normalized to the form
+```math
+y=0 . d_1 d_2 \ldots d_k d_{k+1} d_{k+2} \ldots \times 10^n
+```
+- BUT our computer has to terminate the __mantissa__ at ``k`` decimal digits.
+- The floating-point form of ``y``, denoted ``\text{fl}(y)``, is obtained by terminating the mantissa of ``y`` at ``k`` decimal digits. 
+- There are two common ways of performing this termination. 
+  - __One method__, called __chopping__, is to simply chop off the digits ``d_{k+1} d_{k+2} \ldots``. This produces the floating-point form
+```math
+\text{fl}(y)=0 . d_1 d_2 \ldots d_k \times 10^n .
+```
+-
+  - The other method, called __rounding__, adds ``5 \times 10^{n-(k+1)}`` to ``y`` and then chops the result to obtain a number of the form
+```math
+\text{fl}(y)=0 . \delta_1 \delta_2 \ldots \delta_k \times 10^n .
+```
+
+> For rounding, when ``d_{k+1} \geq 5``, we add 1 to ``d_k`` to obtain ``\text{fl}(y)``; that is, we round up. When ``d_{k+1}<5``, we simply chop off all but the first ``k`` digits; that is, round down. If we round down, then ``\delta_i=d_i``, for each ``i=1,2, \ldots, k``. However, if we round up, the digits (and even the exponent) might change.
+"""
+
+# ╔═╡ 7caaa18e-8ef8-4ae5-bd1c-e9fd0536b901
+π  
+
+# ╔═╡ 43e1134e-020c-4fff-8164-050f0fcb9c38
+# let 
+# 	n = 0.31415926535897e1
+# 	# chooping
+# 	n_chopped =0.31415e1 
+# 	n_rounded = 0.31416e1
+# end
+
+# ╔═╡ 8c6005c5-e947-4a8a-8083-78ab5f84f07b
+# let
+# 	function actualErro(p,pstar)
+# 		p-pstar
+# 	end
+# 	function absoluteErro(p,pstar)
+# 		abs(p-pstar)
+# 	end
+# 	function relativeErro(p,pstar)
+# 		abs(p-pstar)/abs(p)
+# 	end
+# 	p,pstar=0.3000e1,0.3100e1
+# 	actualErro(p,pstar)
+# 	absoluteErro(p,pstar)
+# 	relativeErro(p,pstar)
+# end
+
+# ╔═╡ c8d040f0-3264-42c6-84c5-be8c633c36e4
+let
+	# (a)
+	aerror1=0.1e2
+end
+
+
+# ╔═╡ 786351e5-47cc-4d61-a47d-771bc47aa3a9
+cm"""
+For machine decimal representations of numbers we have
+```math
+\left|\frac{y-f l(y)}{y}\right| \text {. }
+```
+
+If ``k`` decimal digits and chopping are used for the machine representation of
+```math
+y=0 . d_1 d_2 \ldots d_k d_{k+1} \ldots \times 10^n
+```
+then
+```math
+\begin{aligned}
+\left|\frac{y-f l(y)}{y}\right| & =\left|\frac{0 . d_1 d_2 \ldots d_k d_{k+1} \ldots \times 10^n-0 . d_1 d_2 \ldots d_k \times 10^n}{0 . d_1 d_2 \ldots \times 10^n}\right| \\
+& =\left|\frac{0 . d_{k+1} d_{k+2} \ldots \times 10^{n-k}}{0 . d_1 d_2 \ldots \times 10^n}\right|=\left|\frac{0 . d_{k+1} d_{k+2} \ldots}{0 . d_1 d_2 \ldots}\right| \times 10^{-k} .
+\end{aligned}
+```
+
+Since ``d_1 \neq 0``, the minimal value of the denominator is 0.1 . The numerator is bounded above by 1 . As a consequence,
+```math
+\left|\frac{y-f l(y)}{y}\right| \leq \frac{1}{0.1} \times 10^{-k}=10^{-k+1} .
+```
+
+"""
+
+# ╔═╡ 2e3eefec-a29b-4dff-a863-eabbb4a3c7ef
+md"## Finite-Digit Arithmetic"
+
+# ╔═╡ 712e7cbd-1280-4885-8adb-d83de2c26560
+begin
+	struct FloatK
+	    m::Int
+	    n::Int
+	    s::Int
+	    digits::Int
+	    rounding::String
+	end
+	Base.convert(::Type{Float64}, x::FloatK) = x.s * x.m * (10.0)^(x.n - x.digits)
+	Base.show(io::IO, ::MIME"text/plain", n::FloatK) = print(io, n.s == 1 ? "" : "-", " 0.", n.m, "× 10^", n.n)
+	Base.show(io::IO, ::MIME"application/x-tex", n::FloatK) = print(io, n.s == 1 ? "" : "-", "0.", n.m, "× 10^", n.n)
+	FloatK(n::Float64, dgts::Int, rounding::String) = begin
+	    s = n >= 0 ? 1 : -1
+	    fpart, ipart = modf(n)
+	    ipart = abs(ipart)
+	    fpart = abs(fpart)
+	    no_ipart = (ipart == 0.0)
+	    fparts = "$fpart"
+	    fpartstr, expntn = if 'e' in fparts
+	        fe = findfirst('e', fparts)
+	        np = fparts[1:1] * fparts[3:fe-1]
+	        nex = parse(Int, fparts[fe+1:end]) + 1
+	        fraction_str, fraction_exp = if no_ipart
+	            repeat('0', abs(nex)) * np, nex
+	        else
+	            np, length("$(Int(ipart))")
+	        end
+	        fraction_str, fraction_exp
+	    else
+	        np = fparts[3:end]
+	        nex = findfirst(x -> x != '0', np)
+	        fraction_str, fraction_exp = if no_ipart
+	            np[nex:end], -nex + 1
+	        else
+	            np, length("$(Int(ipart))")
+	        end
+	        fraction_str, fraction_exp
+	    end
+	    fpartstr = fpartstr * repeat('0', 5 * dgts)
+	    iparttstr = parse(Int, split("$ipart", ".")[1])
+	    glued = no_ipart ? fpartstr : "$iparttstr" * fpartstr
+	
+	
+	    nstr = if rounding == "chop"
+	        glued[1:dgts]
+	    else
+	        glued_rounded = replace("$(round(parse(Int, glued[2:dgts+3]) * 10.0^(-dgts - 2), digits=dgts))", '.' => "") * repeat('0', 2 * dgts)
+	        last_digit = parse(Int, glued_rounded[dgts+1])
+	        correction = last_digit >= 5 ? 1 : 0
+	        temp = "$(parse(Int, glued[1:dgts]) + correction))"
+	        temp[1:dgts]
+	    end
+	
+	    m = parse(Int, nstr)
+	    FloatK(m, expntn, s, dgts, rounding)
+	end
+	FloatK(x::FloatK) = FloatK(x.m, x.n, x.s, x.digits, x.rounding)
+	FloatK(x::FloatK, rounding::String) = FloatK(x.m, x.n, x.s, x.digits, rounding)
+	FloatK(x::FloatK, digits::Int, rounding::String) = FloatK(x.m, x.n, x.s, digits, rounding)
+	FloatK(n::Float64, dgts::Int) = FloatK(n, dgts, "chop")
+	FloatK(n::Float64, rounding::String) = FloatK(n, 5, rounding)
+	FloatK(n::Float64) = FloatK(n, 5, "chop")
+	
+	Base.:+(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) + convert(Float64, b), a.digits, a.rounding)
+	Base.:+(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a) + b, a.digits, a.rounding)
+	Base.:+(b::T where {T<:Real}, a::FloatK) = FloatK(a, b)
+	
+	Base.:-(a::FloatK) = FloatK(-convert(Float64, a))
+	Base.:-(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) - convert(Float64, b), a.digits, a.rounding)
+	Base.:-(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a) - b, a.digits, a.rounding)
+	Base.:-(b::T where {T<:Real}, a::FloatK) = FloatK(b - convert(Float64, a), a.digits, a.rounding)
+	
+	Base.:*(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) * convert(Float64, b), a.digits, a.rounding)
+	Base.:*(a::T where {T<:Real}, b::FloatK) = FloatK(a * convert(Float64, b), b.digits, b.rounding)
+	Base.:*(a::FloatK, b::T where {T<:Real}) = FloatK(b, a)
+	
+	Base.:^(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a)^b, a.digits, a.rounding)
+	Base.:sqrt(a::FloatK) = FloatK(sqrt(convert(Float64, a)), a.digits, a.rounding)
+	Base.:÷(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) / convert(Float64, b), a.digits, a.rounding)
+	Base.:÷(a::T where {T<:Real}, b::FloatK) = FloatK(a / convert(Float64, b), b.digits, b.rounding)
+	Base.:÷(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, b) / a, a.digits, a.rounding)
+	
+	Base.:/(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) / convert(Float64, b), a.digits, a.rounding)
+	Base.:/(a::T where {T<:Real}, b::FloatK) = FloatK(a / convert(Float64, b), b.digits, b.rounding)
+	Base.:/(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, b) / a, a.digits, a.rounding)
+
+	function createFiniteDigitSystem(; digits::Int=5, truncation::String="chop")
+	    fl(x) = FloatK(x, digits, truncation)
+	    ⊕(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) + FloatK(b, digits, truncation), digits, truncation)
+	    ⊖(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) - FloatK(b, digits, truncation), digits, truncation)
+	    ⊗(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) * FloatK(b, digits, truncation), digits, truncation)
+	    ⨸(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) ÷ FloatK(b, digits, truncation), digits, truncation)
+	    fl, ⊕, ⊖, ⊗, ⨸
+	end
+
+	function re(p::T where {T<:Number},ps::FloatK)
+		abs(convert(Float64,(p-ps))/p)
+	end
+end
+
+# ╔═╡ e223e89c-af0c-44ed-bb83-fd51124c7899
+let
+	f(x)=cos(x)
+	P2(x)=1-0.5*x^2
+	x=3
+	f(x),P2(x)
+end
+
+# ╔═╡ ee13d4c2-edce-4d7c-8ace-103aab1f7ba0
+let
+	f(x) = cos(x)
+	x0=0
+	# slider1
+	
+	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
+	Pn = P(slider1)(x0) 
+	Pn	
+	
+end
+
+# ╔═╡ afbd4725-9c76-4453-a62a-ebac185655a2
+let
+	@syms ζ::Real
+	x0=0
+	n=slider1
+	f(x) = cos(x)
+	((x-x0)^(n+1))*df(f,n+1,ζ)/factorial(n+1)
+end
+
+# ╔═╡ 422a3ccc-1e62-407b-bd3e-0703f1a5a33d
+let
+	f(x)=cos(x)
+	x0=0
+	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
+	Pn = P(slider1)(x0) 
+	p1= plot(f;framestyle=:origin,label=L"f(x)",line=(1,:red))
+	labels = [L"P_{%$i}(x)" for i in 0:2:slider1]
+	plot(p1,[t->substitute(P(i)(x0),Dict(x=>t)) for i in 0:2:slider1];
+	label=reshape(labels,1,length(labels)),
+		xlimits=(-12,12),ylimits=(-1,1.5)
+	)
+end
+
+# ╔═╡ 9b0cd30c-3162-4423-b32f-88c9a01c1cbd
+let
+	x1=0.01
+	n=slider1
+	f(x)=cos(x)
+	x0=0
+	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
+	vals = substitute(P(n)(x0),Dict(x=>x1)), f(x1)
+	Rn=((x-x0)^(n+1))/factorial(n+1) |> y -> substitute(y,Dict(x=>x1))
+	pntex = texeq("""
+	P_{$n}($x1) = $(vals[1])
+		""")
+	ftex=texeq("f($x1) = $(vals[2])") 
+	error=texeq("|\\textrm{Error}| \\leq $(Rn)")
+	md"""
+	$ftex
+	
+	$pntex
+	
+	$error
+	"""
+	
+end
+
+# ╔═╡ 98652338-3d5c-40f9-9220-c4f6e94f532c
+sqrt(2)
 
 # ╔═╡ 2563dd79-3e17-4b81-82f3-43d6aea85b71
 begin
@@ -261,9 +482,6 @@ begin
 end
 
 
-# ╔═╡ c9819b7f-4bf8-46e3-a4bc-e991bf26ce7a
-
-
 # ╔═╡ 13ac7d12-0740-45df-831c-30670afd9f40
 let
 	a = Int(2)
@@ -271,12 +489,6 @@ let
 	# parse(Int,bitstring(a);base=2)
 	# typeof(str)
 end
-
-# ╔═╡ ed835d55-deaf-44b5-b360-f8eff7800f6d
-cm"""
-- What is the next smallest machine real number to the previous number ?
-- What is the next largest machine real number to the previous number ?
-"""
 
 # ╔═╡ 239e7eaa-b8da-47d4-b642-8415ef1e0683
 let 
@@ -289,13 +501,6 @@ let
 	# 0.5(nn-n)
 end
 
-# ╔═╡ 36211411-8f83-4373-8dd0-7b7f334f8bc1
-cm"""
-- What is the smallest real number can be represented ?
-- What is the largest real number can be represented?
-
-"""
-
 # ╔═╡ bb4ed82e-3b7e-4898-987f-9a9bac49c205
 let 	
 	smallest_number=String(repeat('0',64))
@@ -303,15 +508,6 @@ let
 	# bitstring(1-1023)
 	largest_number='0'*repeat('1',62)*'0'
 	float64_to_dec(largest_number)
-end
-
-# ╔═╡ 66fa9c4b-f2f3-44a1-8755-bc13ffccaba1
-let
-	x =split("27.56640625",'.')
-	# sum(float(Int(x[2][i])//(2^(i))) for i in 1:length(x[2]))
-	bs=bitstring(parse(Float64,"27.56640625"))
-	reinterpret(Float64,parse(Int,"0100000000111011100100001111111111111111111111111111111111111111",base=2))
-	
 end
 
 # ╔═╡ 75bac38d-3c93-4cad-8302-6eb60e40038b
@@ -325,96 +521,12 @@ __BE CAREFULL__
 $(0.1+0.2)
 """
 
-# ╔═╡ ff2fe07a-d35b-4d5b-bf95-f669fafc2132
-md"## Decimal Machine Numbers"
-
-# ╔═╡ 9ddc2701-bf18-4f96-9394-36a95b399252
-cm"""
-We assume that machine numbers are represented in the normalized decimal floating-point form
-```math
-\pm 0 . d_1 d_2 \ldots d_k \times 10^n, \quad 1 \leq d_1 \leq 9, \quad \text { and } \quad 0 \leq d_i \leq 9,
-```
-for each ``i=2, \ldots, k``. Numbers of this form are called ``k``-digit decimal machine numbers.
-- Any positive real number within the numerical range of the machine can be normalized to the form
-```math
-y=0 . d_1 d_2 \ldots d_k d_{k+1} d_{k+2} \ldots \times 10^n
-```
-- BUT our computer has to terminate the __mantissa__ at ``k`` decimal digits.
-- The floating-point form of ``y``, denoted ``\text{fl}(y)``, is obtained by terminating the mantissa of ``y`` at ``k`` decimal digits. 
-- There are two common ways of performing this termination. 
-  - __One method__, called __chopping__, is to simply chop off the digits ``d_{k+1} d_{k+2} \ldots``. This produces the floating-point form
-```math
-\text{fl}(y)=0 . d_1 d_2 \ldots d_k \times 10^n .
-```
--
-  - The other method, called __rounding__, adds ``5 \times 10^{n-(k+1)}`` to ``y`` and then chops the result to obtain a number of the form
-```math
-\text{fl}(y)=0 . \delta_1 \delta_2 \ldots \delta_k \times 10^n .
-```
-
-> For rounding, when ``d_{k+1} \geq 5``, we add 1 to ``d_k`` to obtain ``\text{fl}(y)``; that is, we round up. When ``d_{k+1}<5``, we simply chop off all but the first ``k`` digits; that is, round down. If we round down, then ``\delta_i=d_i``, for each ``i=1,2, \ldots, k``. However, if we round up, the digits (and even the exponent) might change.
-"""
-
-# ╔═╡ 43e1134e-020c-4fff-8164-050f0fcb9c38
-let 
-	n = 0.31415926535897e1
-	# chooping
-	# 0.00005
-	# bitstring(0.1)
-end
-
-# ╔═╡ 8c6005c5-e947-4a8a-8083-78ab5f84f07b
-let
-	function actualErro(p,pstar)
-		p-pstar
-	end
-	function absoluteErro(p,pstar)
-		abs(p-pstar)
-	end
-	function relativeErro(p,pstar)
-		abs(p-pstar)/abs(p)
-	end
-	p,pstar=0.3000e1,0.3100e1
-	actualErro(p,pstar)
-	absoluteErro(p,pstar)
-	relativeErro(p,pstar)
-end
-
 # ╔═╡ d38e3f95-71c4-45dc-8ab9-0a216de91311
 let 
 strs = join(map(x->"$(x*5*10^(-4.0))",[0.1  0.5  100  1000  5000  9990 10000]),",")
 strs = L"%$strs"
 	
 end
-
-# ╔═╡ 786351e5-47cc-4d61-a47d-771bc47aa3a9
-cm"""
-For machine decimal representations of numbers we have
-```math
-\left|\frac{y-f l(y)}{y}\right| \text {. }
-```
-
-If ``k`` decimal digits and chopping are used for the machine representation of
-```math
-y=0 . d_1 d_2 \ldots d_k d_{k+1} \ldots \times 10^n
-```
-then
-```math
-\begin{aligned}
-\left|\frac{y-f l(y)}{y}\right| & =\left|\frac{0 . d_1 d_2 \ldots d_k d_{k+1} \ldots \times 10^n-0 . d_1 d_2 \ldots d_k \times 10^n}{0 . d_1 d_2 \ldots \times 10^n}\right| \\
-& =\left|\frac{0 . d_{k+1} d_{k+2} \ldots \times 10^{n-k}}{0 . d_1 d_2 \ldots \times 10^n}\right|=\left|\frac{0 . d_{k+1} d_{k+2} \ldots}{0 . d_1 d_2 \ldots}\right| \times 10^{-k} .
-\end{aligned}
-```
-
-Since ``d_1 \neq 0``, the minimal value of the denominator is 0.1 . The numerator is bounded above by 1 . As a consequence,
-```math
-\left|\frac{y-f l(y)}{y}\right| \leq \frac{1}{0.1} \times 10^{-k}=10^{-k+1} .
-```
-
-"""
-
-# ╔═╡ 2e3eefec-a29b-4dff-a863-eabbb4a3c7ef
-md"## Finite-Digit Arithmetic"
 
 # ╔═╡ 4db7b813-d0da-4fc6-8447-aae94fbae670
 cm"""
@@ -429,28 +541,298 @@ x \ominus y=f l(f l(x)-f l(y)), & x \circledast y=f l(f l(x) \div f l(y)) .
 ```
 """
 
+# ╔═╡ 9010d6bd-26d2-4211-ab12-ac58d77edbbc
+let
+	re(p::T,ps::S) where {T<:Number,S<:Number} = abs((p-ps)/p)
+	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=5, truncation="chop")
+	x = 5/7
+	y=1/3
+	p,ps=x+y,	x ⊕ y
+	re(p,convert(Float64,ps))
+	# x ⊖ y
+	# x ⊗ y
+	# x ⨸ y
+end
+
 # ╔═╡ b50497e4-e0f9-4da6-bba3-48628cee0173
 let
-	fls(x)=begin 
-		xs = split("$x",'.')
-		fs = @sprintf "%.4f" parse(Float64,"."*xs[2])
-		xs[1]*"."*fs[3:end]
-	end
-	fl(x)=parse(Float64,fls(x))
-	⊕(a,b)=fl(fl(a)+fl(b))
-	⊖(a,b)=fl(fl(a)-fl(b))
-	⊗(a,b)=fl(fl(a)*fl(b))
-	⊛(a,b)=fl(fl(a)÷fl(b))
+	re(p::T,ps::S) where {T<:Number,S<:Number} = abs((p-ps)/p)
+	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=5, truncation="chop")
 	x=5/7
-	flx=fl(x)
 	y=1/3
-	fly=fl(y)
-	xy = fl(x)+fl(y)
-	⊕(x,y)
-	⊖(x,y)
-	⊗(x,y)
-	⊛(x,y)
+	u=0.714251
+	v=98765.9
+	w=0.111111e-4
+	p1 = 0.0003
+	p2 = p1 ⊗ v
 end
+
+# ╔═╡ 379608bf-906d-45db-9cab-018a50fcbd07
+let
+	f(x)=x^2 +62.10x+1
+	x1(a,b,c) =((-b+sqrt(b^2-4*a*c))/2a)
+	x2(a,b,c) =((-b-sqrt(b^2-4*a*c))/2a)
+	a,b,c =1, 62.10, 1
+	x1(a,b,c)
+	x2(a,b,c)
+	aa=cc=1
+	ba=62.10
+	ab2= 0.3856e4
+	# ab2= ba^2
+	a4ac = 4
+	asqr=0.6206e2
+	# asqr=sqrt(ab2-a4ac)
+	anum1=-0.0400
+	ax1=anum1/2.0
+	anum2=-0.1242e3
+	ax2=anum2/2.0
+	
+	
+end
+
+# ╔═╡ 1922d625-ba5e-4ea2-b050-a3c64077c742
+let
+	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(digits=5, truncation="round")
+	f(x)=x^2 +62.10x+1
+	x1(a,b,c) =((-b+sqrt(b^2-4*a*c))/2a)
+	x1f(a,b,c) =((-fl(b)+fl(sqrt(fl(fl(fl(b)^2)-fl(4*fl(a)*fl(c))))))/fl(2a))
+	x2(a,b,c) =((-b-sqrt(b^2-4*a*c))/2a)
+	x2f(a,b,c) =((-fl(b)-fl(sqrt(fl(fl(fl(b)^2)-fl(4*fl(a)*fl(c))))))/fl(2a))
+	a,b,c=1.0,62.10,1.0
+	x1(a,b,c)
+	x2f(a,b,c)
+	# x2(a,b,c)
+	# x2(fl(a),fl(b),fl(c))
+end
+
+# ╔═╡ 5ed7d51c-b5fa-4953-b2b4-c2040edced33
+md"## Nested Arithmetic"
+
+# ╔═╡ 987b5101-f2d6-4d03-98de-595bf6710d96
+let
+	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=3, truncation="chop")
+	f(x)=x^3-6.1*x^2+3.2*x+1.5
+	fn(x)=x*(x*(x-6.1)+3.2)+1.5
+	x=4.71
+	y=f(x)
+	ys = f(fl(x))
+	z = fn(x)
+	zs = fn(fl(x))
+	# fl(x^2,3,"round")
+end
+
+# ╔═╡ a7cc3418-4607-4e03-ab87-bab26530cc53
+md"# 1.3 Algorithms and Convergence"
+
+# ╔═╡ 78fc998d-a2c8-448b-90f5-d822e3513e8b
+md"## Characterizing Algorithms"
+
+# ╔═╡ 8cfd5ff2-cbf6-469e-af5a-050ecf2f3198
+cm"""
+| ``n`` | Computed ``\hat{p}_n`` | Correct ``p_n`` | Relative error |
+| :--- | ---: | :--- | :--- |
+| 0 | ``0.10000 \times 10^1`` | ``0.10000 \times 10^1`` |  |
+| 1 | ``0.33333 \times 10^0`` | ``0.33333 \times 10^0`` |  |
+| 2 | ``0.11110 \times 10^0`` | ``0.11111 \times 10^0`` | ``9 \times 10^{-5}`` |
+| 3 | ``0.37000 \times 10^{-1}`` | ``0.37037 \times 10^{-1}`` | ``1 \times 10^{-3}`` |
+| 4 | ``0.12230 \times 10^{-1}`` | ``0.12346 \times 10^{-1}`` | ``9 \times 10^{-3}`` |
+| 5 | ``0.37660 \times 10^{-2}`` | ``0.41152 \times 10^{-2}`` | ``8 \times 10^{-2}`` |
+| 6 | ``0.32300 \times 10^{-3}`` | ``0.13717 \times 10^{-2}`` | ``8 \times 10^{-1}`` |
+| 7 | ``-0.26893 \times 10^{-2}`` | ``0.45725 \times 10^{-3}`` | ``7 \times 10^0`` |
+| 8 | ``-0.92872 \times 10^{-2}`` | ``0.15242 \times 10^{-3}`` | ``6 \times 10^1`` |
+
+__The error grows exponentially__
+"""
+
+# ╔═╡ 95e1b0f1-fec8-4c35-a527-a5351ed38d92
+cm"""
+| ``n`` | Computed ``\hat{p}_n`` | Correct ``p_n`` | Relative error |
+| :--- | ---: | ---: | :---: |
+| 0 | ``0.10000 \times 10^1`` | ``0.10000 \times 10^1`` |  |
+| 1 | ``0.33333 \times 10^0`` | ``0.33333 \times 10^0`` |  |
+| 2 | ``-0.33330 \times 10^0`` | ``-0.33333 \times 10^0`` | ``9 \times 10^{-5}`` |
+| 3 | ``-0.10000 \times 10^1`` | ``-0.10000 \times 10^1`` | 0 |
+| 4 | ``-0.16667 \times 10^1`` | ``-0.16667 \times 10^1`` | 0 |
+| 5 | ``-0.23334 \times 10^1`` | ``-0.23333 \times 10^1`` | ``4 \times 10^{-5}`` |
+| 6 | ``-0.30000 \times 10^1`` | ``-0.30000 \times 10^1`` | 0 |
+| 7 | ``-0.36667 \times 10^1`` | ``-0.36667 \times 10^1`` | 0 |
+| 8 | ``-0.43334 \times 10^1`` | ``-0.43333 \times 10^1`` | ``2 \times 10^{-5}`` |
+
+__Error grows linearly__
+"""
+
+# ╔═╡ fdae435c-4d85-453e-a9ea-8383d31c5fe5
+md"## Rates of Convergence"
+
+# ╔═╡ f50aff72-d978-4c2a-8683-8127a14a4ea9
+let 
+	@syms h::Real ζ::Real
+	P(n)=sum(iseven(i) ? (-1)^i*h^(i)/(factorial(i)) : 0 for i in 0:n) + (iseven(n) ? sin(ζ)*h^(n+1)/factorial(n+1) : cos(ζ)*h^(n+1)/factorial(n+1))
+	p3 = P(3)
+	
+end
+
+# ╔═╡ 4dd54f9d-eb3f-49b4-9d56-41c5397ba001
+md"# 2.1 The Bisection Method"
+
+# ╔═╡ 7d947cce-355f-4168-a76d-df5929d03be5
+cm"""
+__Bisection__
+
+To find a solution to `` f(x) = 0 `` given the continuous function `` f `` on the interval ``[a, b]``, where `` f(a) `` and `` f(b) `` have opposite signs:
+
+``\textbf{INPUT}`` endpoints `` a ``, `` b ``; tolerance ``\texttt{TOL}``; maximum number of iterations `` N_0 ``.
+
+``\textbf{OUTPUT}`` approximate solution `` p `` or message of failure.
+
+- ``\textbf{Step 1}`` Set `` i = 1 ``; `` FA = f(a). ``
+- ``\textbf{Step 2}`` While `` i \leq N_0 `` do Steps 3--6.
+- ``\textbf{Step 3}`` Set `` p = a + \frac{b - a}{2}; \quad \text{(Compute } p_i.\text{)} ``
+        `` FP = f(p). ``
+- ``\textbf{Step 4}`` If `` FP = 0 `` or `` \frac{b - a}{2} < \texttt{TOL} `` then 
+        `` \text{OUTPUT } (p); \quad \text{(Procedure completed successfully.)} ``
+        ``\text{STOP.}``
+
+- ``\textbf{Step 5}`` Set `` i = i + 1 ``.
+- ``\textbf{Step 6}`` `` \text{If }  FA \cdot FP > 0 `` then set `` a = p ``;  (Compute  ``a_i, b_i``.) `` FA = FP `` else set  `` b = p ``.  (FA is unchanged.)
+- ``\textbf{Step 7}`` ``\text{OUTPUT}`` Method failed after ``N_0`` iterations, `` N_0 =``, ``N_0``);
+    `` \text{(The procedure was unsuccessful.)} ``
+    ``\text{STOP.}``
+		"""
+
+# ╔═╡ 3b64007d-762c-4bc5-8751-81ccb69ef376
+let
+	f(x)=x^2*(x+4)-10
+	
+	# p,T = bisect(1,2,1e-4,14)
+	# p,T
+	# pretty_table(HTML,T[1:13,:], header=["n","an", "bn", "pn", "f(pn)"])
+end
+
+# ╔═╡ 9e6ed715-6bf8-4e60-b77e-f4f8e2118f02
+let
+	function bisect(a,b,TOL,N0)
+		i=1
+		FA=f(a)
+		T=Matrix{Number}(undef,N0,5)
+		while i<=N0
+			p = a+(b-a)/2
+			FP=f(p)
+			T[i,:]=vcat(i,a,b,p,FP)
+			if FP==0 || ((b-a)/2)<TOL
+				TT = T[1:i,:]
+				return p,TT
+			end
+			i=i+1
+			if FA*FP>0
+				a = p
+				FA=FP
+			else
+				b=p
+			end
+		end
+		@error("Maximum number of iterations reached")
+	end
+end
+
+# ╔═╡ 505497ed-7060-48fe-ba2d-69a31413c267
+md"# 2.2 Fixed-Point Iteration"
+
+# ╔═╡ 1b28028a-92df-4d7a-942f-11ab9f4d06a7
+begin 
+	function fixed_point(g,x0,ϵ;maxiters=50)
+		n = maxiters
+		# r(n,x0)=reduce((c,_)->abs(c-g(c)) <ϵ ? c : g(c),1:n,init=x0)
+		xs = Vector{Float64}(undef,n)
+		xs[1]=x0
+		# fixit(x)=g(x)
+		i = 2
+		while i <= n
+			xs[i]= try 
+				g(xs[i-1])
+			catch
+				NaN
+			end
+			if abs(1-xs[i-1]/xs[i]) < ϵ || isnan(xs[i])
+				break
+			end
+			i += 1
+		end
+		# gx = [r(i,x0) for i in 1:n]
+		last_i = min(i,n)
+		xs = filter(x->!isnan(x),xs[1:last_i])
+		ys = xs[2:end]
+		xss = xs[1:end-1] 
+		xss,ys
+	end
+	function animate_fixedpoint(g,x0,ϵ;maxiters=50)
+		xs,ys = fixed_point(g,x0,ϵ;maxiters=50)
+		
+		plt= plot([g,x->x],label=[L"g(x)" L"y=x"], framestyle=:origin,legend=:topright)
+		anim = @animate for j ∈ 1:(length(xs)-1)
+			scatter(plt,xs[1:j],ys[1:j],label=L"x_{%$j}=%$(xs[j])")
+		end
+		# # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
+		# # gif(anim, "anim_fps15.gif", fps = 2)
+		anim
+	end
+	
+end
+
+# ╔═╡ f35de386-da3a-4cbf-89ae-3049218531df
+# let
+# 	anim = animate_fixedpoint(x->x^2-2,1.1,0.001)
+# 	gif(anim, "anim1_fps15.gif", fps = 2)
+# end
+
+# ╔═╡ 9ac51023-96ca-4304-a8b0-af36c3c8f60e
+md"## Fixed-Point Iteration"
+
+# ╔═╡ 4ed1a6ca-0d21-4257-87db-f39fff0d208f
+let
+	p0=1.5
+	n = 30
+	ϵ = 1e-9
+	g1(x)=x-x^3-4x^2+10
+	g2(x)=sqrt((10/x)-4x)
+	g3(x)=(1/2.0)*sqrt(10-x^3)
+	g4(x)=sqrt(10/(4+x))
+	g5(x)=x-(x^3+4x^2-10)/(3x^2+8x)
+	xs1,ys1 = fixed_point(g1,p0,ϵ;maxiters=n)
+	xs2,ys2 = fixed_point(g2,p0,ϵ;maxiters=n)
+	xs3,ys3 = fixed_point(g3,p0,ϵ;maxiters=n)
+	xs4,ys4 = fixed_point(g4,p0,ϵ;maxiters=n)
+	xs5,ys5 = fixed_point(g5,p0,ϵ;maxiters=n)
+	
+	T = hcat(0:n,
+		vcat(xs1,repeat([" "],n+1-length(xs1))),
+		vcat(xs2,repeat([" "],n+1-length(xs2))),
+		vcat(xs3,repeat([" "],n+1-length(xs3))),
+		vcat(xs4,repeat([" "],n+1-length(xs4))),
+		vcat(xs5,repeat([" "],n+1-length(xs5))))
+	# T = hcat(reshape(repeat([" "],31),31,1))
+	# length(xs1)
+	pretty_table(HTML,T,header=vcat(:n, [Symbol("g$i") for i in 1:5]...))
+	# anim2 = animate_fixedpoint(g4,p0,ϵ;maxiters=n)
+	# gif(anim2, "anim2_fps15.gif", fps = 2)
+end
+
+# ╔═╡ 54b12ace-4743-49a5-9e43-8580ee43ca6a
+cm"""
+- __Question__: How can we find a fixed-point problem that produces a sequence that reliably and rapidly converges to a solution to a given root-finding problem?
+"""
+
+
+
+# ╔═╡ 7ecbc555-7c10-4002-a662-b3de16611269
+cm"""
+- __Answer__: Manipulate the root-finding problem into a fixed point problem that satisfies the conditions of Fixed-Point Theorem 2.4 and has a derivative that is as small as possible near the fixed point.
+"""
+
+# ╔═╡ 9d6e52a1-d573-4b50-a584-5e517991e8ed
+md"""# 2.3 Newton's Method and its Extensions 
+__(Newton’s method and Secant method only)__
+"""
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 begin
@@ -470,6 +852,9 @@ $(res)
 $(Resource("https://www.dropbox.com/s/cat9ots4ausfzyc/qrcode_itempool.com_kfupm.png?raw=1",:width=>300))
 
 </div>"""
+	end
+	function define(t="")
+		beginBlock("Definition",t)
 	end
 	function bbl(t)
 		beginBlock(t,"")
@@ -681,6 +1066,258 @@ $(ex(3))
 Suppose that ``x=\frac{5}{7}`` and ``y=\frac{1}{3}``. Use five-digit chopping for calculating ``x+y, x-y, x \times y``, and ``x \div y``.
 """
 
+# ╔═╡ 966f78ae-65e1-4efa-b642-79f343e48a9b
+cm"""
+$(ex(4)) Suppose that in addition to ``x=\frac{5}{7}`` and ``y=\frac{1}{3}`` we have
+```math
+u=0.714251, \quad v=98765.9, \quad \text { and } \quad w=0.111111 \times 10^{-4},
+```
+so that
+```math
+f l(u)=0.71425 \times 10^0, \quad f l(v)=0.98765 \times 10^5, \quad \text { and } \quad f l(w)=0.11111 \times 10^{-4} .
+```
+
+Determine the five-digit chopping values of ``x \ominus u,(x \ominus u) \otimes w,(x \ominus u) \otimes v``, and ``u \oplus v``.
+"""
+
+# ╔═╡ c3720d44-e0a5-413a-aaf9-b11c6e6c442b
+cm"""
+$(example("Example",""))
+Solve the following in 4-digit rounding arithmetic
+```math
+x^2 +62.10x+1=0
+```
+"""
+
+# ╔═╡ e7fd2c69-097d-400f-aa20-19265ebdd2eb
+cm"""
+$(ex(6)) Evaluate ``f(x)=x^3-6.1 x^2+3.2 x+1.5`` at ``x=4.71`` using three-digit arithmetic.
+"""
+
+# ╔═╡ 3651b884-9583-49fb-95e8-269f349cf1ce
+cm"""
+$(define("Algorithm")) 
+An __algorithm__ is a procedure that describes, in an unambiguous manner, a finite sequence of steps to be performed in a specified order. The object of the algorithm is to implement a procedure to solve a problem or approximate a solution to the problem.
+$(ebl())
+
+$(define("Pseudocode"))
+A __pseudocode__ specifies the form of the input to be supplied and the form of the desired output. 
+$(ebl())
+- Not all numerical procedures give satisfactory output for arbitrarily chosen input. As a consequence, a stopping technique independent of the numerical technique is incorporated into each algorithm to avoid infinite loops.
+- Two punctuation symbols are used in the algorithms:
+  - A period (.) indicates the termination of a step.
+  - A semicolon (;) separates tasks within a step.
+"""
+
+# ╔═╡ 053b3718-7c29-4a81-9cb8-c639e515aa07
+cm"""
+$(ex(1))
+The ``N`` th Taylor polynomial for ``f(x)=\ln x`` expanded about ``x_0=1`` is
+```math
+P_N(x)=\sum_{i=1}^N \frac{(-1)^{i+1}}{i}(x-1)^i,
+```
+and the value of ``\ln 1.5`` to eight decimal places is 0.40546511 . Construct an algorithm to determine the minimal value of ``N`` required for
+```math
+\left|\ln 1.5-P_N(1.5)\right|<10^{-5}
+```
+without using the Taylor polynomial remainder term.
+"""
+
+# ╔═╡ f9e82af8-cbcb-4eab-8b66-227a5f34ccef
+cm"""
+$(bbl("Solution"))
+
+__INPUT__ value ``x``, tolerance ``T O L``, maximum number of iterations ``M``. 
+
+__OUTPUT__ degree ``N`` of the polynomial or a message of failure.
+
+__Step 1__ Set ``N=1``;
+```math
+\begin{array}{ll}
+& y=x-1 ; \\
+& \text{ SUM }=0 ; \\
+& \text{ POWER }=y ; \\
+& \text{ TERM }=y ; \\
+& \text{ SIGN }=-1 . \quad \text{(Used to implement alternation of signs.)}
+\end{array}
+```
+
+__Step 2__ While ``N \leq M`` do Steps 3-5.
+
+__Step 3__ Set SIGN ``=-`` SIGN; ``\quad`` (Alternate the signs.)
+```math
+\begin{aligned}
+&\text{S U M}=\text{S U M}+\text{S I G N} \cdot \text{T E R M} ; \quad \text{(Accumulate the terms.)} \\
+&\text{P O W E R}=\text{P O W E R} \cdot y ;\\
+&\text{TERM} = \text{POWER}/(N+1). \quad \text{Calculate the next term.}
+\end{aligned}
+```
+
+__Step 4__ If ``|\text{T E R M}|<\text{T O L}`` then (Test for accuracy.)
+
+OUTPUT ( ``N`` );
+STOP. (The procedure was successful.)
+
+__Step 5__ Set ``N=N+1``. (Prepare for the next iteration. (End Step 2))
+
+__Step 6__ OUTPUT ('Method Failed'); (The procedure was unsuccessful.) 
+
+STOP.
+"""
+
+# ╔═╡ e8278f0e-74a6-4cc3-8164-269391162662
+cm"""
+$(define("1.17")) 
+Suppose that ``E_0>0`` denotes an error introduced at some stage in the calculations and ``E_n`` represents the magnitude of the error after ``n`` subsequent operations.
+- If ``E_n \approx C n E_0``, where ``C`` is a constant independent of ``n``, then the growth of error is said to be linear.
+- If ``E_n \approx C^n E_0``, for some ``C>1``, then the growth of error is called exponential.
+"""
+
+# ╔═╡ a8848e7f-dfd2-438a-956e-daa91ac7ecad
+cm"""
+$(example("Example",""))
+Consider the sequence ``\displaystyle p_n=\left(\frac{1}{3}\right)^n`` and use __five-digit rounding arithmatic__ to compute the terms of this sequence.
+"""
+
+# ╔═╡ a69d2160-3a9e-4038-9d87-5119e9e05466
+cm"""
+$(example("Example",""))
+Now consider the sequence ``\displaystyle p_n=1-\frac{2}{3}n`` and use __five-digit rounding arithmatic__ to compute the terms of this sequence.
+"""
+
+# ╔═╡ 90bd960f-794d-496f-bf28-3b52abba90cc
+cm"""
+$(define("1.18")) 
+Suppose ``\left\{\beta_n\right\}_{n=1}^{\infty}`` is a sequence known to converge to zero and ``\left\{\alpha_n\right\}_{n=1}^{\infty}`` converges to a number ``\alpha``. If a positive constant ``K`` exists with
+```math
+\left|\alpha_n-\alpha\right| \leq K\left|\beta_n\right|, \quad \text { for large } n,
+```
+then we say that ``\left\{\alpha_n\right\}_{n=1}^{\infty}`` converges to ``\alpha`` with rate, or order, of convergence ``O\left(\beta_n\right)``. (This expression is read "big oh of ``\beta_n`` ".) It is indicated by writing ``\alpha_n=\alpha+O\left(\beta_n\right)``.
+"""
+
+# ╔═╡ 62fb93e7-4acc-4466-b932-ce6cfdaf8d61
+cm"""
+$(ex(2))
+Suppose that, for ``n \geq 1``,
+```math
+\alpha_n=\frac{n+1}{n^2} \quad \text { and } \quad \hat{\alpha}_n=\frac{n+3}{n^3} \text {. }
+```
+"""
+
+# ╔═╡ 30833702-0444-4d4e-86c6-be97ae1456e7
+cm"""
+$(define("1.19"))
+Suppose that ``\lim _{h \rightarrow 0} G(h)=0`` and ``\lim _{h \rightarrow 0} F(h)=L``. If a positive constant ``K`` exists with
+
+```math
+|F(h)-L| \leq K|G(h)|, \quad \text{for sufficiently small } h,
+```
+then we write ``F(h)=L+O(G(h))``.
+"""
+
+# ╔═╡ a3ad9375-b2bf-4b3b-9f84-d18d41265640
+cm"""
+$(ex(3))
+Use the third Taylor polynomial about ``h=0`` to show that ``\cos h+\frac{1}{2} h^2=1+O\left(h^4\right)``.
+"""
+
+
+# ╔═╡ 9be1a640-c90f-4171-ab54-f6926dba25be
+cm"""
+$(ex(1))
+Show that ``f(x)=x^3+4 x^2-10=0`` has a root in ``[1,2]`` and use the Bisection method to determine an approximation to the root that is accurate to at least within ``10^{-4}``.
+"""
+
+# ╔═╡ b11a67a2-b544-4996-9816-82bfbcd70a18
+cm"""
+$(bth("2.1"))
+Suppose that ``f \in C[a, b]`` and ``f(a) \cdot f(b)<0``. The Bisection method generates a sequence ``\left\{p_n\right\}_{n=1}^{\infty}`` approximating a zero ``p`` of ``f`` with
+```math
+\left|p_n-p\right| \leq \frac{b-a}{2^n}, \quad \text { when } \quad n \geq 1
+```
+"""
+
+# ╔═╡ e69ad96e-7796-4db4-9ae1-049ad0971f9c
+cm"""
+$(ex(2)) Determine the number of iterations necessary to solve ``f(x)=x^3+4 x^2-10=0`` with accuracy ``10^{-3}`` using ``a_1=1`` and ``b_1=2``.
+"""
+
+# ╔═╡ ddb60135-0438-4381-8284-053c464ec506
+cm"""
+$(define("2.2"))
+The number ``p`` is a fixed point for a given function ``g`` if ``g(p)=p``.
+"""
+
+# ╔═╡ 668930ff-00d1-46b6-97a3-b27f5f6628c1
+cm"""
+$(ex(1)) Determine any fixed points of the function ``g(x)=x^2-2``.
+"""
+
+# ╔═╡ 9d2676de-fb2e-4a2c-8701-ee823bca5f71
+cm"""
+$(bth("2.3")) 
+(i) If ``g \in C[a, b]`` and ``g(x) \in[a, b]`` for all ``x \in[a, b]``, then ``g`` has at least one fixed point in ``[a, b]``.
+(ii) If, in addition, ``g^{\prime}(x)`` exists on ``(a, b)`` and a positive constant ``k<1`` exists with
+```math
+\left|g^{\prime}(x)\right| \leq k, \quad \text { for all } x \in(a, b),
+```
+then there is exactly one fixed point in ``[a, b]``. (See Figure 2.3.)
+$(eth())
+"""
+
+# ╔═╡ 00594dfc-5a8b-4551-b300-bb52eee81e04
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/qdx5nwju090krjjywtw51/figure2.3.png?rlkey=sdlxcn8qvfywjyizmf2upctg2&raw=1"))
+"""
+
+
+
+# ╔═╡ a4e97910-11e5-4ad5-b9d2-7d5635e2990b
+cm"""
+$(ex(2)) 
+Show that ``g(x)=\left(x^2-1\right) / 3`` has a unique fixed point on the interval ``[-1,1]``.
+"""
+
+# ╔═╡ a46e742e-9869-478c-b7a8-99267ceb9116
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/wwb8jccvt23artv0ky0j3/algorithm2.2_fixed_point.png?rlkey=lw78ogrp7skapnv2klsbox9pf&raw=1",700))
+"""
+
+# ╔═╡ b28b570c-44f3-49e9-9b94-eb6f2ed89bbf
+cm"""
+$(example("Example",""))
+Solve ``x^3+4 x^2-10=0`` in the intervale ``[1,2]``.
+"""
+
+# ╔═╡ 12aa745e-9361-4af3-8c8b-7a2ffa83e874
+cm"""
+$(bth("2.4 (Fixed-Point Theorem)"))
+Let ``g \in C[a, b]`` be such that ``g(x) \in[a, b]``, for all ``x`` in ``[a, b]``. Suppose, in addition, that ``g^{\prime}`` exists on ``(a, b)`` and that a constant ``0<k<1`` exists with
+```math
+\left|g^{\prime}(x)\right| \leq k, \quad \text { for all } x \in(a, b) .
+```
+
+Then, for any number ``p_0`` in ``[a, b]``, the sequence defined by
+```math
+p_n=g\left(p_{n-1}\right), \quad n \geq 1,
+```
+converges to the unique fixed point ``p`` in ``[a, b]``.
+$(eth())
+"""
+
+# ╔═╡ e3a20e0f-1524-479f-83e8-6fc2093e320b
+cm"""
+$(bbl("Corollary", "2.5")) If ``g`` satisfies the hypotheses of Theorem 2.4 , then bounds for the error involved in using ``p_n`` to approximate ``p`` are given by
+```math
+\left|p_n-p\right| \leq k^n \max \left\{p_0-a, b-p_0\right\}
+```
+and
+```math
+\left|p_n-p\right| \leq \frac{k^n}{1-k}\left|p_1-p_0\right|, \quad \text { for all } \quad n \geq 1
+```
+$(ebl())
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -694,6 +1331,7 @@ PlotThemes = "ccf2f8ad-2431-5c83-bf29-c5338b663b6a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 QRCoders = "f42e9828-16f3-11ed-2883-9126170b272d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
@@ -709,6 +1347,7 @@ PlotThemes = "~3.1.0"
 Plots = "~1.40.4"
 PlutoExtras = "~0.7.12"
 PlutoUI = "~0.7.59"
+PrettyTables = "~2.3.2"
 QRCoders = "~1.4.5"
 Symbolics = "~5.28.0"
 """
@@ -717,9 +1356,9 @@ Symbolics = "~5.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.2"
+julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "141000cf285650972f2ec35a40073d5bd4d4dc50"
+project_hash = "2d3e45879b83a196527e2219b673a6adc424622e"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "fa0822e5baee6e23081c2685ae27265dabee23d8"
@@ -945,7 +1584,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.0+0"
+version = "1.1.1+0"
 
 [[deps.CompositeTypes]]
 git-tree-sha1 = "bce26c3dab336582805503bed209faab1c279768"
@@ -1915,6 +2554,12 @@ git-tree-sha1 = "9306f6085165d270f7e3db02af26a400d580f5c6"
 uuid = "21216c6a-2e73-6563-6e65-726566657250"
 version = "1.4.3"
 
+[[deps.PrettyTables]]
+deps = ["Crayons", "LaTeXStrings", "Markdown", "PrecompileTools", "Printf", "Reexport", "StringManipulation", "Tables"]
+git-tree-sha1 = "66b20dd35966a748321d3b2537c4584cf40387c7"
+uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+version = "2.3.2"
+
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
@@ -2196,6 +2841,12 @@ weakdeps = ["ChainRulesCore", "InverseFunctions"]
     [deps.StatsFuns.extensions]
     StatsFunsChainRulesCoreExt = "ChainRulesCore"
     StatsFunsInverseFunctionsExt = "InverseFunctions"
+
+[[deps.StringManipulation]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "a04cabe79c5f01f4d723cc6704070ada0b9d46d5"
+uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
+version = "0.3.4"
 
 [[deps.StructArrays]]
 deps = ["ConstructionBase", "DataAPI", "Tables"]
@@ -2708,22 +3359,73 @@ version = "1.4.1+1"
 # ╠═36211411-8f83-4373-8dd0-7b7f334f8bc1
 # ╠═bb4ed82e-3b7e-4898-987f-9a9bac49c205
 # ╠═66fa9c4b-f2f3-44a1-8755-bc13ffccaba1
-# ╠═75bac38d-3c93-4cad-8302-6eb60e40038b
+# ╟─75bac38d-3c93-4cad-8302-6eb60e40038b
 # ╟─ff2fe07a-d35b-4d5b-bf95-f669fafc2132
 # ╟─9ddc2701-bf18-4f96-9394-36a95b399252
 # ╟─edfa34e9-ee7d-4a0a-9025-a1857d8b9561
-# ╠═43e1134e-020c-4fff-8164-050f0fcb9c38
+# ╠═7caaa18e-8ef8-4ae5-bd1c-e9fd0536b901
+# ╟─43e1134e-020c-4fff-8164-050f0fcb9c38
 # ╟─244d084f-ed09-4d43-9377-8569995328a8
 # ╟─321e0282-36ae-43dc-adcb-c7a35666a334
-# ╠═8c6005c5-e947-4a8a-8083-78ab5f84f07b
+# ╟─8c6005c5-e947-4a8a-8083-78ab5f84f07b
+# ╠═c8d040f0-3264-42c6-84c5-be8c633c36e4
 # ╟─e3f7eaa9-3fb2-4564-9e9e-961c2ce2e5ad
 # ╟─f84cb603-95f5-42cc-afbc-c110e8e183c1
 # ╟─d38e3f95-71c4-45dc-8ab9-0a216de91311
 # ╟─786351e5-47cc-4d61-a47d-771bc47aa3a9
 # ╟─2e3eefec-a29b-4dff-a863-eabbb4a3c7ef
-# ╠═4db7b813-d0da-4fc6-8447-aae94fbae670
+# ╟─712e7cbd-1280-4885-8adb-d83de2c26560
+# ╟─4db7b813-d0da-4fc6-8447-aae94fbae670
 # ╟─892b86fe-9f31-4a38-9013-1f90e3b06389
+# ╟─9010d6bd-26d2-4211-ab12-ac58d77edbbc
+# ╟─966f78ae-65e1-4efa-b642-79f343e48a9b
 # ╟─b50497e4-e0f9-4da6-bba3-48628cee0173
+# ╟─c3720d44-e0a5-413a-aaf9-b11c6e6c442b
+# ╠═379608bf-906d-45db-9cab-018a50fcbd07
+# ╟─1922d625-ba5e-4ea2-b050-a3c64077c742
+# ╟─5ed7d51c-b5fa-4953-b2b4-c2040edced33
+# ╟─e7fd2c69-097d-400f-aa20-19265ebdd2eb
+# ╠═987b5101-f2d6-4d03-98de-595bf6710d96
+# ╟─a7cc3418-4607-4e03-ab87-bab26530cc53
+# ╟─3651b884-9583-49fb-95e8-269f349cf1ce
+# ╟─053b3718-7c29-4a81-9cb8-c639e515aa07
+# ╟─f9e82af8-cbcb-4eab-8b66-227a5f34ccef
+# ╟─78fc998d-a2c8-448b-90f5-d822e3513e8b
+# ╟─e8278f0e-74a6-4cc3-8164-269391162662
+# ╟─a8848e7f-dfd2-438a-956e-daa91ac7ecad
+# ╟─8cfd5ff2-cbf6-469e-af5a-050ecf2f3198
+# ╟─a69d2160-3a9e-4038-9d87-5119e9e05466
+# ╟─95e1b0f1-fec8-4c35-a527-a5351ed38d92
+# ╟─fdae435c-4d85-453e-a9ea-8383d31c5fe5
+# ╟─90bd960f-794d-496f-bf28-3b52abba90cc
+# ╟─62fb93e7-4acc-4466-b932-ce6cfdaf8d61
+# ╟─30833702-0444-4d4e-86c6-be97ae1456e7
+# ╟─a3ad9375-b2bf-4b3b-9f84-d18d41265640
+# ╟─f50aff72-d978-4c2a-8683-8127a14a4ea9
+# ╟─4dd54f9d-eb3f-49b4-9d56-41c5397ba001
+# ╟─7d947cce-355f-4168-a76d-df5929d03be5
+# ╟─9be1a640-c90f-4171-ab54-f6926dba25be
+# ╠═3b64007d-762c-4bc5-8751-81ccb69ef376
+# ╟─9e6ed715-6bf8-4e60-b77e-f4f8e2118f02
+# ╟─b11a67a2-b544-4996-9816-82bfbcd70a18
+# ╟─e69ad96e-7796-4db4-9ae1-049ad0971f9c
+# ╟─505497ed-7060-48fe-ba2d-69a31413c267
+# ╟─1b28028a-92df-4d7a-942f-11ab9f4d06a7
+# ╟─ddb60135-0438-4381-8284-053c464ec506
+# ╟─668930ff-00d1-46b6-97a3-b27f5f6628c1
+# ╟─f35de386-da3a-4cbf-89ae-3049218531df
+# ╟─9d2676de-fb2e-4a2c-8701-ee823bca5f71
+# ╟─00594dfc-5a8b-4551-b300-bb52eee81e04
+# ╟─a4e97910-11e5-4ad5-b9d2-7d5635e2990b
+# ╟─9ac51023-96ca-4304-a8b0-af36c3c8f60e
+# ╟─a46e742e-9869-478c-b7a8-99267ceb9116
+# ╟─b28b570c-44f3-49e9-9b94-eb6f2ed89bbf
+# ╟─4ed1a6ca-0d21-4257-87db-f39fff0d208f
+# ╟─54b12ace-4743-49a5-9e43-8580ee43ca6a
+# ╟─12aa745e-9361-4af3-8c8b-7a2ffa83e874
+# ╟─e3a20e0f-1524-479f-83e8-6fc2093e320b
+# ╟─7ecbc555-7c10-4002-a662-b3de16611269
+# ╟─9d6e52a1-d573-4b50-a584-5e517991e8ed
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
