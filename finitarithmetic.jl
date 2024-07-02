@@ -111,7 +111,7 @@ u = 0.714251
 v = 98765.9
 w = 0.111111e-4
 p1 = fl(x) - fl(u)
-p2 = p1 / fl(w)
+p2 = p1 ÷ fl(w)
 
 function tofloatk(num::T, digits::S, truncation::String) where {T<:Real,S<:Int}
     s = sign(num)
