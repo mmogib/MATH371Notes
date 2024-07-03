@@ -949,23 +949,23 @@ or
 
 # ╔═╡ e4f0570b-0913-4f40-8a9b-8afb5ce7cbcd
 let
-	x0=0
-	f(x)=cos(x)-x
-	fp(x)=-sin(x)-1
-	xsf,ysf=fixed_point(x->cos(x),x0,1e-6;maxiters=1000)
-	anim_fixed = animate_fixedpoint(x->cos(x),x0,1e-6;maxiters=1000)
-	gif(anim_fixed,"anim_fixed_n1.gif",fps=2)
-	x,xsn,flag = newton_method(f,fp,x0;tol=1e-6,max_iter=1000)
-	# anim_newton = animate_newton(f,fp,x0;tol=1e-6,max_iter=1000,limits=nothing)
+	# x0=0
+	# f(x)=cos(x)-x
+	# fp(x)=-sin(x)-1
+	# xsf,ysf=fixed_point(x->cos(x),x0,1e-6;maxiters=1000)
+	# anim_fixed = animate_fixedpoint(x->cos(x),x0,1e-6;maxiters=1000)
+	# gif(anim_fixed,"anim_fixed_n1.gif",fps=2)
+	# x,xsn,flag = newton_method(f,fp,x0;tol=1e-6,max_iter=1000)
+	# anim_newton = animate_newton(f,fp,x0;tol=1e-6,max_iter=1000,limits=(0.5,1))
 	# gif(anim_newton,"anim_newton_n1.gif",fps=2)
-	common_len=max(length(xsf),length(xsn))
-	T = Matrix{Union{Missing,Number,String}}(missing,common_len,3)
-	T[1:common_len,1]=collect(1:common_len)
-	T[1:length(xsf),2]=xsf
-	T[1:length(xsn),3]=xsn
-	T[:,2] = map(x->ismissing(x) ?  " " : x,T[:,2])
-	T[:,3] = map(x->ismissing(x) ?  " " : x,T[:,3])
-	pretty_table(HTML,T;header=["n" ,"Fixed Point", "Newton"])
+	# common_len=max(length(xsf),length(xsn))
+	# T = Matrix{Union{Missing,Number,String}}(missing,common_len,3)
+	# T[1:common_len,1]=collect(1:common_len)
+	# T[1:length(xsf),2]=xsf
+	# T[1:length(xsn),3]=xsn
+	# T[:,2] = map(x->ismissing(x) ?  " " : x,T[:,2])
+	# T[:,3] = map(x->ismissing(x) ?  " " : x,T[:,3])
+	# pretty_table(HTML,T;header=["n" ,"Fixed Point", "Newton"])
 end
 
 # ╔═╡ 8ce9ee8c-cca0-4ff5-a5a0-14991987feb0
@@ -1063,10 +1063,12 @@ P(x)=L_0(x) f\left(x_0\right)+L_1(x) f\left(x_1\right)=\frac{x-x_1}{x_0-x_1} f\l
 # ╔═╡ 972e9347-72c0-4a53-b20a-205086a29f8b
 let
 	points = [(2,4), (5,1)]
-	# xs = first.(points)
-	# ys = last.(points)
-	# P(x) = LagrangeP(xs,ys)(x)
-	# plot(P)
+	xs = first.(points)
+	ys = last.(points)
+	P(x) = LagrangeP(xs,ys)(x)
+	expand(P(x))
+	plt=plot(P)
+	scatter(plt,xs,ys)
 end
 
 # ╔═╡ 123cec56-4f6d-445d-9f53-629161a1d487
@@ -1113,7 +1115,7 @@ is called the ``\boldsymbol{n}``th __Lagrange interpolating polynomial__.
 # ╔═╡ c101ca1b-13af-4d0b-806b-14481f81b13e
 let
 	f(x)=1/x;
-	xs = [2;2.75;4]
+	xs = [2;2.75;3;4]
 	ys=f.(xs)
 	P(x) = LagrangeP(xs,ys)(x) |> expand
 	P(3)
@@ -1133,6 +1135,114 @@ let
 	# P(3)
 	# plot([f,P],framestyle=:zeros, xlimit=(2,4), label=[L"%$(f(x))" L"%$(P(x))"])
 end
+
+# ╔═╡ e8f8c6c1-184c-4edf-a0b7-ce13a6eaf2a0
+md"# 3.3 Divided Differences"
+
+# ╔═╡ cfbdaefd-bdcc-43e5-bdb4-87b37071c3c8
+cm"""
+- Suppose that ``P_n(x)`` is the ``n``th interpolating polynomial that agrees with the function ``f`` at the distinct numbers ``x_0, x_1, \ldots, x_n``. 
+
+- The __divided differences__ of ``f`` with respect to ``x_0, x_1, \ldots, x_n`` are used to express ``P_n(x)`` in the form
+```math
+P_n(x)=a_0+a_1\left(x-x_0\right)+a_2\left(x-x_0\right)\left(x-x_1\right)+\cdots+a_n\left(x-x_0\right) \cdots\left(x-x_{n-1}\right),
+```
+``\text{-- }``for appropriate constants ``a_0, a_1, \ldots, a_n``. 
+- To determine the first of these constants, ``a_0``, note that if ``P_n(x)`` is written in the form of Eq. (3.5), then evaluating ``P_n(x)`` at ``x_0`` leaves only the constant term ``a_0``; that is,
+```math
+a_0=P_n\left(x_0\right)=f\left(x_0\right) \text {. }
+```
+- Similarly, when ``P(x)`` is evaluated at ``x_1``, the only nonzero terms in the evaluation of ``P_n\left(x_1\right)`` are the constant and linear terms,
+```math
+f\left(x_0\right)+a_1\left(x_1-x_0\right)=P_n\left(x_1\right)=f\left(x_1\right) ;
+```
+
+"""
+
+# ╔═╡ e3deaaf2-9c9b-4693-b903-4c3ecfda1cd7
+cm"""
+so,
+```math
+a_1=\frac{f\left(x_1\right)-f\left(x_0\right)}{x_1-x_0} .
+```
+
+> We now introduce the __divided-difference notation__, which is related to Aitken's __``\Delta^2`` notation__. 
+
+- The __zeroth divided difference__ of the function ``f`` with respect
+to ``x_i``, denoted ``f\left[x_i\right]``, is simply the value of ``f`` at ``x_i`` :
+```math
+f\left[x_i\right]=f\left(x_i\right) .
+```
+
+- the __first divided difference__ of ``f`` with respect to ``x_i`` and ``x_{i+1}`` is denoted ``f\left[x_i, x_{i+1}\right]`` and defined as
+```math
+f\left[x_i, x_{i+1}\right]=\frac{f\left[x_{i+1}\right]-f\left[x_i\right]}{x_{i+1}-x_i} .
+```
+
+- The __second divided difference__, ``f\left[x_i, x_{i+1}, x_{i+2}\right]``, is defined as
+```math
+f\left[x_i, x_{i+1}, x_{i+2}\right]=\frac{f\left[x_{i+1}, x_{i+2}\right]-f\left[x_i, x_{i+1}\right]}{x_{i+2}-x_i} .
+```
+-  Similarly, after the ``(k-1)`` st divided differences,
+```math
+f\left[x_i, x_{i+1}, x_{i+2}, \ldots, x_{i+k-1}\right] \text { and } f\left[x_{i+1}, x_{i+2}, \ldots, x_{i+k-1}, x_{i+k}\right] \text {, }
+```
+have been determined, the ``k`` th divided difference relative to ``x_i, x_{i+1}, x_{i+2}, \ldots, x_{i+k}`` is
+```math
+f\left[x_i, x_{i+1}, \ldots, x_{i+k-1}, x_{i+k}\right]=\frac{f\left[x_{i+1}, x_{i+2}, \ldots, x_{i+k}\right]-f\left[x_i, x_{i+1}, \ldots, x_{i+k-1}\right]}{x_{i+k}-x_i}
+```
+"""
+
+# ╔═╡ e68ab39e-fdb5-4f39-8f18-c25f65e99c05
+cm"""
+_ The process ends with the single nth divided difference,
+```math
+f\left[x_0, x_1, \ldots, x_n\right]=\frac{f\left[x_1, x_2, \ldots, x_n\right]-f\left[x_0, x_1, \ldots, x_{n-1}\right]}{x_n-x_0}
+```
+"""
+
+# ╔═╡ 3d5e1274-386b-4511-8353-0188b2b65eb0
+begin
+	function newton_devided_diff(x,y)
+		n =length(x)
+		F = Matrix{Real}(undef,n,n)
+		F[:,1]=y
+		for col in 2:n
+			for row in col:n
+				F[row,col]=(F[row,col-1]-F[row-1,col-1]) /(x[row]-x[row-col+1])
+			end
+		end
+		diag(F)
+	end
+	function NDDP(xs,ys)
+		F = newton_devided_diff(xs,ys)
+		n = length(xs)
+		return x -> begin
+			F[1]+sum(F[i]*reduce(*,map(u->(x-u),xs[1:i-1])) for i in 2:n)
+		end
+	end
+end
+
+# ╔═╡ 5d5adcae-2ad4-44b7-af71-a8ee276df8a3
+let
+	xs = [1.0;1.3;1.6;1.9;2.2]
+	ys=[0.7651977;0.6200860;0.4554022;0.2818186;0.1103623]
+	# F = newton_devided_diff(xs,ys)
+	# P1(x) = NDDP(xs,ys)(x) |> expand
+	# P2(x) = LagrangeP(xs,ys)(x) |> expand
+	# Dict(
+	# 	:newton_devided_diff => P1(x),
+	# 	:lagrange => P2(x)
+	# )
+	# expand(P(x))
+	# P(1.5)
+end
+
+# ╔═╡ c3fb95a4-c9c0-4fc6-85d4-f6cf8a8258e4
+md"# 3.5 Cubic Spline Interpolation "
+
+# ╔═╡ 6a1d699c-fc16-472d-8395-a486890a089d
+
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 begin
@@ -1737,6 +1847,35 @@ $(eth())
 cm"""
 $(ex(3))
 In Example 2, we found the second Lagrange polynomial for ``f(x)=1 / x`` on [2, 4] using the nodes ``x_0=2, x_1=2.75``, and ``x_2=4``. Determine the error form for this polynomial and the maximum error when the polynomial is used to approximate ``f(x)`` for ``x \in[2,4]``.
+"""
+
+# ╔═╡ ea5cb02b-49b4-4edf-89ab-d2fd6155e2a2
+cm"""
+$(bbl("",""))
+So, ``P_n(x)`` can be rewritten in a form called __Newton's DividedDifference__:
+```math
+P_n(x)=f\left[x_0\right]+\sum_{k=1}^n f\left[x_0, x_1, \ldots, x_k\right]\left(x-x_0\right) \cdots\left(x-x_{k-1}\right)
+```
+
+The value of ``f\left[x_0, x_1, \ldots, x_k\right]`` is independent of the order of the numbers ``x_0, x_1, \ldots, x_k``,
+$(ebl())
+"""
+
+# ╔═╡ c04f7b8a-f3ad-49d7-9610-48c5a7305649
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/36fy60w6547qrw1cu5mqu/algo3.2.png?rlkey=zyws01vns88ecijq3fww9cu5f&raw=1",700))
+"""
+
+# ╔═╡ 611bfd31-5eab-41ee-b410-120739748a2a
+cm"""
+$(ex(1)) Complete the divided difference table for the data used in the following Table and construct the interpolating polynomial that uses all these data.
+| ``x`` | ``f(x)`` |
+| :--- | :---: |
+| 1.0 | 0.7651977 |
+| 1.3 | 0.6200860 |
+| 1.6 | 0.4554022 |
+| 1.9 | 0.2818186 |
+| 2.2 | 0.1103623 |
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -4342,7 +4481,7 @@ version = "1.4.1+1"
 # ╟─66b6ed61-d870-46d4-a5ad-cb6afec3a9dc
 # ╟─ffb5767a-24fe-411f-abaa-baac67eaaa3d
 # ╟─2cbceb55-e953-4035-a0d3-e4ec236038ab
-# ╟─e4f0570b-0913-4f40-8a9b-8afb5ce7cbcd
+# ╠═e4f0570b-0913-4f40-8a9b-8afb5ce7cbcd
 # ╟─e57d0aa5-661f-43e8-885c-fd0aa1ab4cc6
 # ╟─8ce9ee8c-cca0-4ff5-a5a0-14991987feb0
 # ╟─e0ab7d80-17fc-478e-90a1-4f0922bfd728
@@ -4355,11 +4494,11 @@ version = "1.4.1+1"
 # ╟─fd29ef1c-d683-4a84-9595-04d0503d61ab
 # ╟─59929002-a335-4368-ab7c-a9ad080b3e78
 # ╟─70ad83fd-6df4-47b7-b5c0-0225c552d2e7
-# ╠═261a5231-b450-4945-ba85-28c737e5f46f
+# ╟─261a5231-b450-4945-ba85-28c737e5f46f
 # ╟─eec05ea5-cb8a-4979-a5c9-23eebd9afe3f
 # ╟─3e3022c4-06ad-4878-aa53-79e274dd40ec
 # ╟─cc596f86-0762-4878-9c32-aaf3981b6398
-# ╠═972e9347-72c0-4a53-b20a-205086a29f8b
+# ╟─972e9347-72c0-4a53-b20a-205086a29f8b
 # ╟─123cec56-4f6d-445d-9f53-629161a1d487
 # ╟─54e544f0-f1d0-467d-9a7a-b773053895df
 # ╟─26847ae3-9b6d-46b4-84e0-225177041c15
@@ -4370,6 +4509,17 @@ version = "1.4.1+1"
 # ╟─90297730-1473-4336-a884-d9441f3103a9
 # ╟─e680937f-1fc5-4416-9991-8153bf604d64
 # ╠═4f9efa7b-a9ea-4012-87e9-7d0cedb9be54
+# ╟─e8f8c6c1-184c-4edf-a0b7-ce13a6eaf2a0
+# ╟─cfbdaefd-bdcc-43e5-bdb4-87b37071c3c8
+# ╟─e3deaaf2-9c9b-4693-b903-4c3ecfda1cd7
+# ╟─e68ab39e-fdb5-4f39-8f18-c25f65e99c05
+# ╟─ea5cb02b-49b4-4edf-89ab-d2fd6155e2a2
+# ╟─c04f7b8a-f3ad-49d7-9610-48c5a7305649
+# ╟─3d5e1274-386b-4511-8353-0188b2b65eb0
+# ╟─611bfd31-5eab-41ee-b410-120739748a2a
+# ╟─5d5adcae-2ad4-44b7-af71-a8ee276df8a3
+# ╟─c3fb95a4-c9c0-4fc6-85d4-f6cf8a8258e4
+# ╠═6a1d699c-fc16-472d-8395-a486890a089d
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
