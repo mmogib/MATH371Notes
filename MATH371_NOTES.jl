@@ -1115,11 +1115,13 @@ is called the ``\boldsymbol{n}``th __Lagrange interpolating polynomial__.
 # ╔═╡ c101ca1b-13af-4d0b-806b-14481f81b13e
 let
 	f(x)=1/x;
-	xs = [2;2.75;3;4]
+	xs = [2;2.75;4]
 	ys=f.(xs)
 	P(x) = LagrangeP(xs,ys)(x) |> expand
-	P(3)
-	plot([f,P],framestyle=:zeros, xlimit=(2,4), label=[L"%$(f(x))" L"%$(P(x))"])
+	# expand(P(x))
+	
+	# P(4)
+	plot([f,P],framestyle=:zeros, xlimit=(1,10), label=[L"%$(f(x))" L"%$(P(x))"])
 end
 
 # ╔═╡ 4f9efa7b-a9ea-4012-87e9-7d0cedb9be54
@@ -1195,7 +1197,7 @@ f\left[x_i, x_{i+1}, \ldots, x_{i+k-1}, x_{i+k}\right]=\frac{f\left[x_{i+1}, x_{
 
 # ╔═╡ e68ab39e-fdb5-4f39-8f18-c25f65e99c05
 cm"""
-_ The process ends with the single nth divided difference,
+- The process ends with the single nth divided difference,
 ```math
 f\left[x_0, x_1, \ldots, x_n\right]=\frac{f\left[x_1, x_2, \ldots, x_n\right]-f\left[x_0, x_1, \ldots, x_{n-1}\right]}{x_n-x_0}
 ```
@@ -1213,6 +1215,7 @@ begin
 			end
 		end
 		diag(F)
+		# F
 	end
 	function NDDP(xs,ys)
 		F = newton_devided_diff(xs,ys)
@@ -1227,22 +1230,103 @@ end
 let
 	xs = [1.0;1.3;1.6;1.9;2.2]
 	ys=[0.7651977;0.6200860;0.4554022;0.2818186;0.1103623]
-	# F = newton_devided_diff(xs,ys)
-	# P1(x) = NDDP(xs,ys)(x) |> expand
-	# P2(x) = LagrangeP(xs,ys)(x) |> expand
-	# Dict(
-	# 	:newton_devided_diff => P1(x),
-	# 	:lagrange => P2(x)
-	# )
+	F = newton_devided_diff(xs,ys)
+	P1(x) = NDDP(xs,ys)(x) |> expand
+	P1(x)
+	P2(x) = LagrangeP(xs,ys)(x) |> expand
+	Dict(
+		:newton_devided_diff => P1(x),
+		:lagrange => P2(x)
+	)
 	# expand(P(x))
-	# P(1.5)
+	P1(1.5), P2(1.5)
 end
 
 # ╔═╡ c3fb95a4-c9c0-4fc6-85d4-f6cf8a8258e4
-md"# 3.5 Cubic Spline Interpolation "
+md"""
+# 3.5 Cubic Spline Interpolation 
+## Piecewise-Polynomial Approximation
+"""
 
-# ╔═╡ 6a1d699c-fc16-472d-8395-a486890a089d
+# ╔═╡ 61b0d517-94fc-4c6c-814b-8dfe51da6f1b
+md"## Cubic Splines"
 
+# ╔═╡ 5f768b64-c67e-4470-bf44-35bb539e1441
+begin
+	function natural_spline(x,y)
+		n = length(x)
+		h = map(i->x[i+1]-x[i],1:n-1)
+		a = copy(y);
+		α = map(2:n-1) do i  
+			(3/h[i])*(a[i+1]-a[i])-(3/h[i-1])*(a[i]-a[i-1]) 
+		end
+		l =  Vector{Real}(undef,n)
+		μ = Vector{Real}(undef,n-1)
+		z = copy(l)
+		c =Vector{Real}(undef,n)
+		b = copy(μ)
+		d = copy(μ)
+		l[1] = 0
+		μ[1]= 0
+		z[1]=0
+		l[n] = 1
+		z[n]=0
+		foreach(2:n-1) do  i
+			l[i] = 2(x[i+1]-x[i-1]) - h[i-1]*μ[i-1]
+			μ[i]  = h[i]/l[i]
+			z[i] = (α[i-1]-h[i-1]*z[i-1])/l[i]
+		end
+		
+		c[n] = 0;
+		foreach(n-1:-1:1) do i 
+			c[i] = z[i]-μ[i]*c[i+1]
+			b[i] = (a[i+1]-a[i])/h[i] - (h[i]*(c[i+1]+2c[i])/3)
+			d[i] = (c[i+1]-c[i])/(3h[i])
+		end
+		a,b,c,d
+	end
+end
+
+# ╔═╡ 22db7d76-b58c-40dd-978c-4f10f9252847
+let
+	xs = [1,2,3]
+	ys =[2,3,5]
+	# a,b,c,d = natural_spline(xs,ys)
+	# S(i) = Rational(a[i])+Rational(b[i])*(x-xs[i])+Rational(c[i])*(x-xs[i])^2 +Rational(d[i])*(x-xs[i])^3
+	# S(1), S(2)
+	
+end
+
+# ╔═╡ c4a80b01-c1e3-4196-8408-3054d0aca71e
+md"## Construction of a Cubic Spline"
+
+# ╔═╡ 25317d39-d107-41e4-a5e3-5ee11a0f8bd5
+cm"""
+As the preceding example demonstrates, 
+- a spline defined on an interval that is divided into ``n`` subintervals will require determining __``4 n``__ constants. To construct the cubic spline interpolant for a given function ``f``, the conditions in the definition are applied to the cubic polynomials
+```math
+S_j(x)=a_j+b_j\left(x-x_j\right)+c_j\left(x-x_j\right)^2+d_j\left(x-x_j\right)^3,
+\quad j \in \{0,1,2,\cdots,n-1\} 
+```
+"""
+
+# ╔═╡ d65a3a75-9e63-4087-912a-89e5e973a171
+md"## Natural Splines"
+
+# ╔═╡ e45f6f80-7a93-4064-97b0-d6e7269a1b68
+let
+	xs = 0:3
+	ys =exp.(xs)
+	# a,b,c,d = natural_spline(xs,ys)
+	# Si(i)=x-> a[i]+b[i]*(x-xs[i])+c[i]*(x-xs[i])^2 +d[i]*(x-xs[i])^3
+	# S(x) = begin 
+	# 	i = findfirst(j-> xs[j] <= x  <= xs[j+1],1:length(xs)-1)
+	# 	Si(i)(x)
+	# end
+	# plot(0:0.0001:3,[exp.(0:0.0001:3),S.(0:0.0001:3)], label=[L"f(x)=e^x" L"S(x)"])
+		
+	
+end
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 begin
@@ -1876,6 +1960,62 @@ $(ex(1)) Complete the divided difference table for the data used in the followin
 | 1.6 | 0.4554022 |
 | 1.9 | 0.2818186 |
 | 2.2 | 0.1103623 |
+"""
+
+# ╔═╡ 6a1d699c-fc16-472d-8395-a486890a089d
+cm"""
+The simplest piecewise-polynomial approximation is piecewise-linear interpolation, which consists of joining a set of data points
+```math
+\left\{\left(x_0, f\left(x_0\right)\right),\left(x_1, f\left(x_1\right)\right), \ldots,\left(x_n, f\left(x_n\right)\right)\right\}
+```
+by a series of straight lines, as shown in Figure 3.7.
+
+$(post_img("https://www.dropbox.com/scl/fi/4sj9035slysb342sxqc5b/fig3.7.png?rlkey=2lh6s4qdqqt1euqtnc6mr03mq&raw=1",700))
+"""
+
+# ╔═╡ a9aa5b73-bde3-4907-971d-696e26ada195
+cm"""$(post_img("https://www.dropbox.com/scl/fi/q9d37ya9w96xt43gg1vfi/fig3.8.png?rlkey=gw741eycxys78h6btem6pz72x&raw=1",700))"""
+
+# ╔═╡ 47e27a13-4e60-40db-9ed7-5433e0230bd3
+cm"""
+$(define("3.10"))
+
+Given a function ``f`` defined on ``[a, b]`` and a set of nodes ``a=x_0 < x_1 < \cdots < x_n=b``, a __cubic spline interpolant ``S`` for ``f``__ is a function that satisfies the following conditions:
+- (a) ``S(x)`` is a cubic polynomial, denoted ``S_j(x)``, on the subinterval ``\left[x_j, x_{j+1}\right]`` for each ``j=0,1, \ldots, n-1``;
+- (b) ``\quad S_j\left(x_j\right)=f\left(x_j\right)`` and ``S_j\left(x_{j+1}\right)=f\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-1``;
+- (c) ``S_{j+1}\left(x_{j+1}\right)=S_j\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``; (Implied by (b).)
+- (d) ``S_{j+1}^{\prime}\left(x_{j+1}\right)=S_j^{\prime}\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``;
+- (e) ``S_{j+1}^{\prime \prime}\left(x_{j+1}\right)=S_j^{\prime \prime}\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``;
+- (f) One of the following sets of boundary conditions is satisfied:
+	- (i) ``S^{\prime \prime}\left(x_0\right)=S^{\prime \prime}\left(x_n\right)=0``
+__(natural (or free) boundary)__;
+	- (ii) ``S^{\prime}\left(x_0\right)=f^{\prime}\left(x_0\right)`` and ``S^{\prime}\left(x_n\right)=f^{\prime}\left(x_n\right) \quad`` __(clamped boundary)__.
+	- (iii) ``S_0^{\prime\prime\prime}\left(x_1\right)=S_1^{\prime\prime\prime}\left(x_1\right)`` and ``S_{n-2}^{\prime\prime\prime}\left(x_{n-1}\right)=S_{n-1}^{\prime\prime\prime}\left(x_{n-1}\right)`` [or ``d_0=d_1`` and ``d_{n-2}=d_{n-1}``] __(Not-a-knot boundary)__.
+	
+"""
+
+# ╔═╡ 904f2372-36d8-47d5-9ac7-02ed91893fbc
+cm"""
+$(ex(1)) Construct a natural cubic spline that passes through the points ``(1,2),(2,3)``, and ``(3,5)``.
+"""
+
+# ╔═╡ 1fd86b21-8457-4c1f-961c-81a105bda5a3
+cm"""
+
+$(bth("3.11"))
+If ``f`` is defined at ``a=x_0 < x_1 < \cdots < x_n=b``, then ``f`` has a unique natural spline interpolant ``S`` on the nodes ``x_0, x_1, \ldots, x_n``; that is, a spline interpolant that satisfies the natural boundary conditions ``S^{\prime \prime}(a)=0`` and ``S^{\prime \prime}(b)=0``.
+$(eth())
+"""
+
+# ╔═╡ cc599ac5-7000-45c9-bb5a-4529df717046
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/3d3jjo4a5uh2spth11dlm/algo3.4.png?rlkey=jvgva2sh5ysyif9d5y3sy1ez0&raw=1",700))
+"""
+
+# ╔═╡ 2482f975-0c63-45ab-8f9a-a2752809b192
+cm"""
+$(ex(2))
+At the beginning of Chapter 3, we gave some Taylor polynomials to approximate the exponential ``f(x)=e^x``. Use the data points ``(0,1),(1, e),\left(2, e^2\right)``, and ``\left(3, e^3\right)`` to form a natural spline ``S(x)`` that approximates ``f(x)=e^x``.
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -4505,7 +4645,7 @@ version = "1.4.1+1"
 # ╟─1c83d413-5ab1-40c2-a533-25a312889f5c
 # ╟─06126200-59c5-4277-bb0c-f156ed90f51f
 # ╟─1c4799ce-911b-4980-80fc-7c56c2b2a6ff
-# ╟─c101ca1b-13af-4d0b-806b-14481f81b13e
+# ╠═c101ca1b-13af-4d0b-806b-14481f81b13e
 # ╟─90297730-1473-4336-a884-d9441f3103a9
 # ╟─e680937f-1fc5-4416-9991-8153bf604d64
 # ╠═4f9efa7b-a9ea-4012-87e9-7d0cedb9be54
@@ -4515,11 +4655,24 @@ version = "1.4.1+1"
 # ╟─e68ab39e-fdb5-4f39-8f18-c25f65e99c05
 # ╟─ea5cb02b-49b4-4edf-89ab-d2fd6155e2a2
 # ╟─c04f7b8a-f3ad-49d7-9610-48c5a7305649
-# ╟─3d5e1274-386b-4511-8353-0188b2b65eb0
+# ╠═3d5e1274-386b-4511-8353-0188b2b65eb0
 # ╟─611bfd31-5eab-41ee-b410-120739748a2a
-# ╟─5d5adcae-2ad4-44b7-af71-a8ee276df8a3
+# ╠═5d5adcae-2ad4-44b7-af71-a8ee276df8a3
 # ╟─c3fb95a4-c9c0-4fc6-85d4-f6cf8a8258e4
-# ╠═6a1d699c-fc16-472d-8395-a486890a089d
+# ╟─6a1d699c-fc16-472d-8395-a486890a089d
+# ╟─61b0d517-94fc-4c6c-814b-8dfe51da6f1b
+# ╟─5f768b64-c67e-4470-bf44-35bb539e1441
+# ╠═22db7d76-b58c-40dd-978c-4f10f9252847
+# ╟─a9aa5b73-bde3-4907-971d-696e26ada195
+# ╟─47e27a13-4e60-40db-9ed7-5433e0230bd3
+# ╟─904f2372-36d8-47d5-9ac7-02ed91893fbc
+# ╟─c4a80b01-c1e3-4196-8408-3054d0aca71e
+# ╟─25317d39-d107-41e4-a5e3-5ee11a0f8bd5
+# ╟─d65a3a75-9e63-4087-912a-89e5e973a171
+# ╟─1fd86b21-8457-4c1f-961c-81a105bda5a3
+# ╟─cc599ac5-7000-45c9-bb5a-4529df717046
+# ╟─2482f975-0c63-45ab-8f9a-a2752809b192
+# ╠═e45f6f80-7a93-4064-97b0-d6e7269a1b68
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
