@@ -16,18 +16,19 @@ end
 
 # ╔═╡ 65bdc140-2f92-11ef-1cbe-31065d820068
 begin
-	using CommonMark
-	using PlutoUI, PlutoExtras
-	using Plots, PlotThemes, LaTeXStrings
-	using Latexify
-	using HypertextLiteral
-	using Colors
-	using LinearAlgebra, Random,  Printf
-	using Symbolics
-	using QRCoders
-	using PrettyTables
-	using NonlinearSolve
-	# using ForwardDiff
+    using CommonMark
+    using PlutoUI, PlutoExtras
+    using Plots, PlotThemes, LaTeXStrings
+    using Latexify
+    using HypertextLiteral
+    using Colors
+    using LinearAlgebra, Random, Printf
+    using Symbolics
+    using QRCoders
+    using PrettyTables
+    using NonlinearSolve
+    # using ForwardDiff
+    using Integrals
 end
 
 # ╔═╡ 8ca0d1c5-166d-44f0-a17e-a6207c19459a
@@ -38,6 +39,7 @@ initialize_eqref()
 <style>
 @import url("https://mmogib.github.io/math102/custom.css");
 
+
 </style>
 """)
 
@@ -45,21 +47,21 @@ initialize_eqref()
 TableOfContents(title="MATH371")
 
 # ╔═╡ a279f75a-1d5a-4c0e-aae6-a168dda0a277
-begin 
-	
-	exportqrcode("https://mshahrani.website/teaching/","website.png"; width=1)
-	
+begin
+
+    exportqrcode("https://mshahrani.website/teaching/", "website.png"; width=1)
+
 end
 
 # ╔═╡ f581c560-afc6-460d-bb7e-48e13c1909d4
 begin
-	struct LocalImage
-		filename
-	end
+    struct LocalImage
+        filename
+    end
 
-	function Base.show(io::IO, ::MIME"image/png", w::LocalImage) 
-		write(io, read(w.filename))
-	end
+    function Base.show(io::IO, ::MIME"image/png", w::LocalImage)
+        write(io, read(w.filename))
+    end
 end
 
 # ╔═╡ 7d454fff-b638-4678-92f6-12d816b541b1
@@ -73,25 +75,26 @@ md"# 1.1: Review of Calculus: Taylor Polynomials and Series"
 
 # ╔═╡ cb26e993-d7c1-4e69-82f3-dcb20d1a4f37
 begin
-	@syms x::Real
-	Df = Differential(x)
-	D(f,x) = begin
-		expand_derivatives(Df(f(x)))
-	end
-	df(f,n,x0) = begin 
-		val = if n== 0
-		f(x)
-		else
-		reduce((acc,val)->begin 
-			D(t->substitute(acc,Dict(x=>t)),x)
-				end,2:n;init=D(f,x))
-		end
-		substitute(val,Dict(x=>x0))
-	end
+    @syms x::Real
+    Df = Differential(x)
+    D(f, x) = begin
+        expand_derivatives(Df(f(x)))
+    end
+    df(f, n, x0) = begin
+        val = if n == 0
+            f(x)
+        else
+            reduce((acc, val) -> begin
+                    D(t -> substitute(acc, Dict(x => t)), x)
+                end, 2:n; init=D(f, x))
+        end
+        substitute(val, Dict(x => x0))
+    end
 end
 
 # ╔═╡ b54035ab-2813-4cdc-887a-e11625ede4aa
-slider1h = @bind slider1 Slider(0:20, show_value=true);""
+slider1h = @bind slider1 Slider(0:20, show_value=true);
+"";
 
 # ╔═╡ 9e344be4-e96a-4b1f-9bac-52deb66c2658
 
@@ -168,11 +171,11 @@ cm"""
 
 # ╔═╡ 66fa9c4b-f2f3-44a1-8755-bc13ffccaba1
 let
-	x =split("27.56640625",'.')
-	# sum(float(Int(x[2][i])//(2^(i))) for i in 1:length(x[2]))
-	bs=bitstring(parse(Float64,"27.56640625"))
-	reinterpret(Float64,parse(Int,"0100000000111011100100001111111111111111111111111111111111111111",base=2))
-	
+    x = split("27.56640625", '.')
+    # sum(float(Int(x[2][i])//(2^(i))) for i in 1:length(x[2]))
+    bs = bitstring(parse(Float64, "27.56640625"))
+    reinterpret(Float64, parse(Int, "0100000000111011100100001111111111111111111111111111111111111111", base=2))
+
 end
 
 # ╔═╡ ff2fe07a-d35b-4d5b-bf95-f669fafc2132
@@ -206,7 +209,7 @@ y=0 . d_1 d_2 \ldots d_k d_{k+1} d_{k+2} \ldots \times 10^n
 """
 
 # ╔═╡ 7caaa18e-8ef8-4ae5-bd1c-e9fd0536b901
-π  
+π
 
 # ╔═╡ 43e1134e-020c-4fff-8164-050f0fcb9c38
 # let 
@@ -235,8 +238,8 @@ y=0 . d_1 d_2 \ldots d_k d_{k+1} d_{k+2} \ldots \times 10^n
 
 # ╔═╡ c8d040f0-3264-42c6-84c5-be8c633c36e4
 let
-	# (a)
-	aerror1=0.1e2
+    # (a)
+    aerror1 = 0.1e2
 end
 
 
@@ -271,170 +274,170 @@ md"## Finite-Digit Arithmetic"
 
 # ╔═╡ 712e7cbd-1280-4885-8adb-d83de2c26560
 begin
-	struct FloatK
-	    m::Int
-	    n::Int
-	    s::Int
-	    digits::Int
-	    rounding::String
-	end
-	Base.convert(::Type{Float64}, x::FloatK) = x.s * x.m * (10.0)^(x.n - x.digits)
-	Base.show(io::IO, ::MIME"text/plain", n::FloatK) = print(io, n.s == 1 ? "" : "-", " 0.", n.m, "× 10^", n.n)
-	Base.show(io::IO, ::MIME"application/x-tex", n::FloatK) = print(io, n.s == 1 ? "" : "-", "0.", n.m, "× 10^", n.n)
-	FloatK(n::Float64, dgts::Int, rounding::String) = begin
-	    s = n >= 0 ? 1 : -1
-	    fpart, ipart = modf(n)
-	    ipart = abs(ipart)
-	    fpart = abs(fpart)
-	    no_ipart = (ipart == 0.0)
-	    fparts = "$fpart"
-	    fpartstr, expntn = if 'e' in fparts
-	        fe = findfirst('e', fparts)
-	        np = fparts[1:1] * fparts[3:fe-1]
-	        nex = parse(Int, fparts[fe+1:end]) + 1
-	        fraction_str, fraction_exp = if no_ipart
-	            repeat('0', abs(nex)) * np, nex
-	        else
-	            np, length("$(Int(ipart))")
-	        end
-	        fraction_str, fraction_exp
-	    else
-	        np = fparts[3:end]
-	        nex = findfirst(x -> x != '0', np)
-	        fraction_str, fraction_exp = if no_ipart
-	            np[nex:end], -nex + 1
-	        else
-	            np, length("$(Int(ipart))")
-	        end
-	        fraction_str, fraction_exp
-	    end
-	    fpartstr = fpartstr * repeat('0', 5 * dgts)
-	    iparttstr = parse(Int, split("$ipart", ".")[1])
-	    glued = no_ipart ? fpartstr : "$iparttstr" * fpartstr
-	
-	
-	    nstr = if rounding == "chop"
-	        glued[1:dgts]
-	    else
-	        glued_rounded = replace("$(round(parse(Int, glued[2:dgts+3]) * 10.0^(-dgts - 2), digits=dgts))", '.' => "") * repeat('0', 2 * dgts)
-	        last_digit = parse(Int, glued_rounded[dgts+1])
-	        correction = last_digit >= 5 ? 1 : 0
-	        temp = "$(parse(Int, glued[1:dgts]) + correction))"
-	        temp[1:dgts]
-	    end
-	
-	    m = parse(Int, nstr)
-	    FloatK(m, expntn, s, dgts, rounding)
-	end
-	FloatK(x::FloatK) = FloatK(x.m, x.n, x.s, x.digits, x.rounding)
-	FloatK(x::FloatK, rounding::String) = FloatK(x.m, x.n, x.s, x.digits, rounding)
-	FloatK(x::FloatK, digits::Int, rounding::String) = FloatK(x.m, x.n, x.s, digits, rounding)
-	FloatK(n::Float64, dgts::Int) = FloatK(n, dgts, "chop")
-	FloatK(n::Float64, rounding::String) = FloatK(n, 5, rounding)
-	FloatK(n::Float64) = FloatK(n, 5, "chop")
-	
-	Base.:+(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) + convert(Float64, b), a.digits, a.rounding)
-	Base.:+(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a) + b, a.digits, a.rounding)
-	Base.:+(b::T where {T<:Real}, a::FloatK) = FloatK(a, b)
-	
-	Base.:-(a::FloatK) = FloatK(-convert(Float64, a))
-	Base.:-(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) - convert(Float64, b), a.digits, a.rounding)
-	Base.:-(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a) - b, a.digits, a.rounding)
-	Base.:-(b::T where {T<:Real}, a::FloatK) = FloatK(b - convert(Float64, a), a.digits, a.rounding)
-	
-	Base.:*(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) * convert(Float64, b), a.digits, a.rounding)
-	Base.:*(a::T where {T<:Real}, b::FloatK) = FloatK(a * convert(Float64, b), b.digits, b.rounding)
-	Base.:*(a::FloatK, b::T where {T<:Real}) = FloatK(b, a)
-	
-	Base.:^(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a)^b, a.digits, a.rounding)
-	Base.:sqrt(a::FloatK) = FloatK(sqrt(convert(Float64, a)), a.digits, a.rounding)
-	Base.:÷(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) / convert(Float64, b), a.digits, a.rounding)
-	Base.:÷(a::T where {T<:Real}, b::FloatK) = FloatK(a / convert(Float64, b), b.digits, b.rounding)
-	Base.:÷(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, b) / a, a.digits, a.rounding)
-	
-	Base.:/(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) / convert(Float64, b), a.digits, a.rounding)
-	Base.:/(a::T where {T<:Real}, b::FloatK) = FloatK(a / convert(Float64, b), b.digits, b.rounding)
-	Base.:/(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, b) / a, a.digits, a.rounding)
+    struct FloatK
+        m::Int
+        n::Int
+        s::Int
+        digits::Int
+        rounding::String
+    end
+    Base.convert(::Type{Float64}, x::FloatK) = x.s * x.m * (10.0)^(x.n - x.digits)
+    Base.show(io::IO, ::MIME"text/plain", n::FloatK) = print(io, n.s == 1 ? "" : "-", " 0.", n.m, "× 10^", n.n)
+    Base.show(io::IO, ::MIME"application/x-tex", n::FloatK) = print(io, n.s == 1 ? "" : "-", "0.", n.m, "× 10^", n.n)
+    FloatK(n::Float64, dgts::Int, rounding::String) = begin
+        s = n >= 0 ? 1 : -1
+        fpart, ipart = modf(n)
+        ipart = abs(ipart)
+        fpart = abs(fpart)
+        no_ipart = (ipart == 0.0)
+        fparts = "$fpart"
+        fpartstr, expntn = if 'e' in fparts
+            fe = findfirst('e', fparts)
+            np = fparts[1:1] * fparts[3:fe-1]
+            nex = parse(Int, fparts[fe+1:end]) + 1
+            fraction_str, fraction_exp = if no_ipart
+                repeat('0', abs(nex)) * np, nex
+            else
+                np, length("$(Int(ipart))")
+            end
+            fraction_str, fraction_exp
+        else
+            np = fparts[3:end]
+            nex = findfirst(x -> x != '0', np)
+            fraction_str, fraction_exp = if no_ipart
+                np[nex:end], -nex + 1
+            else
+                np, length("$(Int(ipart))")
+            end
+            fraction_str, fraction_exp
+        end
+        fpartstr = fpartstr * repeat('0', 5 * dgts)
+        iparttstr = parse(Int, split("$ipart", ".")[1])
+        glued = no_ipart ? fpartstr : "$iparttstr" * fpartstr
 
-	function createFiniteDigitSystem(; digits::Int=5, truncation::String="chop")
-	    fl(x) = FloatK(x, digits, truncation)
-	    ⊕(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) + FloatK(b, digits, truncation), digits, truncation)
-	    ⊖(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) - FloatK(b, digits, truncation), digits, truncation)
-	    ⊗(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) * FloatK(b, digits, truncation), digits, truncation)
-	    ⨸(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) ÷ FloatK(b, digits, truncation), digits, truncation)
-	    fl, ⊕, ⊖, ⊗, ⨸
-	end
 
-	function re(p::T where {T<:Number},ps::FloatK)
-		abs(convert(Float64,(p-ps))/p)
-	end
+        nstr = if rounding == "chop"
+            glued[1:dgts]
+        else
+            glued_rounded = replace("$(round(parse(Int, glued[2:dgts+3]) * 10.0^(-dgts - 2), digits=dgts))", '.' => "") * repeat('0', 2 * dgts)
+            last_digit = parse(Int, glued_rounded[dgts+1])
+            correction = last_digit >= 5 ? 1 : 0
+            temp = "$(parse(Int, glued[1:dgts]) + correction))"
+            temp[1:dgts]
+        end
+
+        m = parse(Int, nstr)
+        FloatK(m, expntn, s, dgts, rounding)
+    end
+    FloatK(x::FloatK) = FloatK(x.m, x.n, x.s, x.digits, x.rounding)
+    FloatK(x::FloatK, rounding::String) = FloatK(x.m, x.n, x.s, x.digits, rounding)
+    FloatK(x::FloatK, digits::Int, rounding::String) = FloatK(x.m, x.n, x.s, digits, rounding)
+    FloatK(n::Float64, dgts::Int) = FloatK(n, dgts, "chop")
+    FloatK(n::Float64, rounding::String) = FloatK(n, 5, rounding)
+    FloatK(n::Float64) = FloatK(n, 5, "chop")
+
+    Base.:+(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) + convert(Float64, b), a.digits, a.rounding)
+    Base.:+(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a) + b, a.digits, a.rounding)
+    Base.:+(b::T where {T<:Real}, a::FloatK) = FloatK(a, b)
+
+    Base.:-(a::FloatK) = FloatK(-convert(Float64, a))
+    Base.:-(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) - convert(Float64, b), a.digits, a.rounding)
+    Base.:-(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a) - b, a.digits, a.rounding)
+    Base.:-(b::T where {T<:Real}, a::FloatK) = FloatK(b - convert(Float64, a), a.digits, a.rounding)
+
+    Base.:*(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) * convert(Float64, b), a.digits, a.rounding)
+    Base.:*(a::T where {T<:Real}, b::FloatK) = FloatK(a * convert(Float64, b), b.digits, b.rounding)
+    Base.:*(a::FloatK, b::T where {T<:Real}) = FloatK(b, a)
+
+    Base.:^(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, a)^b, a.digits, a.rounding)
+    Base.:sqrt(a::FloatK) = FloatK(sqrt(convert(Float64, a)), a.digits, a.rounding)
+    Base.:÷(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) / convert(Float64, b), a.digits, a.rounding)
+    Base.:÷(a::T where {T<:Real}, b::FloatK) = FloatK(a / convert(Float64, b), b.digits, b.rounding)
+    Base.:÷(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, b) / a, a.digits, a.rounding)
+
+    Base.:/(a::FloatK, b::FloatK) = FloatK(convert(Float64, a) / convert(Float64, b), a.digits, a.rounding)
+    Base.:/(a::T where {T<:Real}, b::FloatK) = FloatK(a / convert(Float64, b), b.digits, b.rounding)
+    Base.:/(a::FloatK, b::T where {T<:Real}) = FloatK(convert(Float64, b) / a, a.digits, a.rounding)
+
+    function createFiniteDigitSystem(; digits::Int=5, truncation::String="chop")
+        fl(x) = FloatK(x, digits, truncation)
+        ⊕(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) + FloatK(b, digits, truncation), digits, truncation)
+        ⊖(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) - FloatK(b, digits, truncation), digits, truncation)
+        ⊗(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) * FloatK(b, digits, truncation), digits, truncation)
+        ⨸(a::Float64, b::Float64) = FloatK(FloatK(a, digits, truncation) ÷ FloatK(b, digits, truncation), digits, truncation)
+        fl, ⊕, ⊖, ⊗, ⨸
+    end
+
+    function re(p::T where {T<:Number}, ps::FloatK)
+        abs(convert(Float64, (p - ps)) / p)
+    end
 end
 
 # ╔═╡ e223e89c-af0c-44ed-bb83-fd51124c7899
 let
-	f(x)=cos(x)
-	P2(x)=1-0.5*x^2
-	x=3
-	f(x),P2(x)
+    f(x) = cos(x)
+    P2(x) = 1 - 0.5 * x^2
+    x = 3
+    f(x), P2(x)
 end
 
 # ╔═╡ ee13d4c2-edce-4d7c-8ace-103aab1f7ba0
 let
-	f(x) = cos(x)
-	x0=0
-	# slider1
-	
-	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
-	Pn = P(slider1)(x0) 
-	Pn	
-	
+    f(x) = cos(x)
+    x0 = 0
+    # slider1
+
+    P(n) = x0 -> sum(((x - x0)^i) * df(f, i, x0) / factorial(i) for i in 0:n)
+    Pn = P(slider1)(x0)
+    Pn
+
 end
 
 # ╔═╡ afbd4725-9c76-4453-a62a-ebac185655a2
 let
-	@syms ζ::Real
-	x0=0
-	n=slider1
-	f(x) = cos(x)
-	((x-x0)^(n+1))*df(f,n+1,ζ)/factorial(n+1)
+    @syms ζ::Real
+    x0 = 0
+    n = slider1
+    f(x) = cos(x)
+    ((x - x0)^(n + 1)) * df(f, n + 1, ζ) / factorial(n + 1)
 end
 
 # ╔═╡ 422a3ccc-1e62-407b-bd3e-0703f1a5a33d
 let
-	f(x)=cos(x)
-	x0=0
-	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
-	Pn = P(slider1)(x0) 
-	p1= plot(f;framestyle=:origin,label=L"f(x)",line=(1,:red))
-	labels = [L"P_{%$i}(x)" for i in 0:2:slider1]
-	plot(p1,[t->substitute(P(i)(x0),Dict(x=>t)) for i in 0:2:slider1];
-	label=reshape(labels,1,length(labels)),
-		xlimits=(-12,12),ylimits=(-1,1.5)
-	)
+    f(x) = cos(x)
+    x0 = 0
+    P(n) = x0 -> sum(((x - x0)^i) * df(f, i, x0) / factorial(i) for i in 0:n)
+    Pn = P(slider1)(x0)
+    p1 = plot(f; framestyle=:origin, label=L"f(x)", line=(1, :red))
+    labels = [L"P_{%$i}(x)" for i in 0:2:slider1]
+    plot(p1, [t -> substitute(P(i)(x0), Dict(x => t)) for i in 0:2:slider1];
+        label=reshape(labels, 1, length(labels)),
+        xlimits=(-12, 12), ylimits=(-1, 1.5)
+    )
 end
 
 # ╔═╡ 9b0cd30c-3162-4423-b32f-88c9a01c1cbd
 let
-	x1=0.01
-	n=slider1
-	f(x)=cos(x)
-	x0=0
-	P(n)=x0->sum(((x-x0)^i)*df(f,i,x0)/factorial(i) for i in 0:n)
-	vals = substitute(P(n)(x0),Dict(x=>x1)), f(x1)
-	Rn=((x-x0)^(n+1))/factorial(n+1) |> y -> substitute(y,Dict(x=>x1))
-	pntex = texeq("""
-	P_{$n}($x1) = $(vals[1])
-		""")
-	ftex=texeq("f($x1) = $(vals[2])") 
-	error=texeq("|\\textrm{Error}| \\leq $(Rn)")
-	md"""
-	$ftex
-	
-	$pntex
-	
-	$error
-	"""
-	
+    x1 = 0.01
+    n = slider1
+    f(x) = cos(x)
+    x0 = 0
+    P(n) = x0 -> sum(((x - x0)^i) * df(f, i, x0) / factorial(i) for i in 0:n)
+    vals = substitute(P(n)(x0), Dict(x => x1)), f(x1)
+    Rn = ((x - x0)^(n + 1)) / factorial(n + 1) |> y -> substitute(y, Dict(x => x1))
+    pntex = texeq("""
+    P_{$n}($x1) = $(vals[1])
+    	""")
+    ftex = texeq("f($x1) = $(vals[2])")
+    error = texeq("|\\textrm{Error}| \\leq $(Rn)")
+    md"""
+    $ftex
+
+    $pntex
+
+    $error
+    """
+
 end
 
 # ╔═╡ 98652338-3d5c-40f9-9220-c4f6e94f532c
@@ -442,72 +445,72 @@ sqrt(2)
 
 # ╔═╡ 2563dd79-3e17-4b81-82f3-43d6aea85b71
 begin
-	function bint64_to_dec(str::String)
-		if length(str)>64
-			error("The binary string is too long. It should be less than 64.")
-		end
-		if length(filter(x->x in ['0','1'],str))!=length(str)
-			error("The string is not valid.")
-		end
-		reduce((c,v)->v[2]=='0' ? c : c+2^(Float64(v[1]-1)),zip(length(str):-1:1,str);init=0)
-	end
-	function float64_to_dec(str::String)
-		if length(str)>64
-			error("The binary string is too long. It should be less than 64.")
-		end
-		if length(filter(x->x in ['0','1'],str))!=length(str)
-			error("The string is not valid.")
-		end
-		lstr =length(str) 
-		str =  lstr < 63 ? repeat('0',64-length(str))*str : str
-		# m,c,s= str[13:64], str[2:12], str[1]
-		# mv = reduce((c,v)->v[2]=='0' ? c : c+1/2^(BigFloat(v[1])),zip(1:length(m),m);init=0)
-		# cv = bint64_to_dec(c)
-		# sv = s=='0' ? 1 : -1
-		# # reduce((c,v)->v[2]=='0' ? c : c+2^(v[1]-1),zip(length(str):-1:1,str);init=0)
-		
-		# sv*2^(float(cv-1023))*(1+mv)
-		reinterpret(Float64,parse(Int,str,base=2))
-	end
+    function bint64_to_dec(str::String)
+        if length(str) > 64
+            error("The binary string is too long. It should be less than 64.")
+        end
+        if length(filter(x -> x in ['0', '1'], str)) != length(str)
+            error("The string is not valid.")
+        end
+        reduce((c, v) -> v[2] == '0' ? c : c + 2^(Float64(v[1] - 1)), zip(length(str):-1:1, str); init=0)
+    end
+    function float64_to_dec(str::String)
+        if length(str) > 64
+            error("The binary string is too long. It should be less than 64.")
+        end
+        if length(filter(x -> x in ['0', '1'], str)) != length(str)
+            error("The string is not valid.")
+        end
+        lstr = length(str)
+        str = lstr < 63 ? repeat('0', 64 - length(str)) * str : str
+        # m,c,s= str[13:64], str[2:12], str[1]
+        # mv = reduce((c,v)->v[2]=='0' ? c : c+1/2^(BigFloat(v[1])),zip(1:length(m),m);init=0)
+        # cv = bint64_to_dec(c)
+        # sv = s=='0' ? 1 : -1
+        # # reduce((c,v)->v[2]=='0' ? c : c+2^(v[1]-1),zip(length(str):-1:1,str);init=0)
+
+        # sv*2^(float(cv-1023))*(1+mv)
+        reinterpret(Float64, parse(Int, str, base=2))
+    end
 end
 
 # ╔═╡ 726a42a1-9746-4083-88f3-0661cd7396b5
-bint64_to_dec("11111111111")-1023
+bint64_to_dec("11111111111") - 1023
 
 # ╔═╡ 4d8df2cc-74b1-445e-9cab-cb58af4d56bb
 begin
-	strs = "0100000000111011100100010000000000000000000000000000000000000000"
-	float64_to_dec(strs)
-	# 1+sum([1/2 1/8 1/16 1/32 1/256 1/4096])
+    strs = "0100000000111011100100010000000000000000000000000000000000000000"
+    float64_to_dec(strs)
+    # 1+sum([1/2 1/8 1/16 1/32 1/256 1/4096])
 end
 
 
 # ╔═╡ 13ac7d12-0740-45df-831c-30670afd9f40
 let
-	a = Int(2)
-	bint64_to_dec("11111111111")
-	# parse(Int,bitstring(a);base=2)
-	# typeof(str)
+    a = Int(2)
+    bint64_to_dec("11111111111")
+    # parse(Int,bitstring(a);base=2)
+    # typeof(str)
 end
 
 # ╔═╡ 239e7eaa-b8da-47d4-b642-8415ef1e0683
-let 
-	binstr = "0100000000111011100100010000000000000000000000000000000000000000"
-	next_small="0100000000111011100100001111111111111111111111111111111111111111"
-	next_largest="0100000000111011100100010000000000000000000000000000000000000001"
-	pn = float64_to_dec(next_small)
-	n=float64_to_dec(binstr)
-	nn=float64_to_dec.(next_largest)
-	# 0.5(nn-n)
+let
+    binstr = "0100000000111011100100010000000000000000000000000000000000000000"
+    next_small = "0100000000111011100100001111111111111111111111111111111111111111"
+    next_largest = "0100000000111011100100010000000000000000000000000000000000000001"
+    pn = float64_to_dec(next_small)
+    n = float64_to_dec(binstr)
+    nn = float64_to_dec.(next_largest)
+    # 0.5(nn-n)
 end
 
 # ╔═╡ bb4ed82e-3b7e-4898-987f-9a9bac49c205
-let 	
-	smallest_number=String(repeat('0',64))
-	# smll_normalized =String(repeat('0',11)*repeat('0',52))
-	# bitstring(1-1023)
-	largest_number='0'*repeat('1',62)*'0'
-	float64_to_dec(largest_number)
+let
+    smallest_number = String(repeat('0', 64))
+    # smll_normalized =String(repeat('0',11)*repeat('0',52))
+    # bitstring(1-1023)
+    largest_number = '0' * repeat('1', 62) * '0'
+    float64_to_dec(largest_number)
 end
 
 # ╔═╡ 75bac38d-3c93-4cad-8302-6eb60e40038b
@@ -522,10 +525,10 @@ $(0.1+0.2)
 """
 
 # ╔═╡ d38e3f95-71c4-45dc-8ab9-0a216de91311
-let 
-strs = join(map(x->"$(x*5*10^(-4.0))",[0.1  0.5  100  1000  5000  9990 10000]),",")
-strs = L"%$strs"
-	
+let
+    strs = join(map(x -> "$(x*5*10^(-4.0))", [0.1 0.5 100 1000 5000 9990 10000]), ",")
+    strs = L"%$strs"
+
 end
 
 # ╔═╡ 4db7b813-d0da-4fc6-8447-aae94fbae670
@@ -543,66 +546,66 @@ x \ominus y=f l(f l(x)-f l(y)), & x \circledast y=f l(f l(x) \div f l(y)) .
 
 # ╔═╡ 9010d6bd-26d2-4211-ab12-ac58d77edbbc
 let
-	re(p::T,ps::S) where {T<:Number,S<:Number} = abs((p-ps)/p)
-	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=5, truncation="chop")
-	x = 5/7
-	y=1/3
-	p,ps=x+y,	x ⊕ y
-	re(p,convert(Float64,ps))
-	# x ⊖ y
-	# x ⊗ y
-	# x ⨸ y
+    re(p::T, ps::S) where {T<:Number,S<:Number} = abs((p - ps) / p)
+    fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=5, truncation="chop")
+    x = 5 / 7
+    y = 1 / 3
+    p, ps = x + y, x ⊕ y
+    re(p, convert(Float64, ps))
+    # x ⊖ y
+    # x ⊗ y
+    # x ⨸ y
 end
 
 # ╔═╡ b50497e4-e0f9-4da6-bba3-48628cee0173
 let
-	re(p::T,ps::S) where {T<:Number,S<:Number} = abs((p-ps)/p)
-	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=5, truncation="chop")
-	x=5/7
-	y=1/3
-	u=0.714251
-	v=98765.9
-	w=0.111111e-4
-	p1 = 0.0003
-	p2 = p1 ⊗ v
+    re(p::T, ps::S) where {T<:Number,S<:Number} = abs((p - ps) / p)
+    fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=5, truncation="chop")
+    x = 5 / 7
+    y = 1 / 3
+    u = 0.714251
+    v = 98765.9
+    w = 0.111111e-4
+    p1 = 0.0003
+    p2 = p1 ⊗ v
 end
 
 # ╔═╡ 379608bf-906d-45db-9cab-018a50fcbd07
 let
-	f(x)=x^2 +62.10x+1
-	x1(a,b,c) =((-b+sqrt(b^2-4*a*c))/2a)
-	x2(a,b,c) =((-b-sqrt(b^2-4*a*c))/2a)
-	a,b,c =1, 62.10, 1
-	x1(a,b,c)
-	x2(a,b,c)
-	aa=cc=1
-	ba=62.10
-	ab2= 0.3856e4
-	# ab2= ba^2
-	a4ac = 4
-	asqr=0.6206e2
-	# asqr=sqrt(ab2-a4ac)
-	anum1=-0.0400
-	ax1=anum1/2.0
-	anum2=-0.1242e3
-	ax2=anum2/2.0
-	
-	
+    f(x) = x^2 + 62.10x + 1
+    x1(a, b, c) = ((-b + sqrt(b^2 - 4 * a * c)) / 2a)
+    x2(a, b, c) = ((-b - sqrt(b^2 - 4 * a * c)) / 2a)
+    a, b, c = 1, 62.10, 1
+    x1(a, b, c)
+    x2(a, b, c)
+    aa = cc = 1
+    ba = 62.10
+    ab2 = 0.3856e4
+    # ab2= ba^2
+    a4ac = 4
+    asqr = 0.6206e2
+    # asqr=sqrt(ab2-a4ac)
+    anum1 = -0.0400
+    ax1 = anum1 / 2.0
+    anum2 = -0.1242e3
+    ax2 = anum2 / 2.0
+
+
 end
 
 # ╔═╡ 1922d625-ba5e-4ea2-b050-a3c64077c742
 let
-	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(digits=5, truncation="round")
-	f(x)=x^2 +62.10x+1
-	x1(a,b,c) =((-b+sqrt(b^2-4*a*c))/2a)
-	x1f(a,b,c) =((-fl(b)+fl(sqrt(fl(fl(fl(b)^2)-fl(4*fl(a)*fl(c))))))/fl(2a))
-	x2(a,b,c) =((-b-sqrt(b^2-4*a*c))/2a)
-	x2f(a,b,c) =((-fl(b)-fl(sqrt(fl(fl(fl(b)^2)-fl(4*fl(a)*fl(c))))))/fl(2a))
-	a,b,c=1.0,62.10,1.0
-	x1(a,b,c)
-	x2f(a,b,c)
-	# x2(a,b,c)
-	# x2(fl(a),fl(b),fl(c))
+    fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(digits=5, truncation="round")
+    f(x) = x^2 + 62.10x + 1
+    x1(a, b, c) = ((-b + sqrt(b^2 - 4 * a * c)) / 2a)
+    x1f(a, b, c) = ((-fl(b) + fl(sqrt(fl(fl(fl(b)^2) - fl(4 * fl(a) * fl(c)))))) / fl(2a))
+    x2(a, b, c) = ((-b - sqrt(b^2 - 4 * a * c)) / 2a)
+    x2f(a, b, c) = ((-fl(b) - fl(sqrt(fl(fl(fl(b)^2) - fl(4 * fl(a) * fl(c)))))) / fl(2a))
+    a, b, c = 1.0, 62.10, 1.0
+    x1(a, b, c)
+    x2f(a, b, c)
+    # x2(a,b,c)
+    # x2(fl(a),fl(b),fl(c))
 end
 
 # ╔═╡ 5ed7d51c-b5fa-4953-b2b4-c2040edced33
@@ -610,15 +613,15 @@ md"## Nested Arithmetic"
 
 # ╔═╡ 987b5101-f2d6-4d03-98de-595bf6710d96
 let
-	fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=3, truncation="chop")
-	f(x)=x^3-6.1*x^2+3.2*x+1.5
-	fn(x)=x*(x*(x-6.1)+3.2)+1.5
-	x=4.71
-	y=f(x)
-	ys = f(fl(x))
-	z = fn(x)
-	zs = fn(fl(x))
-	# fl(x^2,3,"round")
+    fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=3, truncation="chop")
+    f(x) = x^3 - 6.1 * x^2 + 3.2 * x + 1.5
+    fn(x) = x * (x * (x - 6.1) + 3.2) + 1.5
+    x = 4.71
+    y = f(x)
+    ys = f(fl(x))
+    z = fn(x)
+    zs = fn(fl(x))
+    # fl(x^2,3,"round")
 end
 
 # ╔═╡ a7cc3418-4607-4e03-ab87-bab26530cc53
@@ -665,26 +668,26 @@ __Error grows linearly__
 md"## Rates of Convergence"
 
 # ╔═╡ f50aff72-d978-4c2a-8683-8127a14a4ea9
-let 
-	@syms h::Real ζ::Real
-	P(n)=sum(iseven(i) ? (-1)^i*h^(i)/(factorial(i)) : 0 for i in 0:n) + (iseven(n) ? sin(ζ)*h^(n+1)/factorial(n+1) : cos(ζ)*h^(n+1)/factorial(n+1))
-	p3 = P(3)
-	
+let
+    @syms h::Real ζ::Real
+    P(n) = sum(iseven(i) ? (-1)^i * h^(i) / (factorial(i)) : 0 for i in 0:n) + (iseven(n) ? sin(ζ) * h^(n + 1) / factorial(n + 1) : cos(ζ) * h^(n + 1) / factorial(n + 1))
+    p3 = P(3)
+
 end
 
 # ╔═╡ 4dd54f9d-eb3f-49b4-9d56-41c5397ba001
 md"# 2.1 The Bisection Method"
 
 # ╔═╡ ee859bf9-4d20-46f5-9616-c932962cdbe2
-function solveit(g,u0)
-	f(u,p) = g(u)
-	problem = NonlinearProblem(f,u0)
-	sol = solve(problem)
-	if sol.retcode==ReturnCode.Success
-		sol.u, sol.stats,sol.alg
-	else
-		nothing
-	end
+function solveit(g, u0)
+    f(u, p) = g(u)
+    problem = NonlinearProblem(f, u0)
+    sol = solve(problem)
+    if sol.retcode == ReturnCode.Success
+        sol.u, sol.stats, sol.alg
+    else
+        nothing
+    end
 end
 
 # ╔═╡ 7d947cce-355f-4168-a76d-df5929d03be5
@@ -714,110 +717,110 @@ To find a solution to `` f(x) = 0 `` given the continuous function `` f `` on th
 
 # ╔═╡ 9e6ed715-6bf8-4e60-b77e-f4f8e2118f02
 begin
-	function bisect(f,a,b,TOL,N0)
-		i=1
-		FA=f(a)
-		T=Matrix{Number}(undef,N0,5)
-		while i<=N0
-			p = a+(b-a)/2
-			FP=f(p)
-			T[i,:]=vcat(i,a,b,p,FP)
-			if FP==0 || ((b-a)/2)<TOL
-				TT = T[1:i,:]
-				return p,TT
-			end
-			i=i+1
-			if FA*FP>0
-				a = p
-				FA=FP
-			else
-				b=p
-			end
-		end
-		@error("Maximum number of iterations reached")
-	end
+    function bisect(f, a, b, TOL, N0)
+        i = 1
+        FA = f(a)
+        T = Matrix{Number}(undef, N0, 5)
+        while i <= N0
+            p = a + (b - a) / 2
+            FP = f(p)
+            T[i, :] = vcat(i, a, b, p, FP)
+            if FP == 0 || ((b - a) / 2) < TOL
+                TT = T[1:i, :]
+                return p, TT
+            end
+            i = i + 1
+            if FA * FP > 0
+                a = p
+                FA = FP
+            else
+                b = p
+            end
+        end
+        @error("Maximum number of iterations reached")
+    end
 end
 
 # ╔═╡ 3b64007d-762c-4bc5-8751-81ccb69ef376
 let
-	f(x)=x^2*(x+4)-10
-	# f(1),f(2)
-	result = bisect(f,1,2,1e-12,50)
-	p,T = result
-	# pretty_table
-	pretty_table(HTML,T[1:13,:], header=["n","an", "bn", "pn", "f(pn)"])
-	# f(p)
-	# p
-	# u, = solveit(f,2)
-	# u
-	
+    f(x) = x^2 * (x + 4) - 10
+    # f(1),f(2)
+    result = bisect(f, 1, 2, 1e-12, 50)
+    p, T = result
+    # pretty_table
+    pretty_table(HTML, T[1:13, :], header=["n", "an", "bn", "pn", "f(pn)"])
+    # f(p)
+    # p
+    # u, = solveit(f,2)
+    # u
+
 end
 
 # ╔═╡ 505497ed-7060-48fe-ba2d-69a31413c267
 md"# 2.2 Fixed-Point Iteration"
 
 # ╔═╡ 1b28028a-92df-4d7a-942f-11ab9f4d06a7
-begin 
-	function fixed_point(g,x0,ϵ;maxiters=50)
-		n = maxiters
-		# r(n,x0)=reduce((c,_)->abs(c-g(c)) <ϵ ? c : g(c),1:n,init=x0)
-		xs = Vector{Float64}(undef,n)
-		xs[1]=x0
-		# fixit(x)=g(x)
-		i = 2
-		while i <= n
-			xs[i]= try 
-				g(xs[i-1])
-			catch
-				NaN
-			end
-			if abs(1-xs[i-1]/xs[i]) < ϵ || isnan(xs[i])
-				break
-			end
-			i += 1
-		end
-		# gx = [r(i,x0) for i in 1:n]
-		last_i = min(i,n)
-		xs = filter(x->!isnan(x),xs[1:last_i])
-		ys = xs[2:end]
-		xss = xs[1:end-1] 
-		xss,ys
-	end
-	function animate_fixedpoint(g,x0,ϵ;maxiters=50,limits=nothing)
-		xs,ys = fixed_point(g,x0,ϵ;maxiters=50)
+begin
+    function fixed_point(g, x0, ϵ; maxiters=50)
+        n = maxiters
+        # r(n,x0)=reduce((c,_)->abs(c-g(c)) <ϵ ? c : g(c),1:n,init=x0)
+        xs = Vector{Float64}(undef, n)
+        xs[1] = x0
+        # fixit(x)=g(x)
+        i = 2
+        while i <= n
+            xs[i] = try
+                g(xs[i-1])
+            catch
+                NaN
+            end
+            if abs(1 - xs[i-1] / xs[i]) < ϵ || isnan(xs[i])
+                break
+            end
+            i += 1
+        end
+        # gx = [r(i,x0) for i in 1:n]
+        last_i = min(i, n)
+        xs = filter(x -> !isnan(x), xs[1:last_i])
+        ys = xs[2:end]
+        xss = xs[1:end-1]
+        xss, ys
+    end
+    function animate_fixedpoint(g, x0, ϵ; maxiters=50, limits=nothing)
+        xs, ys = fixed_point(g, x0, ϵ; maxiters=50)
 
-		plt= if isnothing(limits) 
-				plot(g,label=L"g(x)", framestyle=:origin,legend=:topright)
-			else
-				plot(g,label=L"g(x)",framestyle=:origin,legend=:topright,xlimits=limits)
-			end
-		anim = @animate for j ∈ 1:(length(xs)-1)
-			scatter(plt,xs[1:j],repeat([0],j),label=L"x_{%$j}=%$(xs[j])")
-		end
-		# # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
-		# # gif(anim, "anim_fps15.gif", fps = 2)
-		anim
-	end
-	
+        plt = if isnothing(limits)
+            plot(g, label=L"g(x)", framestyle=:origin, legend=:topright)
+        else
+            plot(g, label=L"g(x)", framestyle=:origin, legend=:topright, xlimits=limits)
+        end
+        anim = @animate for j ∈ 1:(length(xs)-1)
+            scatter(plt, xs[1:j], repeat([0], j), label=L"x_{%$j}=%$(xs[j])")
+        end
+        # # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
+        # # gif(anim, "anim_fps15.gif", fps = 2)
+        anim
+    end
+
 end
 
 # ╔═╡ f35de386-da3a-4cbf-89ae-3049218531df
 let
-	# anim = animate_fixedpoint(x->x^2-2,1.1,0.001)
-	# gif(anim, "anim1_fps15.gif", fps = 2)
-	# g(x)=x^2-2;
-	# plot([g,x->x],framestyle=:origin, label=[L"y=x^2-2"  L"y=x"])
-	# scatter!([-1,2],g.([-1,2]), label="fixed points")
+    # anim = animate_fixedpoint(x->x^2-2,1.1,0.001)
+    # gif(anim, "anim1_fps15.gif", fps = 2)
+    # g(x)=x^2-2;
+    # plot([g,x->x],framestyle=:origin, label=[L"y=x^2-2"  L"y=x"])
+    # scatter!([-1,2],g.([-1,2]), label="fixed points")
 end
 
 # ╔═╡ 22cb99e8-a5e4-4a16-8670-1ef1ef6f7b39
 let
-	g(x)=(x^2-1)/3;
-	plot([g,x->x],framestyle=:origin, label=[L"y=%$(g(x))"  L"y=x"])
-	u1,=solveit(x->g(x)-x,-2)
-	u2,=solveit(x->g(x)-x,2)
+    g(x) = (x^2 - 1) / 3
+    plot([g, x -> x], framestyle=:origin, label=[L"y=%$(g(x))" L"y=x"])
+    u1, = solveit(x -> g(x) - x, -2)
+    u2, = solveit(x -> g(x) - x, 2)
 
-	scatter!([u1,u2],g.([u1,u2]), label="fixed points")
+    scatter!([u1, u2], g.([u1, u2]), label="fixed points")
 end
 
 # ╔═╡ 9ac51023-96ca-4304-a8b0-af36c3c8f60e
@@ -837,31 +840,31 @@ g_1(x)&=&x-x^3-4x^2+10\\
 
 # ╔═╡ 4ed1a6ca-0d21-4257-87db-f39fff0d208f
 let
-	p0=1.5
-	n = 30
-	ϵ = 1e-9
-	g1(x)=x-x^3-4x^2+10
-	g2(x)=sqrt((10/x)-4x)
-	g3(x)=(1/2.0)*sqrt(10-x^3)
-	g4(x)=sqrt(10/(4+x))
-	g5(x)=x-(x^3+4x^2-10)/(3x^2+8x)
-	xs1,ys1 = fixed_point(g1,p0,ϵ;maxiters=n)
-	xs2,ys2 = fixed_point(g2,p0,ϵ;maxiters=n)
-	xs3,ys3 = fixed_point(g3,p0,ϵ;maxiters=n)
-	xs4,ys4 = fixed_point(g4,p0,ϵ;maxiters=n)
-	xs5,ys5 = fixed_point(g5,p0,ϵ;maxiters=n)
-	
-	T = hcat(0:n,
-		vcat(xs1,repeat([" "],n+1-length(xs1))),
-		vcat(xs2,repeat([" "],n+1-length(xs2))),
-		vcat(xs3,repeat([" "],n+1-length(xs3))),
-		vcat(xs4,repeat([" "],n+1-length(xs4))),
-		vcat(xs5,repeat([" "],n+1-length(xs5))))
-	# T = hcat(reshape(repeat([" "],31),31,1))
-	# length(xs1)
-	pretty_table(HTML,T,header=vcat(:n, [Symbol("g$i") for i in 1:5]...))
-	# anim2 = animate_fixedpoint(g3,p0,ϵ;maxiters=n,limits=(0,2))
-	# gif(anim2, "anim2_fps15.gif", fps = 2)
+    p0 = 1.5
+    n = 30
+    ϵ = 1e-9
+    g1(x) = x - x^3 - 4x^2 + 10
+    g2(x) = sqrt((10 / x) - 4x)
+    g3(x) = (1 / 2.0) * sqrt(10 - x^3)
+    g4(x) = sqrt(10 / (4 + x))
+    g5(x) = x - (x^3 + 4x^2 - 10) / (3x^2 + 8x)
+    xs1, ys1 = fixed_point(g1, p0, ϵ; maxiters=n)
+    xs2, ys2 = fixed_point(g2, p0, ϵ; maxiters=n)
+    xs3, ys3 = fixed_point(g3, p0, ϵ; maxiters=n)
+    xs4, ys4 = fixed_point(g4, p0, ϵ; maxiters=n)
+    xs5, ys5 = fixed_point(g5, p0, ϵ; maxiters=n)
+
+    T = hcat(0:n,
+        vcat(xs1, repeat([" "], n + 1 - length(xs1))),
+        vcat(xs2, repeat([" "], n + 1 - length(xs2))),
+        vcat(xs3, repeat([" "], n + 1 - length(xs3))),
+        vcat(xs4, repeat([" "], n + 1 - length(xs4))),
+        vcat(xs5, repeat([" "], n + 1 - length(xs5))))
+    # T = hcat(reshape(repeat([" "],31),31,1))
+    # length(xs1)
+    pretty_table(HTML, T, header=vcat(:n, [Symbol("g$i") for i in 1:5]...))
+    # anim2 = animate_fixedpoint(g3,p0,ϵ;maxiters=n,limits=(0,2))
+    # gif(anim2, "anim2_fps15.gif", fps = 2)
 end
 
 # ╔═╡ 54b12ace-4743-49a5-9e43-8580ee43ca6a
@@ -883,49 +886,49 @@ __(Newton’s method and Secant method only)__
 
 # ╔═╡ e8756fef-22eb-48d9-b430-24b2af6dea4f
 begin
-	function newton_method(f, f_prime, x0; tol=1e-7, max_iter=1000)
-	    x = x0
-		T = Vector{Number}(undef,max_iter)
-		
-	    for i in 1:max_iter
-	        fx = f(x)
-	        fpx = f_prime(x)
-	    	T[i]=x    
-	        # Check if the derivative is zero to avoid division by zero
-	        if abs(fpx) < tol
-	           # println("Derivative too small; stopping iteration to avoid division by zero.")
-	            return x,T[1:i], :small_derivative
-	        end
-	        
-	        x_new = x - fx / fpx
-	        
-	        # Check for convergence
-	        if abs(x_new - x) < tol
-				T[i+1]=x_new
-	            return x_new,T[1:i+1],:converged
-	        end
-	        
-	        x = x_new
-	    end
-	    
-	    # println("Maximum number of iterations reached without convergence.")
-	    return x,T,:maxiters_reached
-	end
-	function animate_newton(g,gp,x0;tol=1e-7, max_iter=1000, limits=nothing)
-			_,T,_ = newton_method(g,gp,x0;tol=tol, max_iter=max_iter)
-			xs = T 
-			plt= if isnothing(limits) 
-				plot(g,label=L"g(x)", framestyle=:origin,legend=:topright)
-			else
-				plot(g,label=L"g(x)",framestyle=:origin,legend=:topright,xlimits=limits)
-			end
-			anim = @animate for j ∈ 1:length(xs)
-				scatter(plt,xs[1:j],repeat([0],j),label=L"x_{%$j}=%$(xs[j])")
-			end
-			# # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
-			# # gif(anim, "anim_fps15.gif", fps = 2)
-			anim
-	end
+    function newton_method(f, f_prime, x0; tol=1e-7, max_iter=1000)
+        x = x0
+        T = Vector{Number}(undef, max_iter)
+
+        for i in 1:max_iter
+            fx = f(x)
+            fpx = f_prime(x)
+            T[i] = x
+            # Check if the derivative is zero to avoid division by zero
+            if abs(fpx) < tol
+                # println("Derivative too small; stopping iteration to avoid division by zero.")
+                return x, T[1:i], :small_derivative
+            end
+
+            x_new = x - fx / fpx
+
+            # Check for convergence
+            if abs(x_new - x) < tol
+                T[i+1] = x_new
+                return x_new, T[1:i+1], :converged
+            end
+
+            x = x_new
+        end
+
+        # println("Maximum number of iterations reached without convergence.")
+        return x, T, :maxiters_reached
+    end
+    function animate_newton(g, gp, x0; tol=1e-7, max_iter=1000, limits=nothing)
+        _, T, _ = newton_method(g, gp, x0; tol=tol, max_iter=max_iter)
+        xs = T
+        plt = if isnothing(limits)
+            plot(g, label=L"g(x)", framestyle=:origin, legend=:topright)
+        else
+            plot(g, label=L"g(x)", framestyle=:origin, legend=:topright, xlimits=limits)
+        end
+        anim = @animate for j ∈ 1:length(xs)
+            scatter(plt, xs[1:j], repeat([0], j), label=L"x_{%$j}=%$(xs[j])")
+        end
+        # # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
+        # # gif(anim, "anim_fps15.gif", fps = 2)
+        anim
+    end
 end
 
 
@@ -949,23 +952,23 @@ or
 
 # ╔═╡ e4f0570b-0913-4f40-8a9b-8afb5ce7cbcd
 let
-	# x0=0
-	# f(x)=cos(x)-x
-	# fp(x)=-sin(x)-1
-	# xsf,ysf=fixed_point(x->cos(x),x0,1e-6;maxiters=1000)
-	# anim_fixed = animate_fixedpoint(x->cos(x),x0,1e-6;maxiters=1000)
-	# gif(anim_fixed,"anim_fixed_n1.gif",fps=2)
-	# x,xsn,flag = newton_method(f,fp,x0;tol=1e-6,max_iter=1000)
-	# anim_newton = animate_newton(f,fp,x0;tol=1e-6,max_iter=1000,limits=(0.5,1))
-	# gif(anim_newton,"anim_newton_n1.gif",fps=2)
-	# common_len=max(length(xsf),length(xsn))
-	# T = Matrix{Union{Missing,Number,String}}(missing,common_len,3)
-	# T[1:common_len,1]=collect(1:common_len)
-	# T[1:length(xsf),2]=xsf
-	# T[1:length(xsn),3]=xsn
-	# T[:,2] = map(x->ismissing(x) ?  " " : x,T[:,2])
-	# T[:,3] = map(x->ismissing(x) ?  " " : x,T[:,3])
-	# pretty_table(HTML,T;header=["n" ,"Fixed Point", "Newton"])
+    # x0=0
+    # f(x)=cos(x)-x
+    # fp(x)=-sin(x)-1
+    # xsf,ysf=fixed_point(x->cos(x),x0,1e-6;maxiters=1000)
+    # anim_fixed = animate_fixedpoint(x->cos(x),x0,1e-6;maxiters=1000)
+    # gif(anim_fixed,"anim_fixed_n1.gif",fps=2)
+    # x,xsn,flag = newton_method(f,fp,x0;tol=1e-6,max_iter=1000)
+    # anim_newton = animate_newton(f,fp,x0;tol=1e-6,max_iter=1000,limits=(0.5,1))
+    # gif(anim_newton,"anim_newton_n1.gif",fps=2)
+    # common_len=max(length(xsf),length(xsn))
+    # T = Matrix{Union{Missing,Number,String}}(missing,common_len,3)
+    # T[1:common_len,1]=collect(1:common_len)
+    # T[1:length(xsf),2]=xsf
+    # T[1:length(xsn),3]=xsn
+    # T[:,2] = map(x->ismissing(x) ?  " " : x,T[:,2])
+    # T[:,3] = map(x->ismissing(x) ?  " " : x,T[:,3])
+    # pretty_table(HTML,T;header=["n" ,"Fixed Point", "Newton"])
 end
 
 # ╔═╡ 8ce9ee8c-cca0-4ff5-a5a0-14991987feb0
@@ -973,58 +976,58 @@ md"## The Secant Method"
 
 # ╔═╡ e0ab7d80-17fc-478e-90a1-4f0922bfd728
 begin
-	function secant_method(f, p0, p1, TOL, N0)
-	    i = 1
-	    q0 = f(p0)
-	    q1 = f(p1)
-	    T = Matrix{Number}(undef,N0+1,3)  # Initialize matrix T with NaN values
-	    FLAG = 0  # Initialize FLAG as failure
-		T[1, :] = [0, p0, q0]
-		T[2, :] = [1, p1, q1]
-		while i <= N0
-	        p = p1 - q1 * (p1 - p0) / (q1 - q0)
-			fp = f(p)
-	        T[i+1, :] = [i, p, fp]
-	
-	        if abs(p - p1) < TOL
-	            TT = T[1:i+1, :]  # Return the matrix up to the current iteration
-	            FLAG = 1  # Set FLAG as success
-	            return p, TT, FLAG
-	        end
-	
-	        i += 1
-	        p0, q0 = p1, q1
-	        p1, q1 = p, fp
-	    end
-	
-	    TT = T  # Return the matrix up to the last iteration
-	    p = nothing  # Indicate no valid solution found
-	    return p, TT, FLAG
-	end
-	function animate_secant(g,x0,x1,tol, max_iter;limits=nothing)
-			_,T,_ = secant_method(g,x0,x1,tol, max_iter)
-			xs = T[:,2] 
-			
-			plt= if isnothing(limits) 
-				plot(g,label=L"g(x)", framestyle=:origin,legend=:topright)
-			else
-				plot(g,label=L"g(x)", framestyle=:origin,legend=:topright,xlimits=limits)
-			end
-			anim = @animate for j ∈ 1:length(xs)
-				scatter(plt,xs[1:j],repeat([0],j),label=L"x_{%$j}=%$(xs[j])")
-			end
-			# # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
-			# # gif(anim, "anim_fps15.gif", fps = 2)
-			anim
-	end
+    function secant_method(f, p0, p1, TOL, N0)
+        i = 1
+        q0 = f(p0)
+        q1 = f(p1)
+        T = Matrix{Number}(undef, N0 + 1, 3)  # Initialize matrix T with NaN values
+        FLAG = 0  # Initialize FLAG as failure
+        T[1, :] = [0, p0, q0]
+        T[2, :] = [1, p1, q1]
+        while i <= N0
+            p = p1 - q1 * (p1 - p0) / (q1 - q0)
+            fp = f(p)
+            T[i+1, :] = [i, p, fp]
+
+            if abs(p - p1) < TOL
+                TT = T[1:i+1, :]  # Return the matrix up to the current iteration
+                FLAG = 1  # Set FLAG as success
+                return p, TT, FLAG
+            end
+
+            i += 1
+            p0, q0 = p1, q1
+            p1, q1 = p, fp
+        end
+
+        TT = T  # Return the matrix up to the last iteration
+        p = nothing  # Indicate no valid solution found
+        return p, TT, FLAG
+    end
+    function animate_secant(g, x0, x1, tol, max_iter; limits=nothing)
+        _, T, _ = secant_method(g, x0, x1, tol, max_iter)
+        xs = T[:, 2]
+
+        plt = if isnothing(limits)
+            plot(g, label=L"g(x)", framestyle=:origin, legend=:topright)
+        else
+            plot(g, label=L"g(x)", framestyle=:origin, legend=:topright, xlimits=limits)
+        end
+        anim = @animate for j ∈ 1:length(xs)
+            scatter(plt, xs[1:j], repeat([0], j), label=L"x_{%$j}=%$(xs[j])")
+        end
+        # # annotation=[(2,5,L"x_{%$i}=%$(xs[i])",10)]
+        # # gif(anim, "anim_fps15.gif", fps = 2)
+        anim
+    end
 
 end
 
 # ╔═╡ f91c04c2-4e85-4709-a76e-639929d54abd
-let 
-	x,TT,flag=secant_method(x->cos(x)-x,0,1,1e-8,15)
-	sccess = [i==size(TT,1) ? flag==1 ? "Success" : "Fail" :  "" for i in 1:size(TT,1)]
-	pretty_table(HTML,hcat(TT,sccess),header=["n", "p_n", "f(p_n)","FLAG"])
+let
+    x, TT, flag = secant_method(x -> cos(x) - x, 0, 1, 1e-8, 15)
+    sccess = [i == size(TT, 1) ? flag == 1 ? "Success" : "Fail" : "" for i in 1:size(TT, 1)]
+    pretty_table(HTML, hcat(TT, sccess), header=["n", "p_n", "f(p_n)", "FLAG"])
 end
 
 # ╔═╡ 65193530-df0b-46f5-8653-5379a16ab779
@@ -1041,9 +1044,9 @@ md"## Lagrange Interpolating Polynomials"
 
 # ╔═╡ 261a5231-b450-4945-ba85-28c737e5f46f
 begin
-	L(y,i)=x -> prod(i==j ? 1 : (x-y[j])/(y[i]-y[j]) for j in 1:length(y))
-	LagrangeP(xs,ys) = x->sum(ys[i]*L(xs,i)(x) for i in 1:length(xs))
-	LagrangeR(xs,ndf) = (ζ,x) -> ndf(ζ)*prod((x-xs[i]) for i in 1:length(xs))/(factorial(length(xs)))
+    L(y, i) = x -> prod(i == j ? 1 : (x - y[j]) / (y[i] - y[j]) for j in 1:length(y))
+    LagrangeP(xs, ys) = x -> sum(ys[i] * L(xs, i)(x) for i in 1:length(xs))
+    LagrangeR(xs, ndf) = (ζ, x) -> ndf(ζ) * prod((x - xs[i]) for i in 1:length(xs)) / (factorial(length(xs)))
 end
 
 # ╔═╡ 3e3022c4-06ad-4878-aa53-79e274dd40ec
@@ -1062,13 +1065,13 @@ P(x)=L_0(x) f\left(x_0\right)+L_1(x) f\left(x_1\right)=\frac{x-x_1}{x_0-x_1} f\l
 
 # ╔═╡ 972e9347-72c0-4a53-b20a-205086a29f8b
 let
-	points = [(2,4), (5,1)]
-	xs = first.(points)
-	ys = last.(points)
-	P(x) = LagrangeP(xs,ys)(x)
-	expand(P(x))
-	plt=plot(P)
-	scatter(plt,xs,ys)
+    points = [(2, 4), (5, 1)]
+    xs = first.(points)
+    ys = last.(points)
+    P(x) = LagrangeP(xs, ys)(x)
+    expand(P(x))
+    plt = plot(P)
+    scatter(plt, xs, ys)
 end
 
 # ╔═╡ 123cec56-4f6d-445d-9f53-629161a1d487
@@ -1114,28 +1117,28 @@ is called the ``\boldsymbol{n}``th __Lagrange interpolating polynomial__.
 
 # ╔═╡ c101ca1b-13af-4d0b-806b-14481f81b13e
 let
-	f(x)=1/x;
-	xs = [2;2.75;4]
-	ys=f.(xs)
-	P(x) = LagrangeP(xs,ys)(x) |> expand
-	# expand(P(x))
-	
-	# P(4)
-	plot([f,P],framestyle=:zeros, xlimit=(1,10), label=[L"%$(f(x))" L"%$(P(x))"])
+    f(x) = 1 / x
+    xs = [2; 2.75; 4]
+    ys = f.(xs)
+    P(x) = LagrangeP(xs, ys)(x) |> expand
+    # expand(P(x))
+
+    # P(4)
+    plot([f, P], framestyle=:zeros, xlimit=(1, 10), label=[L"%$(f(x))" L"%$(P(x))"])
 end
 
 # ╔═╡ 4f9efa7b-a9ea-4012-87e9-7d0cedb9be54
 let
-	@syms ζ::Real
-	f(x)=1/x;
-	xs = [2;2.75;4]
-	ys=f.(xs)
-	P(x) = LagrangeP(xs,ys)(x) |> expand
-	ndf(x)=-6*x^(-4)
-	R(ζ) = LagrangeR(xs,ndf)(ζ,x)
-	R(ζ)
-	# P(3)
-	# plot([f,P],framestyle=:zeros, xlimit=(2,4), label=[L"%$(f(x))" L"%$(P(x))"])
+    @syms ζ::Real
+    f(x) = 1 / x
+    xs = [2; 2.75; 4]
+    ys = f.(xs)
+    P(x) = LagrangeP(xs, ys)(x) |> expand
+    ndf(x) = -6 * x^(-4)
+    R(ζ) = LagrangeR(xs, ndf)(ζ, x)
+    R(ζ)
+    # P(3)
+    # plot([f,P],framestyle=:zeros, xlimit=(2,4), label=[L"%$(f(x))" L"%$(P(x))"])
 end
 
 # ╔═╡ e8f8c6c1-184c-4edf-a0b7-ce13a6eaf2a0
@@ -1205,41 +1208,41 @@ f\left[x_0, x_1, \ldots, x_n\right]=\frac{f\left[x_1, x_2, \ldots, x_n\right]-f\
 
 # ╔═╡ 3d5e1274-386b-4511-8353-0188b2b65eb0
 begin
-	function newton_devided_diff(x,y)
-		n =length(x)
-		F = Matrix{Real}(undef,n,n)
-		F[:,1]=y
-		for col in 2:n
-			for row in col:n
-				F[row,col]=(F[row,col-1]-F[row-1,col-1]) /(x[row]-x[row-col+1])
-			end
-		end
-		diag(F)
-		# F
-	end
-	function NDDP(xs,ys)
-		F = newton_devided_diff(xs,ys)
-		n = length(xs)
-		return x -> begin
-			F[1]+sum(F[i]*reduce(*,map(u->(x-u),xs[1:i-1])) for i in 2:n)
-		end
-	end
+    function newton_devided_diff(x, y)
+        n = length(x)
+        F = Matrix{Real}(undef, n, n)
+        F[:, 1] = y
+        for col in 2:n
+            for row in col:n
+                F[row, col] = (F[row, col-1] - F[row-1, col-1]) / (x[row] - x[row-col+1])
+            end
+        end
+        diag(F)
+        # F
+    end
+    function NDDP(xs, ys)
+        F = newton_devided_diff(xs, ys)
+        n = length(xs)
+        return x -> begin
+            F[1] + sum(F[i] * reduce(*, map(u -> (x - u), xs[1:i-1])) for i in 2:n)
+        end
+    end
 end
 
 # ╔═╡ 5d5adcae-2ad4-44b7-af71-a8ee276df8a3
 let
-	xs = [1.0;1.3;1.6;1.9;2.2]
-	ys=[0.7651977;0.6200860;0.4554022;0.2818186;0.1103623]
-	F = newton_devided_diff(xs,ys)
-	P1(x) = NDDP(xs,ys)(x) |> expand
-	P1(x)
-	P2(x) = LagrangeP(xs,ys)(x) |> expand
-	Dict(
-		:newton_devided_diff => P1(x),
-		:lagrange => P2(x)
-	)
-	# expand(P(x))
-	P1(1.5), P2(1.5)
+    xs = [1.0; 1.3; 1.6; 1.9; 2.2]
+    ys = [0.7651977; 0.6200860; 0.4554022; 0.2818186; 0.1103623]
+    F = newton_devided_diff(xs, ys)
+    P1(x) = NDDP(xs, ys)(x) |> expand
+    P1(x)
+    P2(x) = LagrangeP(xs, ys)(x) |> expand
+    Dict(
+        :newton_devided_diff => P1(x),
+        :lagrange => P2(x)
+    )
+    # expand(P(x))
+    P1(1.5), P2(1.5)
 end
 
 # ╔═╡ c3fb95a4-c9c0-4fc6-85d4-f6cf8a8258e4
@@ -1253,48 +1256,38 @@ md"## Cubic Splines"
 
 # ╔═╡ 5f768b64-c67e-4470-bf44-35bb539e1441
 begin
-	function natural_spline(x,y)
-		n = length(x)
-		h = map(i->x[i+1]-x[i],1:n-1)
-		a = copy(y);
-		α = map(2:n-1) do i  
-			(3/h[i])*(a[i+1]-a[i])-(3/h[i-1])*(a[i]-a[i-1]) 
-		end
-		l =  Vector{Real}(undef,n)
-		μ = Vector{Real}(undef,n-1)
-		z = copy(l)
-		c =Vector{Real}(undef,n)
-		b = copy(μ)
-		d = copy(μ)
-		l[1] = 0
-		μ[1]= 0
-		z[1]=0
-		l[n] = 1
-		z[n]=0
-		foreach(2:n-1) do  i
-			l[i] = 2(x[i+1]-x[i-1]) - h[i-1]*μ[i-1]
-			μ[i]  = h[i]/l[i]
-			z[i] = (α[i-1]-h[i-1]*z[i-1])/l[i]
-		end
-		
-		c[n] = 0;
-		foreach(n-1:-1:1) do i 
-			c[i] = z[i]-μ[i]*c[i+1]
-			b[i] = (a[i+1]-a[i])/h[i] - (h[i]*(c[i+1]+2c[i])/3)
-			d[i] = (c[i+1]-c[i])/(3h[i])
-		end
-		a,b,c,d
-	end
-end
+    function natural_spline(x, y)
+        n = length(x)
+        h = map(i -> x[i+1] - x[i], 1:n-1)
+        a = copy(y)
+        α = map(2:n-1) do i
+            (3 / h[i]) * (a[i+1] - a[i]) - (3 / h[i-1]) * (a[i] - a[i-1])
+        end
+        l = Vector{Real}(undef, n)
+        μ = Vector{Real}(undef, n - 1)
+        z = copy(l)
+        c = Vector{Real}(undef, n)
+        b = copy(μ)
+        d = copy(μ)
+        l[1] = 0
+        μ[1] = 0
+        z[1] = 0
+        l[n] = 1
+        z[n] = 0
+        foreach(2:n-1) do i
+            l[i] = 2(x[i+1] - x[i-1]) - h[i-1] * μ[i-1]
+            μ[i] = h[i] / l[i]
+            z[i] = (α[i-1] - h[i-1] * z[i-1]) / l[i]
+        end
 
-# ╔═╡ 22db7d76-b58c-40dd-978c-4f10f9252847
-let
-	xs = [1,2,3]
-	ys =[2,3,5]
-	# a,b,c,d = natural_spline(xs,ys)
-	# S(i) = Rational(a[i])+Rational(b[i])*(x-xs[i])+Rational(c[i])*(x-xs[i])^2 +Rational(d[i])*(x-xs[i])^3
-	# S(1), S(2)
-	
+        c[n] = 0
+        foreach(n-1:-1:1) do i
+            c[i] = z[i] - μ[i] * c[i+1]
+            b[i] = (a[i+1] - a[i]) / h[i] - (h[i] * (c[i+1] + 2c[i]) / 3)
+            d[i] = (c[i+1] - c[i]) / (3h[i])
+        end
+        a, b, c, d
+    end
 end
 
 # ╔═╡ c4a80b01-c1e3-4196-8408-3054d0aca71e
@@ -1313,137 +1306,394 @@ S_j(x)=a_j+b_j\left(x-x_j\right)+c_j\left(x-x_j\right)^2+d_j\left(x-x_j\right)^3
 # ╔═╡ d65a3a75-9e63-4087-912a-89e5e973a171
 md"## Natural Splines"
 
+# ╔═╡ bff8bd64-7a8c-4105-96b1-a3f8e8f0cd41
+cm"""
+- Natural Cubic Spline produces a linear system
+```math
+A x = b
+```
+where 
+```math
+A = \begin{bmatrix}
+1 & 0 & 0 & \cdots &\cdots & 0 & 0 \\
+h_0 & 2(h_0 + h_1) & h_1 & \cdots &\cdots & 0 & 0 \\
+0 & h_1 & 2(h_1 + h_2) & \cdots &\cdots & 0 & 0 \\
+\vdots & \vdots & \vdots & \ddots & \cdots &\vdots & \vdots \\
+0 & 0 & 0 & h_{n-1} & \cdots & 2(h_{n-2} + h_{n-1}) & h_{n-1} \\
+0 & 0 & 0 & \cdots &\cdots &  & 1 \\
+\end{bmatrix}
+```
+
+and the vectors ``x`` and ``b`` are defined as
+
+```math
+\mathbf{b}=\left[\begin{array}{c}0 \\ \frac{3}{h_1}\left(a_2-a_1\right)-\frac{3}{h_0}\left(a_1-a_0\right) \\ \vdots \\ \frac{3}{h_{n-1}}\left(a_n-a_{n-1}\right)-\frac{3}{h_{n-2}}\left(a_{n-1}-a_{n-2}\right) \\ 0\end{array}\right] \quad \text{ and} \quad \mathbf{x}=\left[\begin{array}{c}c_0 \\ c_1 \\ \vdots \\ c_n\end{array}\right]
+```
+"""
+
+# ╔═╡ c5f4f53e-6200-4a02-ada7-72e8ae60e38b
+cm"""
+- ``a_j = f(x_j)`` for all ``j=0,\cdots, n``
+- ``b_j=\displaystyle\frac{1}{h_j}\left(a_{j+1}-a_j\right)-\frac{h_j}{3}\left(2 c_j+c_{j+1}\right)`` for all ``j=0,\cdots, n-1``
+- ``d_j = \displaystyle \frac{c_{j+1}-c_j}{3h_j}`` for all ``j=0,\cdots, n-1``
+
+"""
+
+# ╔═╡ c2c69250-1f18-4c6d-b8b7-3de26ba0818a
+let
+    xs = [1, 2, 3]
+    ys = [2, 3, 5]
+    a, b, c, d = natural_spline(xs, ys)
+    Si(i) = x -> a[i] + b[i] * (x - xs[i]) + c[i] * (x - xs[i])^2 + d[i] * (x - xs[i])^3
+    S(x) = begin
+        i = findfirst(j -> xs[j] <= x <= xs[j+1], 1:length(xs)-1)
+        Si(i)(x)
+    end
+    Si(1)(x)
+
+    # A = [1 0 0;1 4 0;0 0 1]
+    # b = [0;3;0]
+    # c = A\b
+    # h = [1;1;1]
+    # a = ys
+    # n = length(xs)
+    # b = [(a[i+1]-a[i])/(h[i]) - h[i]*(c[i+1]+2c[i])/3 for i in 1:n-1]
+    # d = [(c[i+1]-c[i])/(3h[i]) for i in 1:n-1]
+    # X = [x;x]
+    # S = a[1:2] .+ b.*(X.-xs[1:2]) .+  c[1:2] .* (X.-xs[1:2]).^2 .+  d .* (X.-xs[1:2]).^3
+
+end
+
 # ╔═╡ e45f6f80-7a93-4064-97b0-d6e7269a1b68
 let
-	xs = 0:3
-	ys =exp.(xs)
-	# a,b,c,d = natural_spline(xs,ys)
-	# Si(i)=x-> a[i]+b[i]*(x-xs[i])+c[i]*(x-xs[i])^2 +d[i]*(x-xs[i])^3
-	# S(x) = begin 
-	# 	i = findfirst(j-> xs[j] <= x  <= xs[j+1],1:length(xs)-1)
-	# 	Si(i)(x)
-	# end
-	# plot(0:0.0001:3,[exp.(0:0.0001:3),S.(0:0.0001:3)], label=[L"f(x)=e^x" L"S(x)"])
-		
-	
+    xs = 0:3
+    ys = exp.(xs)
+    a, b, c, d = natural_spline(xs, ys)
+
+    Si(i) = x -> a[i] + b[i] * (x - xs[i]) + c[i] * (x - xs[i])^2 + d[i] * (x - xs[i])^3
+    S(x) = begin
+        i = findfirst(j -> xs[j] <= x <= xs[j+1], 1:length(xs)-1)
+        Si(i)(x)
+    end
+    plot(0:0.0001:3, [exp.(0:0.0001:3), S.(0:0.0001:3)], label=[L"f(x)=e^x" L"S(x)"])
+
+    a = copy(ys)
+    n = length(xs)
+    h = [xs[i+1]-xs[i] for i in 1:n-1]
+    Aii = map(i-> i in (1,n) ? 1 : 2*(h[i-1]+h[i]), 1:n)
+    Ait = map(i-> i==1 ? 0 : h[i], 1:n-1)
+    Aib = map(i-> i==(n-1) ? 0 : h[i], 1:n-1)
+    A = diagm(0=>Aii,1=>Ait,-1=>Aib)
+    ho3 = 3 ./ h
+    rhs = map(i-> i in (1,n) ? 0 : ho3[i]*(a[i+1]-a[i])-ho3[i-1]*(a[i]-a[i-1]),1:n)
+    c = A\rhs
+
+    b = [(a[i+1]-a[i])/(h[i]) - h[i]*(c[i+1]+2c[i])/3 for i in 1:n-1]
+    d = [(c[i+1]-c[i])/(3h[i]) for i in 1:n-1]
+    X = repeat([x],n-1)
+    S = a[1:n-1] .+ b.*(X.-xs[1:n-1]) .+  c[1:n-1] .* (X.-xs[1:n-1]).^2 .+  d .* (X.-xs[1:n-1]).^3
+end
+
+# ╔═╡ 3115c2f6-8574-4d09-af83-db8e09731d07
+L"""
+\int_0^3 e^ x dx = \left. e^x \right|_0^3 = e^3 - 1 = %$(exp(3)-1)
+"""
+
+# ╔═╡ 01b33b12-1dad-45e9-a191-8f9619b2fac5
+L"""
+\int_0^3 e^ x dx \approx \int_0^1 S_0(x) dx  +\int_1^2 S_1(x) dx+\int_2^3 S_2(x) dx
+"""
+
+# ╔═╡ b39bcd45-dfc3-4ddb-95e8-7272ba591682
+let
+    xs = 0:3
+    ys = exp.(xs)
+    a, b, c, d = natural_spline(xs, ys)
+    Si(i) = x -> a[i] + b[i] * (x - xs[i]) + c[i] * (x - xs[i])^2 + d[i] * (x - xs[i])^3
+    integratit(i, a, b) = solve(IntegralProblem((x, _) -> Si(i)(x), (a, b)), QuadGKJL()).u
+    L"""
+    \int_0^3 e^ x dx \approx %$(integratit(1,0,1))  +%$(+integratit(2,1,2))+%$(+integratit(3,2,3)) = %$(round((integratit(1,0,1)+integratit(2,1,2)+integratit(3,2,3)),digits=4))
+    """
+
+end
+
+# ╔═╡ eb60c5be-bad0-4c39-9842-3210dbaba8d3
+md"## Clamped Splines"
+
+# ╔═╡ 0c695eed-ebe3-4a26-9a32-7054bf1a51c3
+let
+    xs = [1; 2; 3]
+    ys = [2; 3; 5]
+    A = [
+        1 1 1 0 0 0
+        0 0 0 1 1 1
+        1 2 3 -1 0 0
+        0 1 3 0 -1 0
+        0 1 0 0 0 0
+        0 0 0 0 1 3
+    ]
+    b = [
+        1
+        2
+        0
+        0
+        0
+        0
+    ]
+    b0, c0, d0, b1, c1, d1 = A \ b
+    A2 = [
+        1 1 1 0 0 0
+        0 0 0 1 1 1
+        1 2 3 -1 0 0
+        0 1 3 0 -1 0
+        1 0 0 0 0 0
+        0 0 0 1 2 3
+    ]
+    b2 = [
+        1
+        2
+        0
+        0
+        2
+        1
+    ]
+    b01, c01, d01, b11, c11, d11 = A2 \ b2
+    # A2\b2
+    aN = [2; 3; 5]
+    bN = [b0; b1]
+    cN = [c0; c1]
+    dN = [d0; d1]
+    SiN(i) = x -> aN[i] + bN[i] * (x - xs[i]) + cN[i] * (x - xs[i])^2 + dN[i] * (x - xs[i])^3
+    S(x) = begin
+        i = findfirst(j -> xs[j] <= x <= xs[j+1], 1:length(xs)-1)
+        SiN(i)(x)
+    end
+    bC = [b01; b11]
+    cC = [c01; c11]
+    dC = [d01; d11]
+    SiC(i) = x -> aN[i] + bC[i] * (x - xs[i]) + cC[i] * (x - xs[i])^2 + dC[i] * (x - xs[i])^3
+    SC(x) = begin
+        i = findfirst(j -> xs[j] <= x <= xs[j+1], 1:length(xs)-1)
+        SiC(i)(x)
+    end
+    plot(1:0.01:3, [x -> S(x), x -> SC(x)])
+	map(f->f(x),SiC.(1:2))
+end
+
+# ╔═╡ 92244fae-7546-4608-83ad-6dfe7425243c
+let
+    A = [
+        1 1 1 0 0 0
+        0 0 0 1 1 1
+        1 2 3 -1 0 0
+        0 1 3 0 -1 0
+        1 0 0 0 0 0
+        0 0 0 1 2 3
+    ]
+    b = [
+        1
+        2
+        0
+        0
+        2
+        1
+    ]
+    b0, c0, d0, b1, c1, d1 = A \ b
+
+end
+
+# ╔═╡ 5fff03aa-5063-4bd0-bad1-6a3e568b25a1
+md"# 8.1 Discrete Least Squares Approximation"
+
+# ╔═╡ 4fde53d9-ae78-495e-9898-65af518d6b7f
+cm"""
+Consider the problem of estimating the values of a function at nontabulated points, given the experimental data in Table 
+| ``x_i`` | ``y_i`` |
+| ---: | ---: |
+| 1 | 1.3 |
+| 2 | 3.5 |
+| 3 | 4.2 |
+| 4 | 5.0 |
+| 5 | 7.0 |
+| 6 | 8.8 |
+| 7 | 10.1 |
+| 8 | 12.5 |
+| 9 | 13.0 |
+| 10 | 15.6 |
+
+"""
+
+# ╔═╡ 44e027ce-9f36-4ffb-bf81-b10905107770
+cm" 1. __Let's plot these points__"
+
+# ╔═╡ 0cfec2e7-9166-45ad-b7cd-9585a1205e22
+let
+    xs = 1:10
+    ys = [1.3, 3.5, 4.2, 5.0, 7.0, 8.8, 10.1, 12.5, 13.0, 15.6]
+    scatter(xs, ys, label=nothing)
+end
+
+# ╔═╡ 2c65f0af-38dd-4d5b-868d-c62b6f2653f9
+cm"""
+2. __What is the relationship between ``x`` and ``y``?__ (Linear)
+3. We need to find ``f(x) = a_1 x + a_0`` that approximates these data and gives a good predictor.
+"""
+
+# ╔═╡ 9219bf2c-6e18-4a82-bf59-5050701bc404
+begin
+    a0Slider = @bind a0_slider NumberField(-2:0.001:15, default=0)
+    a1Slider = @bind a1_slider NumberField(0:0.001:5, default=1)
+    cm"""
+    ``a_0`` = $(a0Slider)
+
+    ``a_1`` = $(a1Slider)
+
+    """
+end
+
+# ╔═╡ f24491c0-11a1-45b0-adac-cb9ce23f300f
+let
+    least_squared(ys, fxs) = round(sum((ys - fxs) .^ 2), digits=4)
+    xs = 1:10
+    ys = [1.3, 3.5, 4.2, 5.0, 7.0, 8.8, 10.1, 12.5, 13.0, 15.6]
+    p1 = scatter(xs, ys, label=nothing, framestyle=:origin, xlimits=(0, 15), ylimits=(-1, 20))
+    least_line(x) = a0_slider + a1_slider * x
+    p1 = plot(p1, x -> least_line(x), label=L"y=%$(a0_slider)+%$(a1_slider)*x")
+    scatter(p1, xs, x -> least_line(x), label=L"points on line")
+    annotate!([(2.2, 15, "Error= " * L"%$(least_squared(least_line.(xs),ys))")])
+end
+
+# ╔═╡ d3404e00-1afc-4edb-b185-c44929675f25
+let
+    xs = 1:10
+    ys = [1.3, 3.5, 4.2, 5.0, 7.0, 8.8, 10.1, 12.5, 13.0, 15.6]
+    xs_sum = sum(xs)
+    ys_sum = sum(ys)
+    xs2_sum = sum(xs .^ 2)
+    xsys_sum = sum(xs .* ys)
+    A = [xs_sum length(xs)+1
+        xs2_sum xs_sum
+    ]
+    b = [ys_sum; xsys_sum]
+    α, β = A \ b
 end
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 begin
-	function post_img(img::String,w=500)
-		res=Resource(img,:width=>w)
-		cm"""
-<div class="img-container">
+    function post_img(img::String, w=500)
+        res = Resource(img, :width => w)
+        cm"""
+      <div class="img-container">
 
-$(res)
+      $(res)
 
-</div>"""
-	end
-	function poolcode()
-		cm"""
-<div class="img-container">
+      </div>"""
+    end
+    function poolcode()
+        cm"""
+      <div class="img-container">
 
-$(Resource("https://www.dropbox.com/s/cat9ots4ausfzyc/qrcode_itempool.com_kfupm.png?raw=1",:width=>300))
+      $(Resource("https://www.dropbox.com/s/cat9ots4ausfzyc/qrcode_itempool.com_kfupm.png?raw=1",:width=>300))
 
-</div>"""
-	end
-	function define(t="")
-		beginBlock("Definition",t)
-	end
-	function bbl(t)
-		beginBlock(t,"")
-	end
-	function bbl(t,s)
-		beginBlock(t,s)
-	end
-	ebl()=endBlock()
-	function bth(s)
-		beginTheorem(s)
-	end
-	eth()=endTheorem()
-	ex(n::Int;s::String="")=ex("Example $n",s)
-	ex(t,s)=example(t,s)
-	function beginBlock(title,subtitle)
-		"""<div style="box-sizing: border-box;">
-		<div style="display: flex;flex-direction: column;border: 6px solid rgba(200,200,200,0.5);box-sizing: border-box;">
-		<div style="display: flex;">
-		<div style="background-color: #FF9733;
-		    border-left: 10px solid #df7300;
-		    padding: 5px 10px;
-		    color: #fff!important;
-		    clear: left;
-		    margin-left: 0;font-size: 112%;
-		    line-height: 1.3;
-		    font-weight: 600;">$title</div>  <div style="olor: #000!important;
-		    margin: 0 0 20px 25px;
-		    float: none;
-		    clear: none;
-		    padding: 5px 0 0 0;
-		    margin: 0 0 0 20px;
-		    background-color: transparent;
-		    border: 0;
-		    overflow: hidden;
-		    min-width: 100px;font-weight: 600;
-		    line-height: 1.5;">$subtitle</div>
-		</div>
-		<p style="padding:5px;">
-	"""
-	end
-	function beginTheorem(subtitle)
-		beginBlock("Theorem",subtitle)
-	end
-	function endBlock()
-		"""</p></div></div>"""
-	end
-	function endTheorem()
-		 endBlock()
-	end
-	function example(lable,desc)
-		"""<div style="display:flex;">
-	<div style="
-	font-size: 112%;
-	    line-height: 1.3;
-	    font-weight: 600;
-	    color: #f9ce4e;
-	    float: left;
-	    background-color: #5c5c5c;
-	    border-left: 10px solid #474546;
-	    padding: 5px 10px;
-	    margin: 0 12px 20px 0;
-	    border-radius: 0;
-	">$lable:</div>
-	<div style="flex-grow:3;
-	line-height: 1.3;
-	    font-weight: 600;
-	    float: left;
-	    padding: 5px 10px;
-	    margin: 0 12px 20px 0;
-	    border-radius: 0;
-	">$desc</div>
-	</div>"""
-	end
-	@htl("")
+      </div>"""
+    end
+    function define(t="")
+        beginBlock("Definition", t)
+    end
+    function bbl(t)
+        beginBlock(t, "")
+    end
+    function bbl(t, s)
+        beginBlock(t, s)
+    end
+    ebl() = endBlock()
+    function bth(s)
+        beginTheorem(s)
+    end
+    eth() = endTheorem()
+    ex(n::Int; s::String="") = ex("Example $n", s)
+    ex(t, s) = example(t, s)
+    function beginBlock(title, subtitle)
+        """<div style="box-sizing: border-box;">
+       	<div style="display: flex;flex-direction: column;border: 6px solid rgba(200,200,200,0.5);box-sizing: border-box;">
+       	<div style="display: flex;">
+       	<div style="background-color: #FF9733;
+       	    border-left: 10px solid #df7300;
+       	    padding: 5px 10px;
+       	    color: #fff!important;
+       	    clear: left;
+       	    margin-left: 0;font-size: 112%;
+       	    line-height: 1.3;
+       	    font-weight: 600;">$title</div>  <div style="olor: #000!important;
+       	    margin: 0 0 20px 25px;
+       	    float: none;
+       	    clear: none;
+       	    padding: 5px 0 0 0;
+       	    margin: 0 0 0 20px;
+       	    background-color: transparent;
+       	    border: 0;
+       	    overflow: hidden;
+       	    min-width: 100px;font-weight: 600;
+       	    line-height: 1.5;">$subtitle</div>
+       	</div>
+       	<p style="padding:5px;">
+       """
+    end
+    function beginTheorem(subtitle)
+        beginBlock("Theorem", subtitle)
+    end
+    function endBlock()
+        """</p></div></div>"""
+    end
+    function endTheorem()
+        endBlock()
+    end
+    function example(lable, desc)
+        """<div style="display:flex;">
+       <div style="
+       font-size: 112%;
+           line-height: 1.3;
+           font-weight: 600;
+           color: #f9ce4e;
+           float: left;
+           background-color: #5c5c5c;
+           border-left: 10px solid #474546;
+           padding: 5px 10px;
+           margin: 0 12px 20px 0;
+           border-radius: 0;
+       ">$lable:</div>
+       <div style="flex-grow:3;
+       line-height: 1.3;
+           font-weight: 600;
+           float: left;
+           padding: 5px 10px;
+           margin: 0 12px 20px 0;
+           border-radius: 0;
+       ">$desc</div>
+       </div>"""
+    end
+    @htl("")
 end
 
 # ╔═╡ 19d0bd5d-0168-4952-9ec3-3683424ce231
 begin
-	text_book= post_img("https://m.media-amazon.com/images/I/51ziKPbuEmL.jpg",200);
-md""" # Syllabus
-## Syallbus
-See here [Term 233 - MATH371 - Syllabus](https://www.dropbox.com/scl/fi/qxrcxxa1pxu3wctqzj0gg/T233_MATH371_Syllabus.pdf?rlkey=p715s0xldipiorxyfupe219og&raw=1)
-## Textbook
-__Textbook: “Numerical Analysis” by Richard L. Burden, J. Douglas Faires 10th Edition (2016)__
-$text_book
+    text_book = post_img("https://m.media-amazon.com/images/I/51ziKPbuEmL.jpg", 200)
+    md""" # Syllabus
+    ## Syallbus
+    See here [Term 233 - MATH371 - Syllabus](https://www.dropbox.com/scl/fi/qxrcxxa1pxu3wctqzj0gg/T233_MATH371_Syllabus.pdf?rlkey=p715s0xldipiorxyfupe219og&raw=1)
+    ## Textbook
+    __Textbook: “Numerical Analysis” by Richard L. Burden, J. Douglas Faires 10th Edition (2016)__
+    $text_book
 
-## Office Hours
-I strongly encourage all students to make use of my office hours. These dedicated times are a valuable opportunity for you to ask questions, seek clarification on lecture material, discuss challenging problems, and get personalized feedback on your work. Engaging with me during office hours can greatly enhance your understanding of the course content and improve your performance. Whether you're struggling with a specific concept or simply want to delve deeper into the subject, I am here to support your learning journey. Don't hesitate to drop by; __your success is my priority__.
+    ## Office Hours
+    I strongly encourage all students to make use of my office hours. These dedicated times are a valuable opportunity for you to ask questions, seek clarification on lecture material, discuss challenging problems, and get personalized feedback on your work. Engaging with me during office hours can greatly enhance your understanding of the course content and improve your performance. Whether you're struggling with a specific concept or simply want to delve deeper into the subject, I am here to support your learning journey. Don't hesitate to drop by; __your success is my priority__.
 
-| Day       | Time        |
-|-----------|-------------|
-| Monday    | 3:20-4:00PM |
-| Wednesday | 3:20-4:00PM |
-Also you can ask for an online meeting through __TEAMS__.
-"""
+    | Day       | Time        |
+    |-----------|-------------|
+    | Monday    | 3:20-4:00PM |
+    | Wednesday | 3:20-4:00PM |
+    Also you can ask for an online meeting through __TEAMS__.
+    """
 end
 
 # ╔═╡ b4c501ec-ed11-42ae-988e-6e73becf0d7e
@@ -1536,7 +1786,7 @@ Determine the actual, absolute, and relative errors when approximating ``p`` by 
 """
 
 # ╔═╡ e3f7eaa9-3fb2-4564-9e9e-961c2ce2e5ad
- cm"""
+cm"""
  $(bbl("Definition","significant digits"))
  The number ``p^*`` is said to approximate ``p`` to ``t`` __significant digits__ (or figures) if ``t`` is the largest nonnegative integer for which
 ```math
@@ -1994,11 +2244,6 @@ __(natural (or free) boundary)__;
 	
 """
 
-# ╔═╡ 904f2372-36d8-47d5-9ac7-02ed91893fbc
-cm"""
-$(ex(1)) Construct a natural cubic spline that passes through the points ``(1,2),(2,3)``, and ``(3,5)``.
-"""
-
 # ╔═╡ 1fd86b21-8457-4c1f-961c-81a105bda5a3
 cm"""
 
@@ -2012,10 +2257,169 @@ cm"""
 $(post_img("https://www.dropbox.com/scl/fi/3d3jjo4a5uh2spth11dlm/algo3.4.png?rlkey=jvgva2sh5ysyif9d5y3sy1ez0&raw=1",700))
 """
 
+# ╔═╡ 4177166a-d638-4739-91e7-d0c42a80392d
+cm"""
+$(ex(1)) Construct a natural cubic spline that passes through the points ``(1,2),(2,3)``, and ``(3,5)``.
+"""
+
+
+# ╔═╡ be8b89bb-e38f-423d-80b3-fa00fac7ad9a
+cm"""
+$(bbl("MATLAB",""))
+We can use the MATLAB built-in function __`csape`__ (Cubic spline interpolation with end condition)
+
+
+The `csape` function in MATLAB is used for cubic spline interpolation with specified end conditions. Here's a detailed explanation of the provided code snippet:
+
+
+__Natural Boundary Conditions__
+```matlab
+xs = [1 2 3];
+ys =[2 3 5];
+pp = csape(xs,[0 ys 0],[2 2]);
+```
+##### Explanations:
+
+1. **Vectors Definition**:
+    - `xs = [1 2 3];` defines the `x` coordinates of the data points.
+    - `ys =[2 3 5];` defines the corresponding `y` coordinates of the data points.
+
+2. **csape Function Call**:
+    - `pp = csape(xs,[0 ys' 0],[2 2]);` performs the cubic spline interpolation.
+    - `csape` stands for "Cubic Spline with End Conditions".
+
+##### Arguments:
+- `xs`: The `x` coordinates of the data points.
+- `[0 ys 0]`: The `y` coordinates are augmented by appending a `0` at the start and the end, `[0, ys', 0]`. 
+    - The zeros (`0`) at the start and end are used to specify the boundary conditions.
+- `[2 2]`: Specifies the boundary conditions type. 
+    - The value `2` (second derivative) indicates that natural spline boundary conditions are used at both ends.
+    - Natural spline boundary conditions ensure that the second derivatives at the end points are zero.
+
+##### outputs
+__`pp` Structure__ 
+```{=matlab}
+pp = 
+  struct with fields:
+    form: 'pp'
+    breaks: [1 2 3]
+    coefs: [2x4 double]
+    pieces: 2
+    order: 4
+    dim: 1
+```
+
+The output `pp` is a piecewise polynomial structure that can be used for evaluating the spline at any desired point within the range of `xs`.
+
+The `pp` structure is a MATLAB data type that contains information about a piecewise polynomial, including splines. It typically includes the following fields:
+
+**form**: A string that specifies the form of the piecewise polynomial. For cubic splines, this is usually 'pp' (for piecewise polynomial). 
+```{=matlab}
+pp.form
+``` 
+This would output `'pp'`, indicating that this is a piecewise polynomial.
+
+**breaks**: A vector of points where the pieces of the polynomial meet. These are the `x` coordinates of the data points provided for interpolation.
+```{=matlab}
+pp.breaks
+```
+This would output `[1 2 3]`, which are the x-coordinates of the original data points.
+
+**coefs**: A matrix where each row contains the coefficients of the polynomial for a specific interval. For cubic splines, each row contains four coefficients corresponding to the cubic, quadratic, linear, and constant terms of the polynomial in that interval.
+```{=matlab}
+pp.coefs
+```
+This would output a 2x4 matrix, where each row contains the coefficients `[a, b, c, d]` of the polynomial for the corresponding interval. For example:
+```{=matlab}
+pp.coefs
+ans =
+	1.0000   -0.5000    0.5000    2.0000
+	1.5000   -0.2500    0.7500    3.0000
+```
+Each row represents a cubic polynomial of the form:
+```math
+    p(x) = a(x - x_i)^3 + b(x - x_i)^2 + c(x - x_i) + d
+```
+for the corresponding interval ``[x_i, x_{i+1}]``.
+
+**pieces**: The number of polynomial pieces, which is typically one less than the number of break points.
+```{=matlab}
+pp.pieces
+```
+This would output `2`, indicating there are 2 polynomial pieces.
+
+**order**: The order of the polynomial. For cubic splines, this is 4 because the polynomial includes cubic, quadratic, linear, and constant terms.
+```{=matlab}
+pp.order
+```
+This would output `4`, indicating the polynomial is cubic (four coefficients).
+
+
+**dim**: The dimension of the target. For univariate splines, this is 1.
+```{=matlab}
+pp.dim
+```
+This would output `1`, indicating the dimension of the target is univariate (one-dimensional).
+
+##### Evaluating the Spline:
+
+To evaluate the spline at a given point, you can use the `ppval` function:
+
+```{=matlab}
+x_eval = 1.5;
+y_eval = ppval(pp, x_eval);
+```
+
+
+##### Example Usage:
+To evaluate the spline at specific points, you can use the `ppval` function:
+
+```{=matlab}
+% Example evaluation points
+evaluation_points = linspace(min(xs), max(xs), 100);
+
+% Evaluate the spline at the desired points
+spline_values = ppval(pp, evaluation_points);
+
+% Plot the original data points and the interpolated spline
+plot(xs, ys, 'o', evaluation_points, spline_values, '-');
+legend('Data Points', 'Cubic Spline');
+title('Cubic Spline Interpolation with Natural Boundary Conditions');
+```
+
+This script will plot the original data points along with the interpolated cubic spline, showing how the spline fits the data under natural boundary conditions.
+$(ebl())
+"""
+
 # ╔═╡ 2482f975-0c63-45ab-8f9a-a2752809b192
 cm"""
 $(ex(2))
 At the beginning of Chapter 3, we gave some Taylor polynomials to approximate the exponential ``f(x)=e^x``. Use the data points ``(0,1),(1, e),\left(2, e^2\right)``, and ``\left(3, e^3\right)`` to form a natural spline ``S(x)`` that approximates ``f(x)=e^x``.
+"""
+
+# ╔═╡ 755a1304-ec77-4ed8-806e-c287f13fdb89
+cm"""
+$(example("Example",""))
+Approximate the integral of ``f(x)=e^x`` on ``[0,3]``
+"""
+
+# ╔═╡ 1e34cf47-8338-484e-b27a-fabfc7ef1b0b
+cm"""
+$(ex(3)) 
+In Example 1, we found a natural spline ``S`` that passes through the points (1, 2), (2, 3), and ``(3,5)``. Construct a clamped spline ``s`` through these points that has ``s^{\prime}(1)=2`` and ``s^{\prime}(3)=1``.
+
+"""
+
+# ╔═╡ f0d5e130-d667-4f38-bfef-5aca795b880f
+cm"""
+$(bbl("MATLAB",""))
+```{=matlab}
+	xs =[1 2 3]
+	ys = [2 3 5]
+	% clamped with f'(1)=2 and f'(3)=1
+ 	pp = csape(xs,[2 ys 1],[1 1])
+```
+$(ebl())
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2024,6 +2428,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
 CommonMark = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+Integrals = "de52edbc-65ea-441a-8357-d3a637375a31"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -2042,6 +2447,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 Colors = "~0.12.11"
 CommonMark = "~0.8.12"
 HypertextLiteral = "~0.9.5"
+Integrals = "~4.4.1"
 LaTeXStrings = "~1.3.1"
 Latexify = "~0.16.3"
 NonlinearSolve = "~3.13.0"
@@ -2060,7 +2466,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "0e768530c39f944178aac8f295b0e95c1a32d7bb"
+project_hash = "2e21b8f40adbe4123c40324d72dc0d1112dccbf4"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "fa0822e5baee6e23081c2685ae27265dabee23d8"
@@ -2790,6 +3196,12 @@ git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
 uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
 version = "1.0.2"
 
+[[deps.HCubature]]
+deps = ["Combinatorics", "DataStructures", "LinearAlgebra", "QuadGK", "StaticArrays"]
+git-tree-sha1 = "10f37537bbd83e52c63abf6393f209dbd641fedc"
+uuid = "19dc6840-f33b-545b-b366-655c7e3ffd49"
+version = "1.6.0"
+
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
 git-tree-sha1 = "d1d712be3164d61d1fb98e7ce9bcbc6cc06b45ed"
@@ -2894,6 +3306,36 @@ version = "1.0.0"
 git-tree-sha1 = "d1b1b796e47d94588b3757fe84fbf65a5ec4a80d"
 uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
 version = "0.1.5"
+
+[[deps.IntegerMathUtils]]
+git-tree-sha1 = "b8ffb903da9f7b8cf695a8bead8e01814aa24b30"
+uuid = "18e54dd8-cb9d-406c-a71d-865a43cbb235"
+version = "0.1.2"
+
+[[deps.Integrals]]
+deps = ["CommonSolve", "HCubature", "LinearAlgebra", "MonteCarloIntegration", "QuadGK", "Reexport", "SciMLBase"]
+git-tree-sha1 = "ebf5737d823873add85809f2b52e20e3eae71997"
+uuid = "de52edbc-65ea-441a-8357-d3a637375a31"
+version = "4.4.1"
+
+    [deps.Integrals.extensions]
+    IntegralsArblibExt = "Arblib"
+    IntegralsCubaExt = "Cuba"
+    IntegralsCubatureExt = "Cubature"
+    IntegralsFastGaussQuadratureExt = "FastGaussQuadrature"
+    IntegralsForwardDiffExt = "ForwardDiff"
+    IntegralsMCIntegrationExt = "MCIntegration"
+    IntegralsZygoteExt = ["Zygote", "ChainRulesCore"]
+
+    [deps.Integrals.weakdeps]
+    Arblib = "fb37089c-8514-4489-9461-98f9c8763369"
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    Cuba = "8a292aeb-7a57-582c-b821-06e4c11590b1"
+    Cubature = "667455a9-e2ce-5579-9412-b964f529a492"
+    FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
+    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+    MCIntegration = "ea1e2de9-7db7-4b42-91ee-0cd1bf6df167"
+    Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [[deps.IntelOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -3036,6 +3478,12 @@ version = "0.16.3"
     [deps.Latexify.weakdeps]
     DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
     SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
+
+[[deps.LatticeRules]]
+deps = ["Random"]
+git-tree-sha1 = "7f5b02258a3ca0221a6a9710b0a0a2e8fb4957fe"
+uuid = "73f95e8e-ec14-4e6a-8b18-0d2e271c4e55"
+version = "0.0.1"
 
 [[deps.LayoutPointers]]
 deps = ["ArrayInterface", "LinearAlgebra", "ManualMemory", "SIMDTypes", "Static", "StaticArrayInterface"]
@@ -3301,6 +3749,12 @@ version = "1.2.0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+
+[[deps.MonteCarloIntegration]]
+deps = ["Distributions", "QuasiMonteCarlo", "Random"]
+git-tree-sha1 = "722ad522068d31954b4a976b66a26aeccbf509ed"
+uuid = "4886b29c-78c9-11e9-0a6e-41e1f4161f7b"
+version = "0.2.0"
 
 [[deps.MosaicViews]]
 deps = ["MappedArrays", "OffsetArrays", "PaddedViews", "StackViews"]
@@ -3610,6 +4064,12 @@ git-tree-sha1 = "66b20dd35966a748321d3b2537c4584cf40387c7"
 uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 version = "2.3.2"
 
+[[deps.Primes]]
+deps = ["IntegerMathUtils"]
+git-tree-sha1 = "cb420f77dc474d23ee47ca8d14c90810cafe69e7"
+uuid = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+version = "0.5.6"
+
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
@@ -3648,6 +4108,16 @@ deps = ["DataStructures", "LinearAlgebra"]
 git-tree-sha1 = "9b23c31e76e333e6fb4c1595ae6afa74966a729e"
 uuid = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 version = "2.9.4"
+
+[[deps.QuasiMonteCarlo]]
+deps = ["Accessors", "ConcreteStructs", "LatticeRules", "LinearAlgebra", "Primes", "Random", "Requires", "Sobol", "StatsBase"]
+git-tree-sha1 = "cc086f8485bce77b6187141e1413c3b55f9a4341"
+uuid = "8a4e6c94-4038-4cdc-81c3-7e6ffdb2a71b"
+version = "0.3.3"
+weakdeps = ["Distributions"]
+
+    [deps.QuasiMonteCarlo.extensions]
+    QuasiMonteCarloDistributionsExt = "Distributions"
 
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
@@ -3856,6 +4326,12 @@ deps = ["Dates", "FileIO", "ImageCore", "IndirectArrays", "OffsetArrays", "REPL"
 git-tree-sha1 = "2da10356e31327c7096832eb9cd86307a50b1eb6"
 uuid = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 version = "0.1.3"
+
+[[deps.Sobol]]
+deps = ["DelimitedFiles", "Random"]
+git-tree-sha1 = "5a74ac22a9daef23705f010f72c81d6925b19df8"
+uuid = "ed01d8cd-4d21-5b2a-85b4-cc3bdc58bad4"
+version = "1.5.0"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
@@ -4662,17 +5138,37 @@ version = "1.4.1+1"
 # ╟─6a1d699c-fc16-472d-8395-a486890a089d
 # ╟─61b0d517-94fc-4c6c-814b-8dfe51da6f1b
 # ╟─5f768b64-c67e-4470-bf44-35bb539e1441
-# ╠═22db7d76-b58c-40dd-978c-4f10f9252847
 # ╟─a9aa5b73-bde3-4907-971d-696e26ada195
 # ╟─47e27a13-4e60-40db-9ed7-5433e0230bd3
-# ╟─904f2372-36d8-47d5-9ac7-02ed91893fbc
 # ╟─c4a80b01-c1e3-4196-8408-3054d0aca71e
 # ╟─25317d39-d107-41e4-a5e3-5ee11a0f8bd5
 # ╟─d65a3a75-9e63-4087-912a-89e5e973a171
 # ╟─1fd86b21-8457-4c1f-961c-81a105bda5a3
+# ╟─bff8bd64-7a8c-4105-96b1-a3f8e8f0cd41
+# ╟─c5f4f53e-6200-4a02-ada7-72e8ae60e38b
 # ╟─cc599ac5-7000-45c9-bb5a-4529df717046
+# ╟─4177166a-d638-4739-91e7-d0c42a80392d
+# ╠═c2c69250-1f18-4c6d-b8b7-3de26ba0818a
+# ╟─be8b89bb-e38f-423d-80b3-fa00fac7ad9a
 # ╟─2482f975-0c63-45ab-8f9a-a2752809b192
 # ╠═e45f6f80-7a93-4064-97b0-d6e7269a1b68
+# ╟─755a1304-ec77-4ed8-806e-c287f13fdb89
+# ╟─3115c2f6-8574-4d09-af83-db8e09731d07
+# ╟─01b33b12-1dad-45e9-a191-8f9619b2fac5
+# ╟─b39bcd45-dfc3-4ddb-95e8-7272ba591682
+# ╟─eb60c5be-bad0-4c39-9842-3210dbaba8d3
+# ╟─1e34cf47-8338-484e-b27a-fabfc7ef1b0b
+# ╠═0c695eed-ebe3-4a26-9a32-7054bf1a51c3
+# ╟─f0d5e130-d667-4f38-bfef-5aca795b880f
+# ╠═92244fae-7546-4608-83ad-6dfe7425243c
+# ╟─5fff03aa-5063-4bd0-bad1-6a3e568b25a1
+# ╟─4fde53d9-ae78-495e-9898-65af518d6b7f
+# ╟─44e027ce-9f36-4ffb-bf81-b10905107770
+# ╟─0cfec2e7-9166-45ad-b7cd-9585a1205e22
+# ╟─2c65f0af-38dd-4d5b-868d-c62b6f2653f9
+# ╟─9219bf2c-6e18-4a82-bf59-5050701bc404
+# ╠═f24491c0-11a1-45b0-adac-cb9ce23f300f
+# ╠═d3404e00-1afc-4edb-b185-c44929675f25
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
