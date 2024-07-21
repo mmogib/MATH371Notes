@@ -2229,9 +2229,11 @@ let
 	f(t,y) = y - t^2 + 1
 	y0 = 0.5
 	tspan = 0.0:0.2:2.0
-	# w1 = RK2(f,tspan,y0)
+	w1 = RK2(f,tspan,y0)
+	plot(t->(t+1)^2-0.5exp(t),xlimits=(0,2))
+	plot!(tspan,w1,c=:red)
 	# problem = ODEProblem(f,y0,(0,2.0))
-	w2 = MY_RK4(f,tspan,y0)
+	# w2 = MY_RK4(f,tspan,y0)
 	# solve(problem,RK4())
 end
 
