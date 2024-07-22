@@ -74,6 +74,33 @@ md"__My Website__"
 # ╔═╡ d7267eec-8b39-454e-b1ec-c7ae580190c4
 md"# 1.1: Review of Calculus: Taylor Polynomials and Series"
 
+# ╔═╡ b4c501ec-ed11-42ae-988e-6e73becf0d7e
+cm"""
+
+$(bth("Taylor Theorem"))
+
+Suppose `` f \in C^n[a, b] ``, `` f^{(n+1)} `` exists on ``[a, b]``, and `` x_0 \in [a, b] ``. For every `` x \in [a, b] ``, there exists a number `` \xi(x) `` between `` x_0 `` and `` x `` with
+```math
+f(x) = P_n(x) + R_n(x),
+```
+where
+```math
+P_n(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(x_0)}{2!}(x - x_0)^2 + \cdots + \frac{f^{(n)}(x_0)}{n!}(x - x_0)^n
+```
+```math
+= \sum_{k=0}^{n} \frac{f^{(k)}(x_0)}{k!}(x - x_0)^k
+```
+and
+
+```math
+R_n(x) = \frac{f^{(n+1)}(\xi(x))}{(n+1)!} (x - x_0)^{n+1}.
+```
+$(eth())
+$(bbl("Remarks"))
+- n``^{th}`` Taylor Polynomial ``P_n(x) ``
+- Remainder Term `` R_n(x) ``
+"""
+
 # ╔═╡ cb26e993-d7c1-4e69-82f3-dcb20d1a4f37
 begin
     @syms x::Real
@@ -92,6 +119,16 @@ begin
         substitute(val, Dict(x => x0))
     end
 end
+
+# ╔═╡ 75115115-19c5-44c5-8c6a-7d3874228f35
+cm"""
+$(ex(1))
+Let ``f(x) = \cos x`` and ``x_0 = 0``. Determine
+
+- the second Taylor polynomial for ``f`` about ``x_0``; and
+- the third Taylor polynomial for ``f`` about ``x_0``.
+
+"""
 
 # ╔═╡ b54035ab-2813-4cdc-887a-e11625ede4aa
 slider1h = @bind slider1 Slider(0:20, show_value=true);
@@ -121,6 +158,16 @@ Previous Example illustrates __the two objectives of numerical analysis__:
 
 # ╔═╡ f610361d-e308-49be-8100-ad8b3882bac0
 md"# 1.2 Round-off Errors and Computer Arithmetic"
+
+# ╔═╡ c8beba83-e040-449a-b656-89b7daed7f7c
+cm"""
+$(bbl("Definition","Round-off Error"))
+The error that is produced when a calculator or computer is used to perform real number calculations is called __round-off error__. 
+$(ebl())
+
+- It occurs because the arithmetic performed in a machine involves numbers with only a finite number of digits, with the result that calculations are performed with only approximate representations of the actual numbers. 
+- In a computer, only a relatively small subset of the real number system is used for the representation of all the real numbers. This subset contains only rational numbers, both positive and negative, and stores the fractional part, together with an exponential part.
+"""
 
 # ╔═╡ e4a92b5e-18a7-4007-aab3-3eeca447b8de
 md"""
@@ -154,6 +201,15 @@ The base for the exponent is 2 .
 """
 
 
+# ╔═╡ 0feaa05f-9d53-48d1-b920-ea7c389105f2
+cm"""
+$(example("Example",""))
+Consider the machine number
+
+ 	0 10000000011 10111001000100000000000000000000000000000000000000000
+
+"""
+
 # ╔═╡ c9819b7f-4bf8-46e3-a4bc-e991bf26ce7a
 
 
@@ -178,6 +234,17 @@ let
     reinterpret(Float64, parse(Int, "0100000000111011100100001111111111111111111111111111111111111111", base=2))
 
 end
+
+# ╔═╡ 75bac38d-3c93-4cad-8302-6eb60e40038b
+cm"""
+__BE CAREFULL__
+
+```math
+\large
+0.1 + 0.2
+```
+$(0.1+0.2)
+"""
 
 # ╔═╡ ff2fe07a-d35b-4d5b-bf95-f669fafc2132
 md"## Decimal Machine Numbers"
@@ -209,6 +276,17 @@ y=0 . d_1 d_2 \ldots d_k d_{k+1} d_{k+2} \ldots \times 10^n
 > For rounding, when ``d_{k+1} \geq 5``, we add 1 to ``d_k`` to obtain ``\text{fl}(y)``; that is, we round up. When ``d_{k+1}<5``, we simply chop off all but the first ``k`` digits; that is, round down. If we round down, then ``\delta_i=d_i``, for each ``i=1,2, \ldots, k``. However, if we round up, the digits (and even the exponent) might change.
 """
 
+# ╔═╡ edfa34e9-ee7d-4a0a-9025-a1857d8b9561
+cm"""
+$(ex(1)) 
+Determine the five-digit 
+- (a) chopping and 
+- (b) rounding 
+
+values of the irrational number ``\pi``.
+
+"""
+
 # ╔═╡ 7caaa18e-8ef8-4ae5-bd1c-e9fd0536b901
 π
 
@@ -219,6 +297,28 @@ y=0 . d_1 d_2 \ldots d_k d_{k+1} d_{k+2} \ldots \times 10^n
 # 	n_chopped =0.31415e1 
 # 	n_rounded = 0.31416e1
 # end
+
+# ╔═╡ 244d084f-ed09-4d43-9377-8569995328a8
+cm"""
+$(bbl("Definition","") )
+Suppose that ``p^*`` is an approximation to ``p``. 
+- The actual error is ``p-p^*``, 
+- the absolute error is ``\left|p-p^*\right|``, and 
+- the relative error is 
+```math
+\frac{\left|p-p^*\right|}{|p|}, \text{ provided that } p \neq 0.
+```
+$(ebl())
+"""
+
+# ╔═╡ 321e0282-36ae-43dc-adcb-c7a35666a334
+cm"""
+$(ex(2)) 
+Determine the actual, absolute, and relative errors when approximating ``p`` by ``p^*`` when
+- (a) ``p=0.3000 \times 10^1`` and ``p^*=0.3100 \times 10^1``;
+- (b) ``p=0.3000 \times 10^{-3}`` and ``p^*=0.3100 \times 10^{-3}``;
+- (c) ``p=0.3000 \times 10^4`` and ``p^*=0.3100 \times 10^4``.
+"""
 
 # ╔═╡ 8c6005c5-e947-4a8a-8083-78ab5f84f07b
 # let
@@ -243,6 +343,25 @@ let
     aerror1 = 0.1e2
 end
 
+
+# ╔═╡ e3f7eaa9-3fb2-4564-9e9e-961c2ce2e5ad
+cm"""
+ $(bbl("Definition","significant digits"))
+ The number ``p^*`` is said to approximate ``p`` to ``t`` __significant digits__ (or figures) if ``t`` is the largest nonnegative integer for which
+```math
+\frac{\left|p-p^*\right|}{|p|} \leq 5 \times 10^{-t}
+```
+ $(ebl())
+ """
+
+# ╔═╡ f84cb603-95f5-42cc-afbc-c110e8e183c1
+cm"""
+$(example("Example",""))
+```math
+\begin{array}{l|l|l|l|l|l|l|l}p & 0.1 & 0.5 & 100 & 1000 & 5000 & 9990 & 10000\end{array}
+```
+What is the least upper bound for ``|p-p^*|`` if ``p^*`` agrees with ``p`` to __four__ significant figures.
+"""
 
 # ╔═╡ 786351e5-47cc-4d61-a47d-771bc47aa3a9
 cm"""
@@ -514,17 +633,6 @@ let
     float64_to_dec(largest_number)
 end
 
-# ╔═╡ 75bac38d-3c93-4cad-8302-6eb60e40038b
-cm"""
-__BE CAREFULL__
-
-```math
-\large
-0.1 + 0.2
-```
-$(0.1+0.2)
-"""
-
 # ╔═╡ d38e3f95-71c4-45dc-8ab9-0a216de91311
 let
     strs = join(map(x -> "$(x*5*10^(-4.0))", [0.1 0.5 100 1000 5000 9990 10000]), ",")
@@ -545,6 +653,12 @@ x \ominus y=f l(f l(x)-f l(y)), & x \circledast y=f l(f l(x) \div f l(y)) .
 ```
 """
 
+# ╔═╡ 892b86fe-9f31-4a38-9013-1f90e3b06389
+cm"""
+$(ex(3))
+Suppose that ``x=\frac{5}{7}`` and ``y=\frac{1}{3}``. Use five-digit chopping for calculating ``x+y, x-y, x \times y``, and ``x \div y``.
+"""
+
 # ╔═╡ 9010d6bd-26d2-4211-ab12-ac58d77edbbc
 let
     re(p::T, ps::S) where {T<:Number,S<:Number} = abs((p - ps) / p)
@@ -558,6 +672,20 @@ let
     # x ⨸ y
 end
 
+# ╔═╡ 966f78ae-65e1-4efa-b642-79f343e48a9b
+cm"""
+$(ex(4)) Suppose that in addition to ``x=\frac{5}{7}`` and ``y=\frac{1}{3}`` we have
+```math
+u=0.714251, \quad v=98765.9, \quad \text { and } \quad w=0.111111 \times 10^{-4},
+```
+so that
+```math
+f l(u)=0.71425 \times 10^0, \quad f l(v)=0.98765 \times 10^5, \quad \text { and } \quad f l(w)=0.11111 \times 10^{-4} .
+```
+
+Determine the five-digit chopping values of ``x \ominus u,(x \ominus u) \otimes w,(x \ominus u) \otimes v``, and ``u \oplus v``.
+"""
+
 # ╔═╡ b50497e4-e0f9-4da6-bba3-48628cee0173
 let
     re(p::T, ps::S) where {T<:Number,S<:Number} = abs((p - ps) / p)
@@ -570,6 +698,15 @@ let
     p1 = 0.0003
     p2 = p1 ⊗ v
 end
+
+# ╔═╡ c3720d44-e0a5-413a-aaf9-b11c6e6c442b
+cm"""
+$(example("Example",""))
+Solve the following in 4-digit rounding arithmetic
+```math
+x^2 +62.10x+1=0
+```
+"""
 
 # ╔═╡ 379608bf-906d-45db-9cab-018a50fcbd07
 let
@@ -612,6 +749,11 @@ end
 # ╔═╡ 5ed7d51c-b5fa-4953-b2b4-c2040edced33
 md"## Nested Arithmetic"
 
+# ╔═╡ e7fd2c69-097d-400f-aa20-19265ebdd2eb
+cm"""
+$(ex(6)) Evaluate ``f(x)=x^3-6.1 x^2+3.2 x+1.5`` at ``x=4.71`` using three-digit arithmetic.
+"""
+
 # ╔═╡ 987b5101-f2d6-4d03-98de-595bf6710d96
 let
     fl, ⊕, ⊖, ⊗, ⨸ = createFiniteDigitSystem(; digits=3, truncation="chop")
@@ -628,8 +770,93 @@ end
 # ╔═╡ a7cc3418-4607-4e03-ab87-bab26530cc53
 md"# 1.3 Algorithms and Convergence"
 
+# ╔═╡ 3651b884-9583-49fb-95e8-269f349cf1ce
+cm"""
+$(define("Algorithm")) 
+An __algorithm__ is a procedure that describes, in an unambiguous manner, a finite sequence of steps to be performed in a specified order. The object of the algorithm is to implement a procedure to solve a problem or approximate a solution to the problem.
+$(ebl())
+
+$(define("Pseudocode"))
+A __pseudocode__ specifies the form of the input to be supplied and the form of the desired output. 
+$(ebl())
+- Not all numerical procedures give satisfactory output for arbitrarily chosen input. As a consequence, a stopping technique independent of the numerical technique is incorporated into each algorithm to avoid infinite loops.
+- Two punctuation symbols are used in the algorithms:
+  - A period (.) indicates the termination of a step.
+  - A semicolon (;) separates tasks within a step.
+"""
+
+# ╔═╡ 053b3718-7c29-4a81-9cb8-c639e515aa07
+cm"""
+$(ex(1))
+The ``N`` th Taylor polynomial for ``f(x)=\ln x`` expanded about ``x_0=1`` is
+```math
+P_N(x)=\sum_{i=1}^N \frac{(-1)^{i+1}}{i}(x-1)^i,
+```
+and the value of ``\ln 1.5`` to eight decimal places is 0.40546511 . Construct an algorithm to determine the minimal value of ``N`` required for
+```math
+\left|\ln 1.5-P_N(1.5)\right|<10^{-5}
+```
+without using the Taylor polynomial remainder term.
+"""
+
+# ╔═╡ f9e82af8-cbcb-4eab-8b66-227a5f34ccef
+cm"""
+$(bbl("Solution"))
+
+__INPUT__ value ``x``, tolerance ``T O L``, maximum number of iterations ``M``. 
+
+__OUTPUT__ degree ``N`` of the polynomial or a message of failure.
+
+__Step 1__ Set ``N=1``;
+```math
+\begin{array}{ll}
+& y=x-1 ; \\
+& \text{ SUM }=0 ; \\
+& \text{ POWER }=y ; \\
+& \text{ TERM }=y ; \\
+& \text{ SIGN }=-1 . \quad \text{(Used to implement alternation of signs.)}
+\end{array}
+```
+
+__Step 2__ While ``N \leq M`` do Steps 3-5.
+
+__Step 3__ Set SIGN ``=-`` SIGN; ``\quad`` (Alternate the signs.)
+```math
+\begin{aligned}
+&\text{S U M}=\text{S U M}+\text{S I G N} \cdot \text{T E R M} ; \quad \text{(Accumulate the terms.)} \\
+&\text{P O W E R}=\text{P O W E R} \cdot y ;\\
+&\text{TERM} = \text{POWER}/(N+1). \quad \text{Calculate the next term.}
+\end{aligned}
+```
+
+__Step 4__ If ``|\text{T E R M}|<\text{T O L}`` then (Test for accuracy.)
+
+OUTPUT ( ``N`` );
+STOP. (The procedure was successful.)
+
+__Step 5__ Set ``N=N+1``. (Prepare for the next iteration. (End Step 2))
+
+__Step 6__ OUTPUT ('Method Failed'); (The procedure was unsuccessful.) 
+
+STOP.
+"""
+
 # ╔═╡ 78fc998d-a2c8-448b-90f5-d822e3513e8b
 md"## Characterizing Algorithms"
+
+# ╔═╡ e8278f0e-74a6-4cc3-8164-269391162662
+cm"""
+$(define("1.17")) 
+Suppose that ``E_0>0`` denotes an error introduced at some stage in the calculations and ``E_n`` represents the magnitude of the error after ``n`` subsequent operations.
+- If ``E_n \approx C n E_0``, where ``C`` is a constant independent of ``n``, then the growth of error is said to be linear.
+- If ``E_n \approx C^n E_0``, for some ``C>1``, then the growth of error is called exponential.
+"""
+
+# ╔═╡ a8848e7f-dfd2-438a-956e-daa91ac7ecad
+cm"""
+$(example("Example",""))
+Consider the sequence ``\displaystyle p_n=\left(\frac{1}{3}\right)^n`` and use __five-digit rounding arithmatic__ to compute the terms of this sequence.
+"""
 
 # ╔═╡ 8cfd5ff2-cbf6-469e-af5a-050ecf2f3198
 cm"""
@@ -646,6 +873,12 @@ cm"""
 | 8 | ``-0.92872 \times 10^{-2}`` | ``0.15242 \times 10^{-3}`` | ``6 \times 10^1`` |
 
 __The error grows exponentially__
+"""
+
+# ╔═╡ a69d2160-3a9e-4038-9d87-5119e9e05466
+cm"""
+$(example("Example",""))
+Now consider the sequence ``\displaystyle p_n=1-\frac{2}{3}n`` and use __five-digit rounding arithmatic__ to compute the terms of this sequence.
 """
 
 # ╔═╡ 95e1b0f1-fec8-4c35-a527-a5351ed38d92
@@ -667,6 +900,43 @@ __Error grows linearly__
 
 # ╔═╡ fdae435c-4d85-453e-a9ea-8383d31c5fe5
 md"## Rates of Convergence"
+
+# ╔═╡ 90bd960f-794d-496f-bf28-3b52abba90cc
+cm"""
+$(define("1.18")) 
+Suppose ``\left\{\beta_n\right\}_{n=1}^{\infty}`` is a sequence known to converge to zero and ``\left\{\alpha_n\right\}_{n=1}^{\infty}`` converges to a number ``\alpha``. If a positive constant ``K`` exists with
+```math
+\left|\alpha_n-\alpha\right| \leq K\left|\beta_n\right|, \quad \text { for large } n,
+```
+then we say that ``\left\{\alpha_n\right\}_{n=1}^{\infty}`` converges to ``\alpha`` with rate, or order, of convergence ``O\left(\beta_n\right)``. (This expression is read "big oh of ``\beta_n`` ".) It is indicated by writing ``\alpha_n=\alpha+O\left(\beta_n\right)``.
+"""
+
+# ╔═╡ 62fb93e7-4acc-4466-b932-ce6cfdaf8d61
+cm"""
+$(ex(2))
+Suppose that, for ``n \geq 1``,
+```math
+\alpha_n=\frac{n+1}{n^2} \quad \text { and } \quad \hat{\alpha}_n=\frac{n+3}{n^3} \text {. }
+```
+"""
+
+# ╔═╡ 30833702-0444-4d4e-86c6-be97ae1456e7
+cm"""
+$(define("1.19"))
+Suppose that ``\lim _{h \rightarrow 0} G(h)=0`` and ``\lim _{h \rightarrow 0} F(h)=L``. If a positive constant ``K`` exists with
+
+```math
+|F(h)-L| \leq K|G(h)|, \quad \text{for sufficiently small } h,
+```
+then we write ``F(h)=L+O(G(h))``.
+"""
+
+# ╔═╡ a3ad9375-b2bf-4b3b-9f84-d18d41265640
+cm"""
+$(ex(3))
+Use the third Taylor polynomial about ``h=0`` to show that ``\cos h+\frac{1}{2} h^2=1+O\left(h^4\right)``.
+"""
+
 
 # ╔═╡ f50aff72-d978-4c2a-8683-8127a14a4ea9
 let
@@ -716,6 +986,12 @@ To find a solution to `` f(x) = 0 `` given the continuous function `` f `` on th
     ``\text{STOP.}``
 		"""
 
+# ╔═╡ 9be1a640-c90f-4171-ab54-f6926dba25be
+cm"""
+$(ex(1))
+Show that ``f(x)=x^3+4 x^2-10=0`` has a root in ``[1,2]`` and use the Bisection method to determine an approximation to the root that is accurate to at least within ``10^{-4}``.
+"""
+
 # ╔═╡ 9e6ed715-6bf8-4e60-b77e-f4f8e2118f02
 begin
     function bisect(f, a, b, TOL, N0)
@@ -756,6 +1032,20 @@ let
     # u
 
 end
+
+# ╔═╡ b11a67a2-b544-4996-9816-82bfbcd70a18
+cm"""
+$(bth("2.1"))
+Suppose that ``f \in C[a, b]`` and ``f(a) \cdot f(b)<0``. The Bisection method generates a sequence ``\left\{p_n\right\}_{n=1}^{\infty}`` approximating a zero ``p`` of ``f`` with
+```math
+\left|p_n-p\right| \leq \frac{b-a}{2^n}, \quad \text { when } \quad n \geq 1
+```
+"""
+
+# ╔═╡ e69ad96e-7796-4db4-9ae1-049ad0971f9c
+cm"""
+$(ex(2)) Determine the number of iterations necessary to solve ``f(x)=x^3+4 x^2-10=0`` with accuracy ``10^{-3}`` using ``a_1=1`` and ``b_1=2``.
+"""
 
 # ╔═╡ 505497ed-7060-48fe-ba2d-69a31413c267
 md"# 2.2 Fixed-Point Iteration"
@@ -805,6 +1095,17 @@ begin
 
 end
 
+# ╔═╡ ddb60135-0438-4381-8284-053c464ec506
+cm"""
+$(define("2.2"))
+The number ``p`` is a fixed point for a given function ``g`` if ``g(p)=p``.
+"""
+
+# ╔═╡ 668930ff-00d1-46b6-97a3-b27f5f6628c1
+cm"""
+$(ex(1)) Determine any fixed points of the function ``g(x)=x^2-2``.
+"""
+
 # ╔═╡ f35de386-da3a-4cbf-89ae-3049218531df
 let
     # anim = animate_fixedpoint(x->x^2-2,1.1,0.001)
@@ -813,6 +1114,31 @@ let
     # plot([g,x->x],framestyle=:origin, label=[L"y=x^2-2"  L"y=x"])
     # scatter!([-1,2],g.([-1,2]), label="fixed points")
 end
+
+# ╔═╡ 9d2676de-fb2e-4a2c-8701-ee823bca5f71
+cm"""
+$(bth("2.3")) 
+(i) If ``g \in C[a, b]`` and ``g(x) \in[a, b]`` for all ``x \in[a, b]``, then ``g`` has at least one fixed point in ``[a, b]``.
+(ii) If, in addition, ``g^{\prime}(x)`` exists on ``(a, b)`` and a positive constant ``k<1`` exists with
+```math
+\left|g^{\prime}(x)\right| \leq k, \quad \text { for all } x \in(a, b),
+```
+then there is exactly one fixed point in ``[a, b]``. (See Figure 2.3.)
+$(eth())
+"""
+
+# ╔═╡ 00594dfc-5a8b-4551-b300-bb52eee81e04
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/qdx5nwju090krjjywtw51/figure2.3.png?rlkey=sdlxcn8qvfywjyizmf2upctg2&raw=1"))
+"""
+
+
+
+# ╔═╡ a4e97910-11e5-4ad5-b9d2-7d5635e2990b
+cm"""
+$(ex(2)) 
+Show that ``g(x)=\left(x^2-1\right) / 3`` has a unique fixed point on the interval ``[-1,1]``.
+"""
 
 # ╔═╡ 22cb99e8-a5e4-4a16-8670-1ef1ef6f7b39
 let
@@ -824,8 +1150,29 @@ let
     scatter!([u1, u2], g.([u1, u2]), label="fixed points")
 end
 
+# ╔═╡ b468696b-bb1b-44f6-8777-623b1b327b0b
+cm"""
+$(ex(3))
+Consider 
+```math
+g(x)=3^{-x}\quad \text{ on } \quad [0,1].
+```
+Thoerem 2.3 does not guarantee the uniquness of the fixed point.
+"""
+
 # ╔═╡ 9ac51023-96ca-4304-a8b0-af36c3c8f60e
 md"## Fixed-Point Iteration"
+
+# ╔═╡ a46e742e-9869-478c-b7a8-99267ceb9116
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/wwb8jccvt23artv0ky0j3/algorithm2.2_fixed_point.png?rlkey=lw78ogrp7skapnv2klsbox9pf&raw=1",700))
+"""
+
+# ╔═╡ b28b570c-44f3-49e9-9b94-eb6f2ed89bbf
+cm"""
+$(example("Example",""))
+Solve ``x^3+4 x^2-10=0`` in the intervale ``[1,2]``.
+"""
 
 # ╔═╡ 8cf9969b-c6ce-46af-9770-effd72bdf06c
 cm"""
@@ -874,6 +1221,35 @@ cm"""
 """
 
 
+
+# ╔═╡ 12aa745e-9361-4af3-8c8b-7a2ffa83e874
+cm"""
+$(bth("2.4 (Fixed-Point Theorem)"))
+Let ``g \in C[a, b]`` be such that ``g(x) \in[a, b]``, for all ``x`` in ``[a, b]``. Suppose, in addition, that ``g^{\prime}`` exists on ``(a, b)`` and that a constant ``0 < k <1 `` exists with
+```math
+\left|g^{\prime}(x)\right| \leq k, \quad \text { for all } x \in(a, b) .
+```
+
+Then, for any number ``p_0`` in ``[a, b]``, the sequence defined by
+```math
+p_n=g\left(p_{n-1}\right), \quad n \geq 1,
+```
+converges to the unique fixed point ``p`` in ``[a, b]``.
+$(eth())
+"""
+
+# ╔═╡ e3a20e0f-1524-479f-83e8-6fc2093e320b
+cm"""
+$(bbl("Corollary", "2.5")) If ``g`` satisfies the hypotheses of Theorem 2.4 , then bounds for the error involved in using ``p_n`` to approximate ``p`` are given by
+```math
+\left|p_n-p\right| \leq k^n \max \left\{p_0-a, b-p_0\right\}
+```
+and
+```math
+\left|p_n-p\right| \leq \frac{k^n}{1-k}\left|p_1-p_0\right|, \quad \text { for all } \quad n \geq 1
+```
+$(ebl())
+"""
 
 # ╔═╡ 7ecbc555-7c10-4002-a662-b3de16611269
 cm"""
@@ -936,6 +1312,23 @@ end
 # ╔═╡ d70b02b7-9697-428f-8eb7-e75f329da362
 md"## Newton's Method (Newton-Raphson)"
 
+# ╔═╡ 9291e2ac-56a3-41a0-88b8-d3d8ecb7e819
+cm"""
+- __Newton's method__ starts with an initial approximation __``p_0``__ and 
+	- generates the sequence ``\left\{p_n\right\}_{n=0}^{\infty}``, by
+```math
+p_n=p_{n-1}-\frac{f\left(p_{n-1}\right)}{f^{\prime}\left(p_{n-1}\right)}, \quad \text { for } n \geq 1
+```
+See Figure 2.7
+
+$(post_img("https://www.dropbox.com/scl/fi/ojynxcvtkpk8zta8whse7/fig2.7.png?rlkey=hk25cb8v4l7xv4705x9b3muu6&raw=1",700))
+"""
+
+# ╔═╡ 66b6ed61-d870-46d4-a5ad-cb6afec3a9dc
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/emcox2hdvabw08m0npeu0/algo2.3.png?rlkey=69o3qsf1tl2whxywgjd8eyvqc&raw=1",700))
+"""
+
 # ╔═╡ ffb5767a-24fe-411f-abaa-baac67eaaa3d
 cm"""
 __Stopping Criteria__ Same as Bisection method. Nameley, select a tolerance ``\varepsilon>0`` and construct ``p_1, \ldots p_N`` until
@@ -949,6 +1342,12 @@ or
 ```math
 \left|f\left(p_N\right)\right|<\varepsilon .
 ```
+"""
+
+# ╔═╡ 2cbceb55-e953-4035-a0d3-e4ec236038ab
+cm"""
+$(ex(1))
+Consider the function ``f(x)=\cos x-x=0``. Approximate a root of ``f`` using (a) a fixed-point method, and (b) Newton's method.
 """
 
 # ╔═╡ e4f0570b-0913-4f40-8a9b-8afb5ce7cbcd
@@ -971,6 +1370,12 @@ let
     # T[:,3] = map(x->ismissing(x) ?  " " : x,T[:,3])
     # pretty_table(HTML,T;header=["n" ,"Fixed Point", "Newton"])
 end
+
+# ╔═╡ e57d0aa5-661f-43e8-885c-fd0aa1ab4cc6
+cm"""
+$(bth("2.6")) Let ``f \in C^2[a, b]``. If ``p \in(a, b)`` such that ``f(p)=0`` and ``f^{\prime}(p) \neq 0``, then there exists a ``\delta>0`` such that Newton's method generates a sequence ``\left\{p_n\right\}_{n=1}^{\infty}`` converging to ``p`` for any initial approximation ``p_0 \in[p-\delta, p+\delta]``.
+$(eth())
+"""
 
 # ╔═╡ 8ce9ee8c-cca0-4ff5-a5a0-14991987feb0
 md"## The Secant Method"
@@ -1024,6 +1429,22 @@ begin
 
 end
 
+# ╔═╡ 00e4aeb4-d28c-4de6-b298-a47a9d8ee3ab
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/c3f1pl27xv8ieo27lbbrg/fig2.9.png?rlkey=64rg0o9375jz0pum3ggd3amcm&raw=1",700))
+"""
+
+# ╔═╡ 4e765c64-eac2-4654-badf-222601c888b7
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/rw8czxi3l1gs2w50szffr/fig2.4.png?rlkey=0ruonucku445z3y4cp6xa84e8&raw=1",700))
+"""
+
+# ╔═╡ 079acdc9-781f-43c1-bd93-12e40142a0af
+cm"""
+$(ex(2))
+Solve Example 1 using the __Secant Method__.
+"""
+
 # ╔═╡ f91c04c2-4e85-4709-a76e-639929d54abd
 let
     x, TT, flag = secant_method(x -> cos(x) - x, 0, 1, 1e-8, 15)
@@ -1040,6 +1461,29 @@ end
 # ╔═╡ c638088a-c6fe-406e-8ef5-f3511319aef9
 md"# 3.1 Interpolation and the Lagrange Polynomials"
 
+# ╔═╡ fd29ef1c-d683-4a84-9595-04d0503d61ab
+cm"""
+- __Algebraic polynomials__, the set of functions of the form
+```math
+P_n(x)=a_n x^n+a_{n-1} x^{n-1}+\cdots+a_1 x+a_0,
+```
+``\color{white}{--.}``where ``n`` is a nonnegative integer and ``a_0, \ldots, a_n`` are real constants.
+- Given __any function__, defined and continuous on a closed and bounded interval, __there exists a polynomial__ that is as "close" to the given function as desired. This result is expressed precisely in the Weierstrass Approximation Theorem. (See Figure 3.1.)
+
+$(post_img("https://www.dropbox.com/scl/fi/uqu4r9frmxmrxa032yvae/fig3.1.png?rlkey=2l7ws8elwvptpkfu7omco1dqi&raw=1",700))
+
+
+"""
+
+# ╔═╡ 59929002-a335-4368-ab7c-a9ad080b3e78
+cm"""
+$(bth("3.1 (Weierstrass Approximation Theorem)")) 
+Suppose ``f`` is defined and continuous on ``[a, b]``. For each ``\epsilon>0``, there exists a polynomial ``P(x)``, with the property that
+```math
+|f(x)-P(x)|<\epsilon, \quad \text { for all } x \text { in }[a, b] .
+```
+"""
+
 # ╔═╡ 70ad83fd-6df4-47b7-b5c0-0225c552d2e7
 md"## Lagrange Interpolating Polynomials"
 
@@ -1049,6 +1493,12 @@ begin
     LagrangeP(xs, ys) = x -> sum(ys[i] * L(xs, i)(x) for i in 1:length(xs))
     LagrangeR(xs, ndf) = (ζ, x) -> ndf(ζ) * prod((x - xs[i]) for i in 1:length(xs)) / (factorial(length(xs)))
 end
+
+# ╔═╡ eec05ea5-cb8a-4979-a5c9-23eebd9afe3f
+cm"""
+$(define("interpolation"))
+Using a polynomial for approximation within the interval given by the endpoints is called __polynomial interpolation.__
+"""
 
 # ╔═╡ 3e3022c4-06ad-4878-aa53-79e274dd40ec
 cm"""
@@ -1062,6 +1512,12 @@ The __linear Lagrange interpolating polynomial__ through ``\left(x_0, y_0\right)
 ```math
 P(x)=L_0(x) f\left(x_0\right)+L_1(x) f\left(x_1\right)=\frac{x-x_1}{x_0-x_1} f\left(x_0\right)+\frac{x-x_0}{x_1-x_0} f\left(x_1\right) .
 ```
+"""
+
+# ╔═╡ cc596f86-0762-4878-9c32-aaf3981b6398
+cm"""
+$(ex(1))
+Determine the linear Lagrange interpolating polynomial that passes through the points ``(2,4)`` and ``(5,1)``.
 """
 
 # ╔═╡ 972e9347-72c0-4a53-b20a-205086a29f8b
@@ -1086,6 +1542,10 @@ To generalize the concept of linear interpolation, consider the construction of 
 (See Figure 3.4.)
 """
 
+# ╔═╡ 54e544f0-f1d0-467d-9a7a-b773053895df
+cm"""$(post_img("https://www.dropbox.com/scl/fi/tusc577dwl8j0vcgbubez/fig3.4.png?rlkey=osxczpcds3axenn0nzae7kxa0&raw=1",700))
+"""
+
 # ╔═╡ 26847ae3-9b6d-46b4-84e0-225177041c15
 cm"""
 In this case, we first construct, for each ``k=0,1, \ldots, n``, a function ``L_{n, k}(x)`` with the property that 
@@ -1105,6 +1565,9 @@ L_{n, k}(x)=\frac{\left(x-x_0\right) \cdots\left(x-x_{k-1}\right)\left(x-x_{k+1}
 A sketch of the graph of a typical ``L_{n, k}`` (when ``n`` is even) is shown in Figure 3.5.
 """
 
+# ╔═╡ 1c83d413-5ab1-40c2-a533-25a312889f5c
+cm"""$(post_img("https://www.dropbox.com/scl/fi/hgr57g6wf7np8hdn5un8x/fig3.5.png?rlkey=2v4sy729j19j33ok1lmnilukq&raw=1",700))"""
+
 # ╔═╡ 06126200-59c5-4277-bb0c-f156ed90f51f
 cm"""
 The polynomial  given by
@@ -1114,6 +1577,13 @@ P(x)=f\left(x_0\right) L_{n, 0}(x)+\cdots+f\left(x_n\right) L_{n, n}(x)=\sum_{k=
 is called the ``\boldsymbol{n}``th __Lagrange interpolating polynomial__.
 -  It is unique.
 - From now on we write ``L_{k}(x)`` instead of ``L_{n, k}(x)``.
+"""
+
+# ╔═╡ 1c4799ce-911b-4980-80fc-7c56c2b2a6ff
+cm"""
+$(ex(2))
+- (a) Use the numbers (called nodes) ``x_0=2, x_1=2.75``, and ``x_2=4`` to find the second Lagrange interpolating polynomial for ``f(x)=1 / x``.
+- (b) Use this polynomial to approximate ``f(3)=1 / 3``.
 """
 
 # ╔═╡ c101ca1b-13af-4d0b-806b-14481f81b13e
@@ -1127,6 +1597,23 @@ let
     # P(4)
     plot([f, P], framestyle=:zeros, xlimit=(1, 10), label=[L"%$(f(x))" L"%$(P(x))"])
 end
+
+# ╔═╡ 90297730-1473-4336-a884-d9441f3103a9
+cm"""
+$(bth("3.3"))
+Suppose ``x_0, x_1, \ldots, x_n`` are distinct numbers in the interval ``[a, b]`` and ``f \in C^{n+1}[a, b]``. Then, for each ``x`` in ``[a, b]``, a number ``\xi(x)`` (generally unknown) between ``\min \left\{x_0, x_1, \ldots, x_n\right\}``, and the ``\max \left\{x_0, x_1, \ldots, x_n\right\}`` and hence in ``(a, b)``, exists with
+```math
+f(x)=P(x)+\frac{f^{(n+1)}(\xi(x))}{(n+1)!}\left(x-x_0\right)\left(x-x_1\right) \cdots\left(x-x_n\right),
+```
+where ``P(x)`` is the interpolating polynomial given above.
+$(eth())
+"""
+
+# ╔═╡ e680937f-1fc5-4416-9991-8153bf604d64
+cm"""
+$(ex(3))
+In Example 2, we found the second Lagrange polynomial for ``f(x)=1 / x`` on [2, 4] using the nodes ``x_0=2, x_1=2.75``, and ``x_2=4``. Determine the error form for this polynomial and the maximum error when the polynomial is used to approximate ``f(x)`` for ``x \in[2,4]``.
+"""
 
 # ╔═╡ 4f9efa7b-a9ea-4012-87e9-7d0cedb9be54
 let
@@ -1207,6 +1694,23 @@ f\left[x_0, x_1, \ldots, x_n\right]=\frac{f\left[x_1, x_2, \ldots, x_n\right]-f\
 ```
 """
 
+# ╔═╡ ea5cb02b-49b4-4edf-89ab-d2fd6155e2a2
+cm"""
+$(bbl("",""))
+So, ``P_n(x)`` can be rewritten in a form called __Newton's DividedDifference__:
+```math
+P_n(x)=f\left[x_0\right]+\sum_{k=1}^n f\left[x_0, x_1, \ldots, x_k\right]\left(x-x_0\right) \cdots\left(x-x_{k-1}\right)
+```
+
+The value of ``f\left[x_0, x_1, \ldots, x_k\right]`` is independent of the order of the numbers ``x_0, x_1, \ldots, x_k``,
+$(ebl())
+"""
+
+# ╔═╡ c04f7b8a-f3ad-49d7-9610-48c5a7305649
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/36fy60w6547qrw1cu5mqu/algo3.2.png?rlkey=zyws01vns88ecijq3fww9cu5f&raw=1",700))
+"""
+
 # ╔═╡ 3d5e1274-386b-4511-8353-0188b2b65eb0
 begin
     function newton_devided_diff(x, y)
@@ -1230,6 +1734,18 @@ begin
     end
 end
 
+# ╔═╡ 611bfd31-5eab-41ee-b410-120739748a2a
+cm"""
+$(ex(1)) Complete the divided difference table for the data used in the following Table and construct the interpolating polynomial that uses all these data.
+| ``x`` | ``f(x)`` |
+| :--- | :---: |
+| 1.0 | 0.7651977 |
+| 1.3 | 0.6200860 |
+| 1.6 | 0.4554022 |
+| 1.9 | 0.2818186 |
+| 2.2 | 0.1103623 |
+"""
+
 # ╔═╡ 5d5adcae-2ad4-44b7-af71-a8ee276df8a3
 let
     xs = [1.0; 1.3; 1.6; 1.9; 2.2]
@@ -1250,6 +1766,17 @@ end
 md"""
 # 3.5 Cubic Spline Interpolation 
 ## Piecewise-Polynomial Approximation
+"""
+
+# ╔═╡ 6a1d699c-fc16-472d-8395-a486890a089d
+cm"""
+The simplest piecewise-polynomial approximation is piecewise-linear interpolation, which consists of joining a set of data points
+```math
+\left\{\left(x_0, f\left(x_0\right)\right),\left(x_1, f\left(x_1\right)\right), \ldots,\left(x_n, f\left(x_n\right)\right)\right\}
+```
+by a series of straight lines, as shown in Figure 3.7.
+
+$(post_img("https://www.dropbox.com/scl/fi/4sj9035slysb342sxqc5b/fig3.7.png?rlkey=2lh6s4qdqqt1euqtnc6mr03mq&raw=1",700))
 """
 
 # ╔═╡ 61b0d517-94fc-4c6c-814b-8dfe51da6f1b
@@ -1291,6 +1818,27 @@ begin
     end
 end
 
+# ╔═╡ a9aa5b73-bde3-4907-971d-696e26ada195
+cm"""$(post_img("https://www.dropbox.com/scl/fi/q9d37ya9w96xt43gg1vfi/fig3.8.png?rlkey=gw741eycxys78h6btem6pz72x&raw=1",700))"""
+
+# ╔═╡ 47e27a13-4e60-40db-9ed7-5433e0230bd3
+cm"""
+$(define("3.10"))
+
+Given a function ``f`` defined on ``[a, b]`` and a set of nodes ``a=x_0 < x_1 < \cdots < x_n=b``, a __cubic spline interpolant ``S`` for ``f``__ is a function that satisfies the following conditions:
+- (a) ``S(x)`` is a cubic polynomial, denoted ``S_j(x)``, on the subinterval ``\left[x_j, x_{j+1}\right]`` for each ``j=0,1, \ldots, n-1``;
+- (b) ``\quad S_j\left(x_j\right)=f\left(x_j\right)`` and ``S_j\left(x_{j+1}\right)=f\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-1``;
+- (c) ``S_{j+1}\left(x_{j+1}\right)=S_j\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``; (Implied by (b).)
+- (d) ``S_{j+1}^{\prime}\left(x_{j+1}\right)=S_j^{\prime}\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``;
+- (e) ``S_{j+1}^{\prime \prime}\left(x_{j+1}\right)=S_j^{\prime \prime}\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``;
+- (f) One of the following sets of boundary conditions is satisfied:
+	- (i) ``S^{\prime \prime}\left(x_0\right)=S^{\prime \prime}\left(x_n\right)=0``
+__(natural (or free) boundary)__;
+	- (ii) ``S^{\prime}\left(x_0\right)=f^{\prime}\left(x_0\right)`` and ``S^{\prime}\left(x_n\right)=f^{\prime}\left(x_n\right) \quad`` __(clamped boundary)__.
+	- (iii) ``S_0^{\prime\prime\prime}\left(x_1\right)=S_1^{\prime\prime\prime}\left(x_1\right)`` and ``S_{n-2}^{\prime\prime\prime}\left(x_{n-1}\right)=S_{n-1}^{\prime\prime\prime}\left(x_{n-1}\right)`` [or ``d_0=d_1`` and ``d_{n-2}=d_{n-1}``] __(Not-a-knot boundary)__.
+	
+"""
+
 # ╔═╡ c4a80b01-c1e3-4196-8408-3054d0aca71e
 md"## Construction of a Cubic Spline"
 
@@ -1306,6 +1854,14 @@ S_j(x)=a_j+b_j\left(x-x_j\right)+c_j\left(x-x_j\right)^2+d_j\left(x-x_j\right)^3
 
 # ╔═╡ d65a3a75-9e63-4087-912a-89e5e973a171
 md"## Natural Splines"
+
+# ╔═╡ 1fd86b21-8457-4c1f-961c-81a105bda5a3
+cm"""
+
+$(bth("3.11"))
+If ``f`` is defined at ``a=x_0 < x_1 < \cdots < x_n=b``, then ``f`` has a unique natural spline interpolant ``S`` on the nodes ``x_0, x_1, \ldots, x_n``; that is, a spline interpolant that satisfies the natural boundary conditions ``S^{\prime \prime}(a)=0`` and ``S^{\prime \prime}(b)=0``.
+$(eth())
+"""
 
 # ╔═╡ bff8bd64-7a8c-4105-96b1-a3f8e8f0cd41
 cm"""
@@ -1340,6 +1896,17 @@ cm"""
 
 """
 
+# ╔═╡ cc599ac5-7000-45c9-bb5a-4529df717046
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/3d3jjo4a5uh2spth11dlm/algo3.4.png?rlkey=jvgva2sh5ysyif9d5y3sy1ez0&raw=1",700))
+"""
+
+# ╔═╡ 4177166a-d638-4739-91e7-d0c42a80392d
+cm"""
+$(ex(1)) Construct a natural cubic spline that passes through the points ``(1,2),(2,3)``, and ``(3,5)``.
+"""
+
+
 # ╔═╡ c2c69250-1f18-4c6d-b8b7-3de26ba0818a
 let
     xs = [1, 2, 3]
@@ -1364,6 +1931,140 @@ let
     # S = a[1:2] .+ b.*(X.-xs[1:2]) .+  c[1:2] .* (X.-xs[1:2]).^2 .+  d .* (X.-xs[1:2]).^3
 
 end
+
+# ╔═╡ be8b89bb-e38f-423d-80b3-fa00fac7ad9a
+cm"""
+$(bbl("MATLAB",""))
+We can use the MATLAB built-in function __`csape`__ (Cubic spline interpolation with end condition)
+
+
+The `csape` function in MATLAB is used for cubic spline interpolation with specified end conditions. Here's a detailed explanation of the provided code snippet:
+
+
+__Natural Boundary Conditions__
+```matlab
+xs = [1 2 3];
+ys =[2 3 5];
+pp = csape(xs,[0 ys 0],[2 2]);
+```
+##### Explanations:
+
+1. **Vectors Definition**:
+    - `xs = [1 2 3];` defines the `x` coordinates of the data points.
+    - `ys =[2 3 5];` defines the corresponding `y` coordinates of the data points.
+
+2. **csape Function Call**:
+    - `pp = csape(xs,[0 ys' 0],[2 2]);` performs the cubic spline interpolation.
+    - `csape` stands for "Cubic Spline with End Conditions".
+
+##### Arguments:
+- `xs`: The `x` coordinates of the data points.
+- `[0 ys 0]`: The `y` coordinates are augmented by appending a `0` at the start and the end, `[0, ys', 0]`. 
+    - The zeros (`0`) at the start and end are used to specify the boundary conditions.
+- `[2 2]`: Specifies the boundary conditions type. 
+    - The value `2` (second derivative) indicates that natural spline boundary conditions are used at both ends.
+    - Natural spline boundary conditions ensure that the second derivatives at the end points are zero.
+
+##### outputs
+__`pp` Structure__ 
+```{=matlab}
+pp = 
+  struct with fields:
+    form: 'pp'
+    breaks: [1 2 3]
+    coefs: [2x4 double]
+    pieces: 2
+    order: 4
+    dim: 1
+```
+
+The output `pp` is a piecewise polynomial structure that can be used for evaluating the spline at any desired point within the range of `xs`.
+
+The `pp` structure is a MATLAB data type that contains information about a piecewise polynomial, including splines. It typically includes the following fields:
+
+**form**: A string that specifies the form of the piecewise polynomial. For cubic splines, this is usually 'pp' (for piecewise polynomial). 
+```{=matlab}
+pp.form
+``` 
+This would output `'pp'`, indicating that this is a piecewise polynomial.
+
+**breaks**: A vector of points where the pieces of the polynomial meet. These are the `x` coordinates of the data points provided for interpolation.
+```{=matlab}
+pp.breaks
+```
+This would output `[1 2 3]`, which are the x-coordinates of the original data points.
+
+**coefs**: A matrix where each row contains the coefficients of the polynomial for a specific interval. For cubic splines, each row contains four coefficients corresponding to the cubic, quadratic, linear, and constant terms of the polynomial in that interval.
+```{=matlab}
+pp.coefs
+```
+This would output a 2x4 matrix, where each row contains the coefficients `[a, b, c, d]` of the polynomial for the corresponding interval. For example:
+```{=matlab}
+pp.coefs
+ans =
+	1.0000   -0.5000    0.5000    2.0000
+	1.5000   -0.2500    0.7500    3.0000
+```
+Each row represents a cubic polynomial of the form:
+```math
+    p(x) = a(x - x_i)^3 + b(x - x_i)^2 + c(x - x_i) + d
+```
+for the corresponding interval ``[x_i, x_{i+1}]``.
+
+**pieces**: The number of polynomial pieces, which is typically one less than the number of break points.
+```{=matlab}
+pp.pieces
+```
+This would output `2`, indicating there are 2 polynomial pieces.
+
+**order**: The order of the polynomial. For cubic splines, this is 4 because the polynomial includes cubic, quadratic, linear, and constant terms.
+```{=matlab}
+pp.order
+```
+This would output `4`, indicating the polynomial is cubic (four coefficients).
+
+
+**dim**: The dimension of the target. For univariate splines, this is 1.
+```{=matlab}
+pp.dim
+```
+This would output `1`, indicating the dimension of the target is univariate (one-dimensional).
+
+##### Evaluating the Spline:
+
+To evaluate the spline at a given point, you can use the `ppval` function:
+
+```{=matlab}
+x_eval = 1.5;
+y_eval = ppval(pp, x_eval);
+```
+
+
+##### Example Usage:
+To evaluate the spline at specific points, you can use the `ppval` function:
+
+```{=matlab}
+% Example evaluation points
+evaluation_points = linspace(min(xs), max(xs), 100);
+
+% Evaluate the spline at the desired points
+spline_values = ppval(pp, evaluation_points);
+
+% Plot the original data points and the interpolated spline
+plot(xs, ys, 'o', evaluation_points, spline_values, '-');
+legend('Data Points', 'Cubic Spline');
+title('Cubic Spline Interpolation with Natural Boundary Conditions');
+```
+
+This script will plot the original data points along with the interpolated cubic spline, showing how the spline fits the data under natural boundary conditions.
+$(ebl())
+"""
+
+# ╔═╡ 2482f975-0c63-45ab-8f9a-a2752809b192
+cm"""
+$(ex(2))
+At the beginning of Chapter 3, we gave some Taylor polynomials to approximate the exponential ``f(x)=e^x``. Use the data points ``(0,1),(1, e),\left(2, e^2\right)``, and ``\left(3, e^3\right)`` to form a natural spline ``S(x)`` that approximates ``f(x)=e^x``.
+"""
 
 # ╔═╡ e45f6f80-7a93-4064-97b0-d6e7269a1b68
 let
@@ -1395,6 +2096,12 @@ let
     S = a[1:n-1] .+ b.*(X.-xs[1:n-1]) .+  c[1:n-1] .* (X.-xs[1:n-1]).^2 .+  d .* (X.-xs[1:n-1]).^3
 end
 
+# ╔═╡ 755a1304-ec77-4ed8-806e-c287f13fdb89
+cm"""
+$(example("Example",""))
+Approximate the integral of ``f(x)=e^x`` on ``[0,3]``
+"""
+
 # ╔═╡ 3115c2f6-8574-4d09-af83-db8e09731d07
 L"""
 \int_0^3 e^ x dx = \left. e^x \right|_0^3 = e^3 - 1 = %$(exp(3)-1)
@@ -1420,6 +2127,13 @@ end
 
 # ╔═╡ eb60c5be-bad0-4c39-9842-3210dbaba8d3
 md"## Clamped Splines"
+
+# ╔═╡ 1e34cf47-8338-484e-b27a-fabfc7ef1b0b
+cm"""
+$(ex(3)) 
+In Example 1, we found a natural spline ``S`` that passes through the points (1, 2), (2, 3), and ``(3,5)``. Construct a clamped spline ``s`` through these points that has ``s^{\prime}(1)=2`` and ``s^{\prime}(3)=1``.
+
+"""
 
 # ╔═╡ 0c695eed-ebe3-4a26-9a32-7054bf1a51c3
 let
@@ -1480,6 +2194,18 @@ let
     plot(1:0.01:3, [x -> S(x), x -> SC(x)])
 	map(f->f(x),SiC.(1:2))
 end
+
+# ╔═╡ f0d5e130-d667-4f38-bfef-5aca795b880f
+cm"""
+$(bbl("MATLAB",""))
+```{=matlab}
+	xs =[1 2 3]
+	ys = [2 3 5]
+	% clamped with f'(1)=2 and f'(3)=1
+ 	pp = csape(xs,[2 ys 1],[1 1])
+```
+$(ebl())
+"""
 
 # ╔═╡ 92244fae-7546-4608-83ad-6dfe7425243c
 let
@@ -1668,6 +2394,19 @@ a_0 \sum_{i=1}^m x_i^n+a_1 \sum_{i=1}^m x_i^{n+1}+a_2 \sum_{i=1}^m x_i^{n+2}+\cd
 These normal equations have a unique solution provided that the ``x_i`` are distinct 
 """
 
+# ╔═╡ 766a993a-b41e-4de3-b511-6fa6e4b092e7
+cm"""
+$(ex(2))
+Example 2 Fit the following data with the discrete least squares polynomial of degree at most 2 .
+| ``i`` | ``x_i`` | ``y_i`` |
+| :---: | :---: | :---: |
+| 1 | 0 | 1.0000 |
+| 2 | 0.25 | 1.2840 |
+| 3 | 0.50 | 1.6487 |
+| 4 | 0.75 | 2.1170 |
+| 5 | 1.00 | 2.7183 |
+"""
+
 # ╔═╡ 3141d33a-677b-47bc-ba45-fb906c984259
 let
 	xs = 0:0.25:1
@@ -1697,6 +2436,18 @@ let
 	plot(p1, x->a₀ + a₁*x + a₂*x^2,label=L"y=%$(a₀) + %$(a₁)x + %$(a₂)x^2",c=:purple)
 end
 
+# ╔═╡ 3ade9674-04a8-4592-bb30-e807ffb0e17d
+cm"""
+$(ex(3)) Find exponential least squares for
+| ``x_i`` | ``y_i`` |
+| :---: | :---: |
+| 1.00 | 5.10 |
+| 1.25 | 5.79 |
+| 1.50 | 6.53 |
+| 1.75 | 7.45 |
+| 2.00 | 8.46 |
+"""
+
 # ╔═╡ aa7ba0e8-c1a3-4bdf-8bf5-aa389bc3795e
 let
 	xs = 1:0.25:2 
@@ -1717,6 +2468,84 @@ let
 	p1 = scatter(xs,ys,label="Data",mark=(:hexagon,7))
 	plot(p1,x->b*(x^a),label=L"y=%$(b) x^{%$a}",lw=1.5)
 end
+
+# ╔═╡ ac719200-b17f-4be9-be43-43b37b5c4018
+cm"""
+$(bbl("MATLAB",""))
+The `fit` function in MATLAB is used to fit curves or surfaces to data. When using the `fit` function with different `fittype` options, you specify the type of model you want to fit to your data. Here is a brief explanation of using `fit` with the `fittype` options 'poly1', 'poly2', 'exp1', and 'power1':
+
+##### Syntax
+```{=matlab}
+f = fit(xs, ys, 'fittype')
+```
+
+Here, `xs` and `ys` are vectors containing your data points, and `'fittype'` specifies the type of curve you want to fit.
+
+##### `fittype` Options:
+
+1. **'poly1'** (Linear Polynomial)
+   - Fits a linear polynomial of the form `` f(x) = p1 \cdot x + p2 ``
+   - **Example Usage**:
+     ```{=matlab}
+     f = fit(xs, ys, 'poly1');
+     ```
+   - **Description**: This fits a straight line to the data points, where `p1` is the slope and `p2` is the intercept.
+
+2. **'poly2'** (Quadratic Polynomial)
+   - Fits a quadratic polynomial of the form `` f(x) = p1 \cdot x^2 + p2 \cdot x + p3 ``
+   - **Example Usage**:
+     ```{=matlab}
+     f = fit(xs, ys, 'poly2');
+     ```
+   - **Description**: This fits a parabola to the data points, where `p1`, `p2`, and `p3` are the coefficients of the quadratic, linear, and constant terms, respectively.
+
+3. **'exp1'** (Single-Term Exponential)
+   - Fits an exponential function of the form `` f(x) = a \cdot e^{b \cdot x} ``
+   - **Example Usage**:
+     ```{=matlab}
+     f = fit(xs, ys, 'exp1');
+     ```
+   - **Description**: This fits an exponential curve to the data points, where `a` and `b` are the coefficients.
+
+4. **'power1'** (Single-Term Power)
+   - Fits a power function of the form `` f(x) = a \cdot x^b ``
+   - **Example Usage**:
+     ```{=matlab}
+     f = fit(xs, ys, 'power1');
+     ```
+   - **Description**: This fits a power-law curve to the data points, where `a` is the coefficient and `b` is the exponent.
+
+##### Example
+
+Given data points in vectors `xs` and `ys`:
+```{=matlab}
+xs = [1; 2; 3; 4; 5];
+ys = [2; 4; 6; 8; 10];
+```
+
+###### Linear Polynomial Fit:
+```{=matlab}
+f = fit(xs, ys, 'poly1');
+```
+
+###### Quadratic Polynomial Fit:
+```{=matlab}
+f = fit(xs, ys, 'poly2');
+```
+
+###### Exponential Fit:
+```{=matlab}
+f = fit(xs, ys, 'exp1');
+```
+
+###### Power Fit:
+```{=matlab}
+f = fit(xs, ys, 'power1');
+```
+
+In each case, the `fit` function will return a fit object `f` that contains the coefficients of the fitted model, which can be used to evaluate the model, plot it, or analyze its properties.
+$(ebl())
+"""
 
 # ╔═╡ 4171e8d8-5821-4a11-ba03-b8f88d785e68
 md"# 4.1 Numerical Differentiation"
@@ -1798,6 +2627,11 @@ f^{\prime}\left(x_0\right)=\frac{f\left(x_0+h\right)-f\left(x_0\right)}{h}-\frac
 
 """
 
+# ╔═╡ 34a1ae00-ae62-4782-bb03-9de7a8d26d1f
+cm"""
+$(ex(1)) Use the forward-difference formula to approximate the derivative of ``f(x)=\ln x`` at ``x_0=1.8`` using ``h=0.1, h=0.05``, and ``h=0.01`` and determine bounds for the approximation errors.
+"""
+
 # ╔═╡ 4909326c-c521-40f6-9941-ade4f56adfa7
 let
 	x0=1.8
@@ -1826,8 +2660,39 @@ f(x)=\sum_{k=0}^n f\left(x_k\right) L_k(x)+\frac{\left(x-x_0\right) \cdots\left(
 # ╔═╡ 4a7f2e34-fe1e-4a34-a942-a4cf29938167
 md"## Three-Point Endpoint Formula"
 
+# ╔═╡ bf7b6d08-4801-4757-87f0-c61e8966fec3
+cm"""
+```math
+\displaystyle f^{\prime}\left(x_0\right)=\frac{1}{2 h}\left[-3 f\left(x_0\right)+4 f\left(x_0+h\right)-f\left(x_0+2 h\right)\right]+\frac{h^2}{3} f^{(3)}\left(\xi_0\right),
+```
+
+$(add_space(22)) where ``\xi_0`` lies between ``x_0`` and ``x_0+2 h``.
+
+"""
+
 # ╔═╡ ac71abdd-790e-403d-97f3-c88fe62b40b7
 md"## Three-Point Midpoint Formula"
+
+# ╔═╡ 4f4fcb2c-a636-40e3-b82e-a2b8888ca7ae
+cm"""
+```math
+f^{\prime}\left(x_0\right)=\frac{1}{2 h}\left[f\left(x_0+h\right)-f\left(x_0-h\right)\right]-\frac{h^2}{6} f^{(3)}\left(\xi_1\right),
+```
+$(add_space(22))where ``\xi_1`` lies between ``x_0-h`` and ``x_0+h``.
+"""
+
+
+# ╔═╡ b6163d7f-1447-461b-8912-f3c152fad7d5
+cm"""
+$(ex(2)) Values for ``f(x)=x e^x`` are given in below. Use all the applicable three-point formulas to approximate ``f^{\prime}(2.0)``.
+| ``x`` | ``f(x)`` |
+| :--- | :---: |
+| 1.8 | 10.889365 |
+| 1.9 | 12.703199 |
+| 2.0 | 14.778112 |
+| 2.1 | 17.148957 |
+| 2.2 | 19.855030 |
+"""
 
 # ╔═╡ ce129375-fc38-46ae-a9b7-90605211620e
 let
@@ -1848,6 +2713,21 @@ end
 # ╔═╡ e4e2c6aa-a849-4841-974e-a30e55843718
 md"## Second Derivative Midpoint Formula"
 
+# ╔═╡ c6947376-99f5-4564-822c-0578f136b54a
+cm"""
+```math
+f^{\prime \prime}\left(x_0\right)=\frac{1}{h^2}\left[f\left(x_0-h\right)-2 f\left(x_0\right)+f\left(x_0+h\right)\right]-\frac{h^2}{12} f^{(4)}(\xi),
+```
+$(add_space(15))for some ``\xi``, where ``x_0-h < \xi < x_0+h``.
+
+$(add_space(10)) If ``f^{(4)}`` is continuous on ``\left[x_0-h, x_0+h\right]``, it is also bounded, and the approximation is ``O\left(h^2\right)``.
+"""
+
+# ╔═╡ f69d01bf-9832-4624-9c19-6c6eb024d24a
+cm"""
+$(ex(3)) Using the data from Example 2, use second derivative Midpoint formula to approximate ``f''(2.0)``
+"""
+
 # ╔═╡ 997136cf-24c5-45b4-bec1-87d28504d7b0
 let
 	xs = 1.8:0.01:2.2
@@ -1863,6 +2743,113 @@ let
 	end
 	adff(2.0,0.01)
 end
+
+# ╔═╡ c1894e87-0df3-431f-8ce6-f4dab38349c7
+cm"""
+$(bbl("MATLAB","<strong>diff</strong>"))
+
+The `diff` function in MATLAB is used to calculate the difference between adjacent elements of an array. This function can be employed to approximate the first and second derivatives of a data set. Here is a brief explanation:
+
+##### Syntax
+```{=matlab}
+Y = diff(X)
+```
+
+##### Description
+- `Y = diff(X)` returns the differences between adjacent elements of `X`. If `X` is a vector, `Y` will be a vector of length `length(X)-1`. If `X` is a matrix, `Y` will be a matrix of the same number of rows, but with one less column, containing the differences between adjacent elements in each column.
+
+##### Approximating the First Derivative
+To approximate the first derivative of a function given by discrete data points, you can use the `diff` function to calculate the differences between consecutive data points.
+
+### Example and Explanation
+
+We will approximate the first and second derivatives of the sine function using finite differences.
+
+#### Code:
+```{=matlab}
+h = 0.001;       % step size
+X = -pi:h:pi;    % domain
+f = sin(X);      % range
+Y = diff(f)/h;   % first derivative
+Z = diff(Y)/h;   % second derivative
+plot(X(1:end-2), Z, 'k', X(1:end-1), Y, 'r', X, f, 'b')
+legend('Second Derivative', 'First Derivative', 'Function')
+```
+
+#### Explanation:
+
+1. **Step Size and Domain**:
+    ```{=matlab}
+    h = 0.001;       % step size
+    X = -pi:h:pi;    % domain
+    ```
+    - `h` is the step size for the finite difference method.
+    - `X` is a vector containing values from `-π` to `π` with increments of `h`.
+
+2. **Function Values**:
+    ```{=matlab}
+    f = sin(X);      % range
+    ```
+    - `f` computes the sine of each value in `X`. This gives us the y-values of the sine function over the interval from `-π` to `π`.
+
+3. **First Derivative Approximation**:
+    ```{=matlab}
+    Y = diff(f)/h;   % first derivative
+    ```
+    - `diff(f)` computes the difference between consecutive elements of `f`.
+    - Dividing by `h` approximates the first derivative \( f'(x) \) using the central difference method.
+
+4. **Second Derivative Approximation**:
+    ```{=matlab}
+    Z = diff(Y)/h;   % second derivative
+    ```
+    - `diff(Y)` computes the difference between consecutive elements of `Y`.
+    - Dividing by `h` approximates the second derivative \( f''(x) \).
+
+5. **Plotting the Results**:
+    ```{=matlab}
+    plot(X(1:end-2), Z, 'k', X(1:end-1), Y, 'r', X, f, 'b')
+    legend('Second Derivative', 'First Derivative', 'Function')
+    ```
+    - `X(1:end-2)` is used for the second derivative because `Z` has two fewer elements than `X`.
+    - `X(1:end-1)` is used for the first derivative because `Y` has one fewer element than `X`.
+    - `X` is used for the original function `f`.
+    - The plot shows the original sine function in blue, the first derivative (cosine) in red, and the second derivative (-sine) in black.
+
+#### Explanation of Derivatives with the `diff` Function
+
+##### First Derivative:
+The `diff` function calculates the difference between consecutive elements in the vector `f`. This difference, divided by the step size `h`, gives an approximation of the first derivative using the finite difference method:
+
+```math
+Y_i = \frac{f_{i+1} - f_i}{h} 
+```
+
+This is essentially the slope of the line connecting two adjacent points on the sine curve, giving an estimate of the derivative at each point.
+
+##### Second Derivative:
+The second derivative is calculated by applying the `diff` function again to the first derivative `Y`. This provides the rate of change of the first derivative, which approximates the second derivative:
+
+```math
+Z_i = \frac{Y_{i+1} - Y_i}{h} = \frac{\left(\frac{f_{i+2} - f_{i+1}}{h}\right) - \left(\frac{f_{i+1} - f_i}{h}\right)}{h} 
+```
+
+Simplifying the above, we get:
+
+```math
+Z_i = \frac{f_{i+2} - 2f_{i+1} + f_i}{h^2} 
+```
+
+This represents the concavity or the rate of change of the slope, which is the second derivative of the function.
+
+#### Conclusion
+
+By using the `diff` function iteratively, we can approximate both the first and second derivatives of a function. The above example demonstrates this method for the sine function, showing how `diff` and finite differences can be used to estimate derivatives in MATLAB.
+
+$(ebl())
+
+
+"""
 
 # ╔═╡ 233e1c2d-2d45-4aa7-be03-6bc4dc76d716
 md"# 4.3 Elements of Numerical Integration"
@@ -1937,6 +2924,30 @@ begin
 		
 end
 
+# ╔═╡ 979c7a6f-dd1d-4eb2-a862-7f370d654058
+cm"""
+- The need often arises for evaluating the definite integral of a function that has 
+1. __no explicit antiderivative__ or 
+2. whose __antiderivative is not easy to obtain__. 
+
+- The basic method involved in approximating ``\int_a^b f(x) d x`` is called __numerical quadrature__. It uses a sum 
+```math
+\sum_{i=0}^n a_i f\left(x_i\right) \quad \text{to approximate}\quad \int_a^b f(x) d x.
+```
+
+- The methods of quadrature in this section are based on the interpolation polynomials given in Chapter 3. The basic idea is to select a set of distinct nodes ``\left\{x_0, \ldots, x_n\right\}`` from the interval ``[a, b]``. Then integrate the Lagrange interpolating polynomial
+```math
+P_n(x)=\sum_{i=0}^n f\left(x_i\right) L_i(x)
+```
+$(add_space(15))and its truncation error term over ``[a, b]`` to obtain
+```math
+\begin{aligned}
+\int_a^b f(x) d x & =\int_a^b \sum_{i=0}^n f\left(x_i\right) L_i(x) d x+\int_a^b \prod_{i=0}^n\left(x-x_i\right) \frac{f^{(n+1)}(\xi(x))}{(n+1)!} d x \\
+& =\sum_{i=0}^n a_i f\left(x_i\right)+\frac{1}{(n+1)!} \int_a^b \prod_{i=0}^n\left(x-x_i\right) f^{(n+1)}(\xi(x)) d x
+\end{aligned}
+```
+"""
+
 # ╔═╡ 0663cf1a-a42e-440f-931f-8321cc7d65f7
 cm"""
 - where ``\xi(x)`` is in ``[a, b]`` for each ``x`` and
@@ -1983,9 +2994,51 @@ The product ``\left(x-x_0\right)\left(x-x_1\right)`` does not change sign on ``\
 ```
 """
 
+# ╔═╡ 6e52e8cf-5b78-41bd-b8fd-390e37614b76
+cm"""
+Consequently, 
+```math
+\begin{aligned}
+\int_a^b f(x) d x & =\left[\frac{\left(x-x_1\right)^2}{2\left(x_0-x_1\right)} f\left(x_0\right)+\frac{\left(x-x_0\right)^2}{2\left(x_1-x_0\right)} f\left(x_1\right)\right]_{x_0}^{x_1}-\frac{h^3}{12} f^{\prime \prime}(\xi) \\
+& =\frac{\left(x_1-x_0\right)}{2}\left[f\left(x_0\right)+f\left(x_1\right)\right]-\frac{h^3}{12} f^{\prime \prime}(\xi)
+\end{aligned}
+```
+Using the notation ``h=x_1-x_0`` gives the following rule:
+$(bbl("Trapezoidal Rule:",""))
+```math
+\int_a^b f(x) d x=\frac{h}{2}\left[f\left(x_0\right)+f\left(x_1\right)\right]-\frac{h^3}{12} f^{\prime \prime}(\xi) .
+```
+$(ebl())
+"""
+
 # ╔═╡ e880c7b4-ab83-4bfc-ac7d-3d1616e3f925
 md"## Simpson's Rule
 Simpson's rule results from integrating over $[a, b]$ the second Lagrange polynomial with equally spaced nodes $x_0=a, x_2=b$, and $x_1=a+h$, where $h=(b-a) / 2$. (See Figure 4.4)"
+
+# ╔═╡ de6d1d86-94d3-4b8f-966c-4681dc4c5e2c
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/g1ejkkhsp9r0pya7buwzq/fig4.4.png?rlkey=zk35qvb4qfxxj0nqxib3ezjxy&raw=1",700))
+"""
+
+# ╔═╡ d426f020-40fe-4f10-a366-5ec99c11900b
+cm"""
+$(bbl("Simpson's Rule:",""))
+```math
+\int_{x_0}^{x_2} f(x) d x=\frac{h}{3}\left[f\left(x_0\right)+4 f\left(x_1\right)+f\left(x_2\right)\right]-\frac{h^5}{90} f^{(4)}(\xi) .
+```
+$(ebl())
+"""
+
+# ╔═╡ 00f5e3a3-dce4-4478-bf7c-2d1845205a71
+cm"""
+$(ex(1)) Compare the Trapezoidal rule and Simpson's rule approximations to ``\int_0^2 f(x) d x`` when ``f(x)`` is
+- (a) ``x^2``
+- (b) ``x^4``
+- (c) ``(x+1)^{-1}``
+- (d) ``\sqrt{1+x^2}``
+- (e) ``\sin x``
+- (f) ``e^x``
+"""
 
 # ╔═╡ e7eed220-a52f-43d4-b431-57344875c0f7
 let
@@ -2018,8 +3071,19 @@ end
 # ╔═╡ 76715703-febf-454f-85b3-9bca7d8a44f4
 md"## Measuring Precision"
 
+# ╔═╡ dda247d8-e3b5-4d0f-a072-4a6f0dc262b5
+cm"""
+$(define("Degree of Accuracy"))
+The degree of accuracy, or precision, of a quadrature formula is the largest positive integer ``n`` such that the formula is exact for ``x^k``, for each ``k=0,1, \ldots, n``.
+"""
+
 # ╔═╡ 32bf866c-03ec-48d4-bf41-31586e248a92
 md"# 4.4 Composite Numerical Integration"
+
+# ╔═╡ 8e77e17a-99a0-4c5d-8aa3-6e86f89f6292
+cm"""
+$(ex(1)) Use Simpson's rule to approximate ``\int_0^4 e^x d x`` and compare this to the results obtained by adding the Simpson's rule approximations for ``\int_0^2 e^x d x`` and ``\int_2^4 e^x d x`` and adding those for ``\int_0^1 e^x d x, \int_1^2 e^x d x, \int_2^3 e^x d x``, and ``\int_3^4 e^x d x``
+"""
 
 # ╔═╡ 76bc523f-cbc4-49e0-9dbd-286b2a98a894
 let
@@ -2028,6 +3092,39 @@ let
 	I3 = sum(simpson(i,i+1,x->exp.(x)) for i in 0:3)
 	I1,I2,I3,exp(4)-1
 end
+
+# ╔═╡ b086377d-2be1-485f-a241-12df11cde33e
+cm"""
+$(bth("4.4")) Let ``f \in C^4[a, b], n`` be even, ``h=(b-a) / n``, and ``x_j=a+j h``, for each ``j=0,1, \ldots, n``. There exists a ``\mu \in(a, b)`` for which the Composite Simpson's rule for ``n`` subintervals can be written with its error term as
+```math
+\int_a^b f(x) d x=\frac{h}{3}\left[f(a)+2 \sum_{j=1}^{(n / 2)-1} f\left(x_{2 j}\right)+4 \sum_{j=1}^{n / 2} f\left(x_{2 j-1}\right)+f(b)\right]-\frac{b-a}{180} h^4 f^{(4)}(\mu) \text {. }
+```
+$(eth())
+"""
+
+# ╔═╡ 4f1c3f5a-1490-4a1d-b26b-679773b90fac
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/ang29vx7rp1qly35kpss6/algo4.1.png?rlkey=g6b3yz0ew3habpwkvdut8vmld&raw=1",700))
+"""
+
+# ╔═╡ ab5d5e0d-afb3-457d-a169-e34608c1a93e
+cm"""
+$(bth("4.5"))
+Let ``f \in C^2[a, b], h=(b-a) / n``, and ``x_j=a+j h``, for each ``j=0,1, \ldots, n``. There exists a ``\mu \in(a, b)`` for which the Composite Trapezoidal rule for ``n`` subintervals can be written with its error term as
+```math
+\int_a^b f(x) d x=\frac{h}{2}\left[f(a)+2 \sum_{j=1}^{n-1} f\left(x_j\right)+f(b)\right]-\frac{b-a}{12} h^2 f^{\prime \prime}(\mu)
+```
+"""
+
+# ╔═╡ 17bcabbc-02c5-451e-9cbe-6e964cd306ef
+cm"""
+$(ex(2))
+Determine values of ``h`` that will ensure an approximation error of less than 0.00002 when approximating ``\displaystyle\int_0^\pi \sin x d x`` and employing
+<div style="display:flex;justify-content:space-evenly;">
+<div>(a) Composite Trapezoidal rule and </div>
+<div>(b) Composite Simpson's rule.</div>
+</div>
+"""
 
 # ╔═╡ 4e814e85-56f6-4407-9de8-73a4c0d30eb6
 let
@@ -2040,8 +3137,167 @@ let
 	abs(Iexact-Isimp) ,0.00002
 end
 
+# ╔═╡ 07786494-0587-436d-a270-6f8e43d944e2
+cm"""
+$(bbl("MATLAB","integral"))
+The MATLAB function `q = integral(fun,xmin,xmax)` is used to compute the numerical integral of a function over a specified interval. This function employs adaptive quadrature methods to evaluate the integral with high accuracy.
+
+##### Syntax
+```{=atlab}
+q = integral(fun, xmin, xmax)
+```
+
+##### Description
+- **`fun`**: A function handle representing the integrand, the function to be integrated. It should be of the form `fun = @(x) expression`.
+- **`xmin`**: The lower limit of integration.
+- **`xmax`**: The upper limit of integration.
+
+##### Output
+- **`q`**: The computed value of the integral over the interval `[xmin, xmax]`.
+
+##### Example
+
+Consider the following integral:
+```math
+\int_0^1 \sin(x) \, dx 
+```
+
+Let's compute this integral using `integral`.
+
+###### Step-by-Step Solution
+
+1. **Define the integrand function:**
+    ```{=atlab}
+    fun = @(x) sin(x);
+    ```
+
+2. **Set the limits of integration:**
+    ```{=atlab}
+    xmin = 0;
+    xmax = 1;
+    ```
+
+3. **Call `integral` to compute the integral:**
+    ```{=atlab}
+    q = integral(fun, xmin, xmax);
+    ```
+
+4. **Display the result:**
+    ```{=atlab}
+    disp(['The integral of sin(x) from 0 to 1 is: ', num2str(q)])
+    ```
+
+##### Full Example Code
+```{=atlab}
+% Define the integrand function
+fun = @(x) sin(x);
+
+% Set the limits of integration
+xmin = 0;
+xmax = 1;
+
+% Compute the integral
+q = integral(fun, xmin, xmax);
+
+% Display the result
+disp(['The integral of sin(x) from 0 to 1 is: ', num2str(q)])
+```
+
+##### Explanation of the Example
+- **`fun`**: This defines the integrand function \( \sin(x) \).
+- **`xmin`**: The lower limit of integration is \( 0 \).
+- **`xmax`**: The upper limit of integration is \( 1 \).
+- **`integral`**: The function is called with the integrand, lower limit, and upper limit to compute the integral.
+- **`disp`**: The result is displayed, showing the value of the integral.
+
+##### Variations with Different Integrands
+
+1. **Polynomial Integrand (fittype 'poly1'):**
+    ```{=atlab}
+    fun = @(x) x.^2;
+    q = integral(fun, 0, 1);
+    disp(['The integral of x^2 from 0 to 1 is: ', num2str(q)])
+    ```
+
+2. **Exponential Integrand (fittype 'exp1'):**
+    ```{=atlab}
+    fun = @(x) exp(x);
+    q = integral(fun, 0, 1);
+    disp(['The integral of exp(x) from 0 to 1 is: ', num2str(q)])
+    ```
+
+3. **Power Integrand (fittype 'power1'):**
+    ```{=atlab}
+    fun = @(x) x.^3;
+    q = integral(fun, 0, 1);
+    disp(['The integral of x^3 from 0 to 1 is: ', num2str(q)])
+    ```
+
+This example demonstrates how `integral` can be used to compute and display the value of an integral in MATLAB. By defining different integrand functions, you can use `integral` to compute various types of integrals over specified intervals.
+$(ebl())
+"""
+
 # ╔═╡ 0318bdb6-cec0-4f1f-bd0d-89c10553b211
 md"# 5.1 The Elementary Theory of Initial-Value Problems"
+
+# ╔═╡ 47d7efd0-48f6-479c-836a-f19c45d1318a
+cm"""
+$(define("5.1")) A function ``f(t, y)`` is said to satisfy a Lipschitz condition in the variable ``y`` on a set ``D \subset \mathbb{R}^2`` if a constant ``L>0`` exists with
+```math
+\left|f\left(t, y_1\right)-f\left(t, y_2,\right)\right| \leq L\left|y_1-y_2\right|,
+```
+whenever ``\left(t, y_1\right)`` and ``\left(t, y_2\right)`` are in ``D``. The constant ``L`` is called a Lipschitz constant for ``f``.
+$(ebl())
+
+$(ex(1)) Show that ``f(t, y)=t|y|`` satisfies a Lipschitz condition on the interval ``D=\{(t, y) \mid 1 \leq`` ``t \leq 2`` and ``-3 \leq y \leq 4\}``.
+"""
+
+# ╔═╡ ba9178c0-677b-470e-8164-7f54bd2438b5
+cm"""
+$(define("5.2"))
+A set ``D \subset \mathbb{R}^2`` is said to be convex if whenever ``\left(t_1, y_1\right)`` and ``\left(t_2, y_2\right)`` belong to ``D``, then 
+```math
+\left((1-\lambda) t_1+\lambda t_2,(1-\lambda) y_1+\lambda y_2\right) \in D \quad\text{ for every }\lambda \in [0,1].
+``` 
+$(ebl())
+
+$(post_img("https://www.dropbox.com/scl/fi/vtp12m6zn8yyz2tefl01s/fig5.1.png?rlkey=99r5x45z32zy51ozjfsqtkpdo&raw=1",700))
+"""
+
+# ╔═╡ 9ad7f65f-1e92-425c-9aa0-9804bbf1911d
+cm"""
+$(bth("5.3"))
+Suppose ``f(t, y)`` is defined on a convex set ``D \subset \mathbb{R}^2``. If a constant ``L>0`` exists with
+```math
+\left|\frac{\partial f}{\partial y}(t, y)\right| \leq L, \quad \text { for all }(t, y) \in D,
+```
+then ``f`` satisfies a Lipschitz condition on ``D`` in the variable ``y`` with Lipschitz constant ``L``.
+$(eth())
+"""
+
+# ╔═╡ e60aaf53-b008-40aa-8403-1f619b81e5b7
+cm"""
+$(theorem("5.4")) Suppose that ``D=\{(t, y) \mid a \leq t \leq b`` and ``-\infty < y < \infty\}`` and that ``f(t, y)`` is continuous on ``D``. If ``f`` satisfies a Lipschitz condition on ``D`` in the variable ``y``, then the initial-value problem
+```math
+y^{\prime}(t)=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha,
+```
+has a unique solution ``y(t)`` for ``a \leq t \leq b``.
+$(eth())
+
+$(ex(2)) Use Theorem 5.4 to show that there is a unique solution to the initial-value problem
+```math
+y^{\prime}=1+t \sin (t y), \quad 0 \leq t \leq 2, \quad y(0)=0
+```
+"""
+
+# ╔═╡ 427b3198-6485-462b-8d13-23322c96a8ac
+cm"""
+$(bbl("Exercise",""))
+Use Theorem 5.4 to show that  the following initial-value problems has a unique solution and find the solution.
+```math
+y^{\prime}=-\frac{2}{t} y+t^2 e^t, 1 \leq t \leq 2, y(1)=\sqrt{2} e.
+```
+"""
 
 # ╔═╡ a92e9f8f-06de-4176-aa1a-aed8a24bc71a
 md"## Well-Posed Problems"
@@ -2051,9 +3307,54 @@ cm"""
 - __Question__: How do we determine whether a particular problem has the property that small changes, or perturbations, in the statement of the problem introduce correspondingly small changes in the solution?
 """
 
+# ╔═╡ 0a5b7cc2-a84e-403e-bc7d-b40f94550383
+cm"""
+$(define("5.5")) The initial-value problem
+```math
+\frac{d y}{d t}=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha,
+```
+is said to be a __well-posed problem__ if:
+- A unique solution, ``y(t)``, to the problem exists, and
+- There exist constants ``\varepsilon_0>0`` and ``k>0`` such that for any ``\varepsilon``, in ``\left(0, \varepsilon_0\right)``, whenever ``\delta(t)`` is continuous with ``|\delta(t)|<\varepsilon`` for all ``t`` in ``[a, b]``, and when ``\left|\delta_0\right|<\varepsilon``, the initial-value problem
+$(texeq"
+\frac{d z}{d t}=f(t, z)+\delta(t), \quad a \leq t \leq b, \quad z(a)=\alpha+\delta_0,
+\label{five_three}")
+$(add_space(10))has a unique solution ``z(t)`` that satisfies
+```math
+|z(t)-y(t)| < k \varepsilon \quad \text { for all } t \text { in }[a, b]
+```
+"""
+
 # ╔═╡ 5189936d-6808-4d88-81da-454b992079eb
 cm"""
 The problem in $(eqref("five_three")) is called a __perturbed problem__ associated with the original proble.
+"""
+
+# ╔═╡ 4c56c9df-9186-4369-9021-c049a2eefdd0
+cm"""
+$(theorem("5.6"))
+Suppose ``D=\{(t, y) \mid a \leq t \leq b`` and ``-\infty < y <\infty\}``. If ``f`` is continuous and satisfies a Lipschitz condition in the variable ``y`` on the set ``D``, then the initial-value problem
+```math
+\frac{d y}{d t}=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha
+```
+is well posed.
+$(eth())
+
+$(ex(3)) Show that the initial-value problem
+```math
+\frac{d y}{d t}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5,
+```
+is well posed on ``D=\{(t, y) \mid 0 \leq t \leq 2`` and ``-\infty < y <\infty\}``.
+"""
+
+# ╔═╡ 3d590d35-f866-404d-9c2a-e8dc17712113
+cm"""
+$(bbl("Illustrations",""))
+As an illustration, consider the solution to the perturbed problem
+```math
+\frac{d z}{d t}=z-t^2+1+\delta, \quad 0 \leq t \leq 2, \quad z(0)=0.5+\delta_0
+```
+$(ebl())
 """
 
 # ╔═╡ c6a776c3-c345-44d7-83f3-088f7eeb20b8
@@ -2123,11 +3424,26 @@ w_0=\alpha \text {, }
 ``w_{i+1}=w_i+h f\left(t_i, w_i\right), \quad`` for each ``i=0,1, \ldots, N-1``
 """
 
+# ╔═╡ cf37eeeb-7317-4050-8218-2a67a2432852
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/lug6uovsoetnx45f5dwwt/algo5.1.png?rlkey=p2r5n84k6jhp4nts5mvrah03h&raw=1",700))
+"""
+
 # ╔═╡ 842361ff-b144-463f-8ae1-9be8a2682723
 function euler(f,t,α)
 	h = t[2]-t[1]
 	reduce((c,ti)->[c..., c[end]+h*f(ti,c[end])],t[1:end-1];init=[α])
 end
+
+# ╔═╡ 8566080c-a6bc-4823-b1f2-747687cdada1
+cm"""
+$(ex(1)) Euler's method was used in the first illustration with ``h=0.5`` to approximate the solution to the initial-value problem
+```math
+y^{\prime}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5 .
+```
+
+Use Algorithm 5.1 with ``N=10`` to determine approximations and compare these with the exact values given by ``y(t)=(t+1)^2-0.5 e^t``.
+"""
 
 # ╔═╡ a554a842-3b8d-45b9-9d40-466bbb879986
 let
@@ -2139,6 +3455,36 @@ let
 	plot(tspan,w, title="Example 1", label="Numerical Solution")
 	plot!(t->(t+1)^2-0.5exp(t), label="Analytical Solution")
 end
+
+# ╔═╡ 66820a81-3ad6-4905-9810-0ab5dd38ce69
+cm"""
+$(theorem("5.9")) Suppose ``f`` is continuous and satisfies a Lipschitz condition with constant ``L`` on
+```math
+D=\{(t, y) \mid a \leq t \leq b \text { and }-\infty < y< \infty\}
+```
+and that a constant ``M`` exists with
+```math
+\left|y^{\prime \prime}(t)\right| \leq M, \quad \text { for all } t \in[a, b]
+```
+where ``y(t)`` denotes the unique solution to the initial-value problem
+```math
+y^{\prime}=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha .
+```
+
+Let ``w_0, w_1, \ldots, w_N`` be the approximations generated by Euler's method for some positive integer ``N``. Then, for each ``i=0,1,2, \ldots, N``,
+```math
+\left|y\left(t_i\right)-w_i\right| \leq \frac{h M}{2 L}\left[e^{L\left(t_i-a\right)}-1\right]
+```
+"""
+
+# ╔═╡ 91cf0689-7e38-4c5d-b718-b444c73853f6
+cm"""
+$(ex(2)) The solution to the initial-value problem
+```math
+y^{\prime}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5,
+```
+was approximated in Example 1 using Euler's method with ``h=0.2``. Use the inequality in Theorem 5.9 to find a bound for the approximation errors and compare these to the actual errors.
+"""
 
 # ╔═╡ e41760c1-8b60-4efa-9bce-dd915fd9b671
 let
@@ -2224,6 +3570,14 @@ w_{i+1} & =w_i+h f\left(t_i+\frac{h}{2}, w_i+\frac{h}{2} f\left(t_i, w_i\right)\
 ```
 """
 
+# ╔═╡ fc5b69cd-eddd-4f1a-92c4-df4d26939821
+cm"""
+$(ex(2)) Use the Midpoint method  with ``N=10, h=0.2, t_i=0.2 i``, and ``w_0=0.5`` to approximate the solution to our usual example,
+```math
+y^{\prime}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5
+```
+"""
+
 # ╔═╡ 99eefc06-0c8a-4326-af71-45aa94814703
 let
 	f(t,y) = y - t^2 + 1
@@ -2253,6 +3607,97 @@ k_4 & =h f\left(t_{i+1}, w_i+k_3\right), \\
 w_{i+1} & =w_i+\frac{1}{6}\left(k_1+2 k_2+2 k_3+k_4\right),
 \end{aligned}
 ```
+"""
+
+# ╔═╡ 767b00e9-3d6c-413c-8a82-1e9152aa5052
+cm"""
+$(bbl("MATLAB","ode45"))
+The MATLAB function `[t,y] = ode45(odefun,tspan,y0)` is used to solve ordinary differential equations (ODEs) numerically using the Dormand-Prince method, which is a method of the Runge-Kutta family. This function is particularly useful for solving non-stiff differential equations.
+
+##### Syntax
+```{=matlab}
+[t,y] = ode45(odefun, tspan, y0)
+```
+
+##### Description
+- **`odefun`**: A function handle that defines the differential equation to be solved. It should be of the form `dy/dt = f(t,y)`.
+- **`tspan`**: A vector specifying the interval of integration `[t0 tf]`. The solver will return the solution at each time step within this interval.
+- **`y0`**: A vector specifying the initial conditions for the ODE.
+
+##### Outputs
+- **`t`**: A column vector of time points at which the solution was evaluated.
+- **`y`**: A matrix where each row corresponds to the solution at a time point in `t`.
+
+##### Example
+
+Consider the following differential equation:
+```math
+\frac{dy}{dt} = -2y + t 
+```
+
+Let's solve this ODE using `ode45` over the interval [0, 5] with the initial condition `` y(0) = 1 ``.
+
+###### Step-by-Step Solution
+
+1. **Define the ODE function:**
+    ```{=matlab}
+    function dydt = odefun(t, y)
+        dydt = -2*y + t;
+    end
+    ```
+
+2. **Set the time span and initial condition:**
+    ```{=matlab}
+    tspan = [0 5];
+    y0 = 1;
+    ```
+
+3. **Call `ode45` to solve the ODE:**
+    ```{=matlab}
+    [t, y] = ode45(@odefun, tspan, y0);
+    ```
+
+4. **Plot the results:**
+    ```{=matlab}
+    plot(t, y)
+    xlabel('Time t')
+    ylabel('Solution y')
+    title('Solution of dy/dt = -2y + t using ode45')
+    ```
+
+##### Full Example Code
+```{=matlab}
+% Define the ODE function
+function dydt = odefun(t, y)
+    dydt = -2*y + t;
+end
+
+% Set the time span and initial condition
+tspan = [0 5];
+y0 = 1;
+
+% Solve the ODE
+[t, y] = ode45(@odefun, tspan, y0);
+
+% Plot the results
+plot(t, y)
+xlabel('Time t')
+ylabel('Solution y')
+title('Solution of dy/dt = -2y + t using ode45')
+```
+
+##### Explanation of the Example
+- **`odefun`**: This function defines the ODE `` \frac{dy}{dt} = -2y + t ``.
+- **`tspan`**: The solver integrates the ODE from `` t = 0 `` to `` t = 5 ``.
+- **`y0`**: The initial condition is `` y(0) = 1 ``.
+- **`ode45`**: The function is called with the ODE function handle, time span, and initial condition to compute the solution.
+- **`plot`**: The solution is plotted with time on the x-axis and the solution on the y-axis.
+
+This example demonstrates how `ode45` can be used to solve and visualize the solution of an ODE in MATLAB.
+
+
+$(ebl())
+
 """
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
@@ -2378,1451 +3823,6 @@ begin
     Also you can ask for an online meeting through __TEAMS__.
     """
 end
-
-# ╔═╡ b4c501ec-ed11-42ae-988e-6e73becf0d7e
-cm"""
-
-$(bth("Taylor Theorem"))
-
-Suppose `` f \in C^n[a, b] ``, `` f^{(n+1)} `` exists on ``[a, b]``, and `` x_0 \in [a, b] ``. For every `` x \in [a, b] ``, there exists a number `` \xi(x) `` between `` x_0 `` and `` x `` with
-```math
-f(x) = P_n(x) + R_n(x),
-```
-where
-```math
-P_n(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{f''(x_0)}{2!}(x - x_0)^2 + \cdots + \frac{f^{(n)}(x_0)}{n!}(x - x_0)^n
-```
-```math
-= \sum_{k=0}^{n} \frac{f^{(k)}(x_0)}{k!}(x - x_0)^k
-```
-and
-
-```math
-R_n(x) = \frac{f^{(n+1)}(\xi(x))}{(n+1)!} (x - x_0)^{n+1}.
-```
-$(eth())
-$(bbl("Remarks"))
-- n``^{th}`` Taylor Polynomial ``P_n(x) ``
-- Remainder Term `` R_n(x) ``
-"""
-
-# ╔═╡ 75115115-19c5-44c5-8c6a-7d3874228f35
-cm"""
-$(ex(1))
-Let ``f(x) = \cos x`` and ``x_0 = 0``. Determine
-
-- the second Taylor polynomial for ``f`` about ``x_0``; and
-- the third Taylor polynomial for ``f`` about ``x_0``.
-
-"""
-
-# ╔═╡ c8beba83-e040-449a-b656-89b7daed7f7c
-cm"""
-$(bbl("Definition","Round-off Error"))
-The error that is produced when a calculator or computer is used to perform real number calculations is called __round-off error__. 
-$(ebl())
-
-- It occurs because the arithmetic performed in a machine involves numbers with only a finite number of digits, with the result that calculations are performed with only approximate representations of the actual numbers. 
-- In a computer, only a relatively small subset of the real number system is used for the representation of all the real numbers. This subset contains only rational numbers, both positive and negative, and stores the fractional part, together with an exponential part.
-"""
-
-# ╔═╡ 0feaa05f-9d53-48d1-b920-ea7c389105f2
-cm"""
-$(example("Example",""))
-Consider the machine number
-
- 	0 10000000011 10111001000100000000000000000000000000000000000000000
-
-"""
-
-# ╔═╡ edfa34e9-ee7d-4a0a-9025-a1857d8b9561
-cm"""
-$(ex(1)) 
-Determine the five-digit 
-- (a) chopping and 
-- (b) rounding 
-
-values of the irrational number ``\pi``.
-
-"""
-
-# ╔═╡ 244d084f-ed09-4d43-9377-8569995328a8
-cm"""
-$(bbl("Definition","") )
-Suppose that ``p^*`` is an approximation to ``p``. 
-- The actual error is ``p-p^*``, 
-- the absolute error is ``\left|p-p^*\right|``, and 
-- the relative error is 
-```math
-\frac{\left|p-p^*\right|}{|p|}, \text{ provided that } p \neq 0.
-```
-$(ebl())
-"""
-
-# ╔═╡ 321e0282-36ae-43dc-adcb-c7a35666a334
-cm"""
-$(ex(2)) 
-Determine the actual, absolute, and relative errors when approximating ``p`` by ``p^*`` when
-- (a) ``p=0.3000 \times 10^1`` and ``p^*=0.3100 \times 10^1``;
-- (b) ``p=0.3000 \times 10^{-3}`` and ``p^*=0.3100 \times 10^{-3}``;
-- (c) ``p=0.3000 \times 10^4`` and ``p^*=0.3100 \times 10^4``.
-"""
-
-# ╔═╡ e3f7eaa9-3fb2-4564-9e9e-961c2ce2e5ad
-cm"""
- $(bbl("Definition","significant digits"))
- The number ``p^*`` is said to approximate ``p`` to ``t`` __significant digits__ (or figures) if ``t`` is the largest nonnegative integer for which
-```math
-\frac{\left|p-p^*\right|}{|p|} \leq 5 \times 10^{-t}
-```
- $(ebl())
- """
-
-# ╔═╡ f84cb603-95f5-42cc-afbc-c110e8e183c1
-cm"""
-$(example("Example",""))
-```math
-\begin{array}{l|l|l|l|l|l|l|l}p & 0.1 & 0.5 & 100 & 1000 & 5000 & 9990 & 10000\end{array}
-```
-What is the least upper bound for ``|p-p^*|`` if ``p^*`` agrees with ``p`` to __four__ significant figures.
-"""
-
-# ╔═╡ 892b86fe-9f31-4a38-9013-1f90e3b06389
-cm"""
-$(ex(3))
-Suppose that ``x=\frac{5}{7}`` and ``y=\frac{1}{3}``. Use five-digit chopping for calculating ``x+y, x-y, x \times y``, and ``x \div y``.
-"""
-
-# ╔═╡ 966f78ae-65e1-4efa-b642-79f343e48a9b
-cm"""
-$(ex(4)) Suppose that in addition to ``x=\frac{5}{7}`` and ``y=\frac{1}{3}`` we have
-```math
-u=0.714251, \quad v=98765.9, \quad \text { and } \quad w=0.111111 \times 10^{-4},
-```
-so that
-```math
-f l(u)=0.71425 \times 10^0, \quad f l(v)=0.98765 \times 10^5, \quad \text { and } \quad f l(w)=0.11111 \times 10^{-4} .
-```
-
-Determine the five-digit chopping values of ``x \ominus u,(x \ominus u) \otimes w,(x \ominus u) \otimes v``, and ``u \oplus v``.
-"""
-
-# ╔═╡ c3720d44-e0a5-413a-aaf9-b11c6e6c442b
-cm"""
-$(example("Example",""))
-Solve the following in 4-digit rounding arithmetic
-```math
-x^2 +62.10x+1=0
-```
-"""
-
-# ╔═╡ e7fd2c69-097d-400f-aa20-19265ebdd2eb
-cm"""
-$(ex(6)) Evaluate ``f(x)=x^3-6.1 x^2+3.2 x+1.5`` at ``x=4.71`` using three-digit arithmetic.
-"""
-
-# ╔═╡ 3651b884-9583-49fb-95e8-269f349cf1ce
-cm"""
-$(define("Algorithm")) 
-An __algorithm__ is a procedure that describes, in an unambiguous manner, a finite sequence of steps to be performed in a specified order. The object of the algorithm is to implement a procedure to solve a problem or approximate a solution to the problem.
-$(ebl())
-
-$(define("Pseudocode"))
-A __pseudocode__ specifies the form of the input to be supplied and the form of the desired output. 
-$(ebl())
-- Not all numerical procedures give satisfactory output for arbitrarily chosen input. As a consequence, a stopping technique independent of the numerical technique is incorporated into each algorithm to avoid infinite loops.
-- Two punctuation symbols are used in the algorithms:
-  - A period (.) indicates the termination of a step.
-  - A semicolon (;) separates tasks within a step.
-"""
-
-# ╔═╡ 053b3718-7c29-4a81-9cb8-c639e515aa07
-cm"""
-$(ex(1))
-The ``N`` th Taylor polynomial for ``f(x)=\ln x`` expanded about ``x_0=1`` is
-```math
-P_N(x)=\sum_{i=1}^N \frac{(-1)^{i+1}}{i}(x-1)^i,
-```
-and the value of ``\ln 1.5`` to eight decimal places is 0.40546511 . Construct an algorithm to determine the minimal value of ``N`` required for
-```math
-\left|\ln 1.5-P_N(1.5)\right|<10^{-5}
-```
-without using the Taylor polynomial remainder term.
-"""
-
-# ╔═╡ f9e82af8-cbcb-4eab-8b66-227a5f34ccef
-cm"""
-$(bbl("Solution"))
-
-__INPUT__ value ``x``, tolerance ``T O L``, maximum number of iterations ``M``. 
-
-__OUTPUT__ degree ``N`` of the polynomial or a message of failure.
-
-__Step 1__ Set ``N=1``;
-```math
-\begin{array}{ll}
-& y=x-1 ; \\
-& \text{ SUM }=0 ; \\
-& \text{ POWER }=y ; \\
-& \text{ TERM }=y ; \\
-& \text{ SIGN }=-1 . \quad \text{(Used to implement alternation of signs.)}
-\end{array}
-```
-
-__Step 2__ While ``N \leq M`` do Steps 3-5.
-
-__Step 3__ Set SIGN ``=-`` SIGN; ``\quad`` (Alternate the signs.)
-```math
-\begin{aligned}
-&\text{S U M}=\text{S U M}+\text{S I G N} \cdot \text{T E R M} ; \quad \text{(Accumulate the terms.)} \\
-&\text{P O W E R}=\text{P O W E R} \cdot y ;\\
-&\text{TERM} = \text{POWER}/(N+1). \quad \text{Calculate the next term.}
-\end{aligned}
-```
-
-__Step 4__ If ``|\text{T E R M}|<\text{T O L}`` then (Test for accuracy.)
-
-OUTPUT ( ``N`` );
-STOP. (The procedure was successful.)
-
-__Step 5__ Set ``N=N+1``. (Prepare for the next iteration. (End Step 2))
-
-__Step 6__ OUTPUT ('Method Failed'); (The procedure was unsuccessful.) 
-
-STOP.
-"""
-
-# ╔═╡ e8278f0e-74a6-4cc3-8164-269391162662
-cm"""
-$(define("1.17")) 
-Suppose that ``E_0>0`` denotes an error introduced at some stage in the calculations and ``E_n`` represents the magnitude of the error after ``n`` subsequent operations.
-- If ``E_n \approx C n E_0``, where ``C`` is a constant independent of ``n``, then the growth of error is said to be linear.
-- If ``E_n \approx C^n E_0``, for some ``C>1``, then the growth of error is called exponential.
-"""
-
-# ╔═╡ a8848e7f-dfd2-438a-956e-daa91ac7ecad
-cm"""
-$(example("Example",""))
-Consider the sequence ``\displaystyle p_n=\left(\frac{1}{3}\right)^n`` and use __five-digit rounding arithmatic__ to compute the terms of this sequence.
-"""
-
-# ╔═╡ a69d2160-3a9e-4038-9d87-5119e9e05466
-cm"""
-$(example("Example",""))
-Now consider the sequence ``\displaystyle p_n=1-\frac{2}{3}n`` and use __five-digit rounding arithmatic__ to compute the terms of this sequence.
-"""
-
-# ╔═╡ 90bd960f-794d-496f-bf28-3b52abba90cc
-cm"""
-$(define("1.18")) 
-Suppose ``\left\{\beta_n\right\}_{n=1}^{\infty}`` is a sequence known to converge to zero and ``\left\{\alpha_n\right\}_{n=1}^{\infty}`` converges to a number ``\alpha``. If a positive constant ``K`` exists with
-```math
-\left|\alpha_n-\alpha\right| \leq K\left|\beta_n\right|, \quad \text { for large } n,
-```
-then we say that ``\left\{\alpha_n\right\}_{n=1}^{\infty}`` converges to ``\alpha`` with rate, or order, of convergence ``O\left(\beta_n\right)``. (This expression is read "big oh of ``\beta_n`` ".) It is indicated by writing ``\alpha_n=\alpha+O\left(\beta_n\right)``.
-"""
-
-# ╔═╡ 62fb93e7-4acc-4466-b932-ce6cfdaf8d61
-cm"""
-$(ex(2))
-Suppose that, for ``n \geq 1``,
-```math
-\alpha_n=\frac{n+1}{n^2} \quad \text { and } \quad \hat{\alpha}_n=\frac{n+3}{n^3} \text {. }
-```
-"""
-
-# ╔═╡ 30833702-0444-4d4e-86c6-be97ae1456e7
-cm"""
-$(define("1.19"))
-Suppose that ``\lim _{h \rightarrow 0} G(h)=0`` and ``\lim _{h \rightarrow 0} F(h)=L``. If a positive constant ``K`` exists with
-
-```math
-|F(h)-L| \leq K|G(h)|, \quad \text{for sufficiently small } h,
-```
-then we write ``F(h)=L+O(G(h))``.
-"""
-
-# ╔═╡ a3ad9375-b2bf-4b3b-9f84-d18d41265640
-cm"""
-$(ex(3))
-Use the third Taylor polynomial about ``h=0`` to show that ``\cos h+\frac{1}{2} h^2=1+O\left(h^4\right)``.
-"""
-
-
-# ╔═╡ 9be1a640-c90f-4171-ab54-f6926dba25be
-cm"""
-$(ex(1))
-Show that ``f(x)=x^3+4 x^2-10=0`` has a root in ``[1,2]`` and use the Bisection method to determine an approximation to the root that is accurate to at least within ``10^{-4}``.
-"""
-
-# ╔═╡ b11a67a2-b544-4996-9816-82bfbcd70a18
-cm"""
-$(bth("2.1"))
-Suppose that ``f \in C[a, b]`` and ``f(a) \cdot f(b)<0``. The Bisection method generates a sequence ``\left\{p_n\right\}_{n=1}^{\infty}`` approximating a zero ``p`` of ``f`` with
-```math
-\left|p_n-p\right| \leq \frac{b-a}{2^n}, \quad \text { when } \quad n \geq 1
-```
-"""
-
-# ╔═╡ e69ad96e-7796-4db4-9ae1-049ad0971f9c
-cm"""
-$(ex(2)) Determine the number of iterations necessary to solve ``f(x)=x^3+4 x^2-10=0`` with accuracy ``10^{-3}`` using ``a_1=1`` and ``b_1=2``.
-"""
-
-# ╔═╡ ddb60135-0438-4381-8284-053c464ec506
-cm"""
-$(define("2.2"))
-The number ``p`` is a fixed point for a given function ``g`` if ``g(p)=p``.
-"""
-
-# ╔═╡ 668930ff-00d1-46b6-97a3-b27f5f6628c1
-cm"""
-$(ex(1)) Determine any fixed points of the function ``g(x)=x^2-2``.
-"""
-
-# ╔═╡ 9d2676de-fb2e-4a2c-8701-ee823bca5f71
-cm"""
-$(bth("2.3")) 
-(i) If ``g \in C[a, b]`` and ``g(x) \in[a, b]`` for all ``x \in[a, b]``, then ``g`` has at least one fixed point in ``[a, b]``.
-(ii) If, in addition, ``g^{\prime}(x)`` exists on ``(a, b)`` and a positive constant ``k<1`` exists with
-```math
-\left|g^{\prime}(x)\right| \leq k, \quad \text { for all } x \in(a, b),
-```
-then there is exactly one fixed point in ``[a, b]``. (See Figure 2.3.)
-$(eth())
-"""
-
-# ╔═╡ 00594dfc-5a8b-4551-b300-bb52eee81e04
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/qdx5nwju090krjjywtw51/figure2.3.png?rlkey=sdlxcn8qvfywjyizmf2upctg2&raw=1"))
-"""
-
-
-
-# ╔═╡ a4e97910-11e5-4ad5-b9d2-7d5635e2990b
-cm"""
-$(ex(2)) 
-Show that ``g(x)=\left(x^2-1\right) / 3`` has a unique fixed point on the interval ``[-1,1]``.
-"""
-
-# ╔═╡ b468696b-bb1b-44f6-8777-623b1b327b0b
-cm"""
-$(ex(3))
-Consider 
-```math
-g(x)=3^{-x}\quad \text{ on } \quad [0,1].
-```
-Thoerem 2.3 does not guarantee the uniquness of the fixed point.
-"""
-
-# ╔═╡ a46e742e-9869-478c-b7a8-99267ceb9116
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/wwb8jccvt23artv0ky0j3/algorithm2.2_fixed_point.png?rlkey=lw78ogrp7skapnv2klsbox9pf&raw=1",700))
-"""
-
-# ╔═╡ b28b570c-44f3-49e9-9b94-eb6f2ed89bbf
-cm"""
-$(example("Example",""))
-Solve ``x^3+4 x^2-10=0`` in the intervale ``[1,2]``.
-"""
-
-# ╔═╡ 12aa745e-9361-4af3-8c8b-7a2ffa83e874
-cm"""
-$(bth("2.4 (Fixed-Point Theorem)"))
-Let ``g \in C[a, b]`` be such that ``g(x) \in[a, b]``, for all ``x`` in ``[a, b]``. Suppose, in addition, that ``g^{\prime}`` exists on ``(a, b)`` and that a constant ``0 < k <1 `` exists with
-```math
-\left|g^{\prime}(x)\right| \leq k, \quad \text { for all } x \in(a, b) .
-```
-
-Then, for any number ``p_0`` in ``[a, b]``, the sequence defined by
-```math
-p_n=g\left(p_{n-1}\right), \quad n \geq 1,
-```
-converges to the unique fixed point ``p`` in ``[a, b]``.
-$(eth())
-"""
-
-# ╔═╡ e3a20e0f-1524-479f-83e8-6fc2093e320b
-cm"""
-$(bbl("Corollary", "2.5")) If ``g`` satisfies the hypotheses of Theorem 2.4 , then bounds for the error involved in using ``p_n`` to approximate ``p`` are given by
-```math
-\left|p_n-p\right| \leq k^n \max \left\{p_0-a, b-p_0\right\}
-```
-and
-```math
-\left|p_n-p\right| \leq \frac{k^n}{1-k}\left|p_1-p_0\right|, \quad \text { for all } \quad n \geq 1
-```
-$(ebl())
-"""
-
-# ╔═╡ 9291e2ac-56a3-41a0-88b8-d3d8ecb7e819
-cm"""
-- __Newton's method__ starts with an initial approximation __``p_0``__ and 
-	- generates the sequence ``\left\{p_n\right\}_{n=0}^{\infty}``, by
-```math
-p_n=p_{n-1}-\frac{f\left(p_{n-1}\right)}{f^{\prime}\left(p_{n-1}\right)}, \quad \text { for } n \geq 1
-```
-See Figure 2.7
-
-$(post_img("https://www.dropbox.com/scl/fi/ojynxcvtkpk8zta8whse7/fig2.7.png?rlkey=hk25cb8v4l7xv4705x9b3muu6&raw=1",700))
-"""
-
-# ╔═╡ 66b6ed61-d870-46d4-a5ad-cb6afec3a9dc
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/emcox2hdvabw08m0npeu0/algo2.3.png?rlkey=69o3qsf1tl2whxywgjd8eyvqc&raw=1",700))
-"""
-
-# ╔═╡ 2cbceb55-e953-4035-a0d3-e4ec236038ab
-cm"""
-$(ex(1))
-Consider the function ``f(x)=\cos x-x=0``. Approximate a root of ``f`` using (a) a fixed-point method, and (b) Newton's method.
-"""
-
-# ╔═╡ e57d0aa5-661f-43e8-885c-fd0aa1ab4cc6
-cm"""
-$(bth("2.6")) Let ``f \in C^2[a, b]``. If ``p \in(a, b)`` such that ``f(p)=0`` and ``f^{\prime}(p) \neq 0``, then there exists a ``\delta>0`` such that Newton's method generates a sequence ``\left\{p_n\right\}_{n=1}^{\infty}`` converging to ``p`` for any initial approximation ``p_0 \in[p-\delta, p+\delta]``.
-$(eth())
-"""
-
-# ╔═╡ 00e4aeb4-d28c-4de6-b298-a47a9d8ee3ab
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/c3f1pl27xv8ieo27lbbrg/fig2.9.png?rlkey=64rg0o9375jz0pum3ggd3amcm&raw=1",700))
-"""
-
-# ╔═╡ 4e765c64-eac2-4654-badf-222601c888b7
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/rw8czxi3l1gs2w50szffr/fig2.4.png?rlkey=0ruonucku445z3y4cp6xa84e8&raw=1",700))
-"""
-
-# ╔═╡ 079acdc9-781f-43c1-bd93-12e40142a0af
-cm"""
-$(ex(2))
-Solve Example 1 using the __Secant Method__.
-"""
-
-# ╔═╡ fd29ef1c-d683-4a84-9595-04d0503d61ab
-cm"""
-- __Algebraic polynomials__, the set of functions of the form
-```math
-P_n(x)=a_n x^n+a_{n-1} x^{n-1}+\cdots+a_1 x+a_0,
-```
-``\color{white}{--.}``where ``n`` is a nonnegative integer and ``a_0, \ldots, a_n`` are real constants.
-- Given __any function__, defined and continuous on a closed and bounded interval, __there exists a polynomial__ that is as "close" to the given function as desired. This result is expressed precisely in the Weierstrass Approximation Theorem. (See Figure 3.1.)
-
-$(post_img("https://www.dropbox.com/scl/fi/uqu4r9frmxmrxa032yvae/fig3.1.png?rlkey=2l7ws8elwvptpkfu7omco1dqi&raw=1",700))
-
-
-"""
-
-# ╔═╡ 59929002-a335-4368-ab7c-a9ad080b3e78
-cm"""
-$(bth("3.1 (Weierstrass Approximation Theorem)")) 
-Suppose ``f`` is defined and continuous on ``[a, b]``. For each ``\epsilon>0``, there exists a polynomial ``P(x)``, with the property that
-```math
-|f(x)-P(x)|<\epsilon, \quad \text { for all } x \text { in }[a, b] .
-```
-"""
-
-# ╔═╡ eec05ea5-cb8a-4979-a5c9-23eebd9afe3f
-cm"""
-$(define("interpolation"))
-Using a polynomial for approximation within the interval given by the endpoints is called __polynomial interpolation.__
-"""
-
-# ╔═╡ cc596f86-0762-4878-9c32-aaf3981b6398
-cm"""
-$(ex(1))
-Determine the linear Lagrange interpolating polynomial that passes through the points ``(2,4)`` and ``(5,1)``.
-"""
-
-# ╔═╡ 54e544f0-f1d0-467d-9a7a-b773053895df
-cm"""$(post_img("https://www.dropbox.com/scl/fi/tusc577dwl8j0vcgbubez/fig3.4.png?rlkey=osxczpcds3axenn0nzae7kxa0&raw=1",700))
-"""
-
-# ╔═╡ 1c83d413-5ab1-40c2-a533-25a312889f5c
-cm"""$(post_img("https://www.dropbox.com/scl/fi/hgr57g6wf7np8hdn5un8x/fig3.5.png?rlkey=2v4sy729j19j33ok1lmnilukq&raw=1",700))"""
-
-# ╔═╡ 1c4799ce-911b-4980-80fc-7c56c2b2a6ff
-cm"""
-$(ex(2))
-- (a) Use the numbers (called nodes) ``x_0=2, x_1=2.75``, and ``x_2=4`` to find the second Lagrange interpolating polynomial for ``f(x)=1 / x``.
-- (b) Use this polynomial to approximate ``f(3)=1 / 3``.
-"""
-
-# ╔═╡ 90297730-1473-4336-a884-d9441f3103a9
-cm"""
-$(bth("3.3"))
-Suppose ``x_0, x_1, \ldots, x_n`` are distinct numbers in the interval ``[a, b]`` and ``f \in C^{n+1}[a, b]``. Then, for each ``x`` in ``[a, b]``, a number ``\xi(x)`` (generally unknown) between ``\min \left\{x_0, x_1, \ldots, x_n\right\}``, and the ``\max \left\{x_0, x_1, \ldots, x_n\right\}`` and hence in ``(a, b)``, exists with
-```math
-f(x)=P(x)+\frac{f^{(n+1)}(\xi(x))}{(n+1)!}\left(x-x_0\right)\left(x-x_1\right) \cdots\left(x-x_n\right),
-```
-where ``P(x)`` is the interpolating polynomial given above.
-$(eth())
-"""
-
-# ╔═╡ e680937f-1fc5-4416-9991-8153bf604d64
-cm"""
-$(ex(3))
-In Example 2, we found the second Lagrange polynomial for ``f(x)=1 / x`` on [2, 4] using the nodes ``x_0=2, x_1=2.75``, and ``x_2=4``. Determine the error form for this polynomial and the maximum error when the polynomial is used to approximate ``f(x)`` for ``x \in[2,4]``.
-"""
-
-# ╔═╡ ea5cb02b-49b4-4edf-89ab-d2fd6155e2a2
-cm"""
-$(bbl("",""))
-So, ``P_n(x)`` can be rewritten in a form called __Newton's DividedDifference__:
-```math
-P_n(x)=f\left[x_0\right]+\sum_{k=1}^n f\left[x_0, x_1, \ldots, x_k\right]\left(x-x_0\right) \cdots\left(x-x_{k-1}\right)
-```
-
-The value of ``f\left[x_0, x_1, \ldots, x_k\right]`` is independent of the order of the numbers ``x_0, x_1, \ldots, x_k``,
-$(ebl())
-"""
-
-# ╔═╡ c04f7b8a-f3ad-49d7-9610-48c5a7305649
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/36fy60w6547qrw1cu5mqu/algo3.2.png?rlkey=zyws01vns88ecijq3fww9cu5f&raw=1",700))
-"""
-
-# ╔═╡ 611bfd31-5eab-41ee-b410-120739748a2a
-cm"""
-$(ex(1)) Complete the divided difference table for the data used in the following Table and construct the interpolating polynomial that uses all these data.
-| ``x`` | ``f(x)`` |
-| :--- | :---: |
-| 1.0 | 0.7651977 |
-| 1.3 | 0.6200860 |
-| 1.6 | 0.4554022 |
-| 1.9 | 0.2818186 |
-| 2.2 | 0.1103623 |
-"""
-
-# ╔═╡ 6a1d699c-fc16-472d-8395-a486890a089d
-cm"""
-The simplest piecewise-polynomial approximation is piecewise-linear interpolation, which consists of joining a set of data points
-```math
-\left\{\left(x_0, f\left(x_0\right)\right),\left(x_1, f\left(x_1\right)\right), \ldots,\left(x_n, f\left(x_n\right)\right)\right\}
-```
-by a series of straight lines, as shown in Figure 3.7.
-
-$(post_img("https://www.dropbox.com/scl/fi/4sj9035slysb342sxqc5b/fig3.7.png?rlkey=2lh6s4qdqqt1euqtnc6mr03mq&raw=1",700))
-"""
-
-# ╔═╡ a9aa5b73-bde3-4907-971d-696e26ada195
-cm"""$(post_img("https://www.dropbox.com/scl/fi/q9d37ya9w96xt43gg1vfi/fig3.8.png?rlkey=gw741eycxys78h6btem6pz72x&raw=1",700))"""
-
-# ╔═╡ 47e27a13-4e60-40db-9ed7-5433e0230bd3
-cm"""
-$(define("3.10"))
-
-Given a function ``f`` defined on ``[a, b]`` and a set of nodes ``a=x_0 < x_1 < \cdots < x_n=b``, a __cubic spline interpolant ``S`` for ``f``__ is a function that satisfies the following conditions:
-- (a) ``S(x)`` is a cubic polynomial, denoted ``S_j(x)``, on the subinterval ``\left[x_j, x_{j+1}\right]`` for each ``j=0,1, \ldots, n-1``;
-- (b) ``\quad S_j\left(x_j\right)=f\left(x_j\right)`` and ``S_j\left(x_{j+1}\right)=f\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-1``;
-- (c) ``S_{j+1}\left(x_{j+1}\right)=S_j\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``; (Implied by (b).)
-- (d) ``S_{j+1}^{\prime}\left(x_{j+1}\right)=S_j^{\prime}\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``;
-- (e) ``S_{j+1}^{\prime \prime}\left(x_{j+1}\right)=S_j^{\prime \prime}\left(x_{j+1}\right)`` for each ``j=0,1, \ldots, n-2``;
-- (f) One of the following sets of boundary conditions is satisfied:
-	- (i) ``S^{\prime \prime}\left(x_0\right)=S^{\prime \prime}\left(x_n\right)=0``
-__(natural (or free) boundary)__;
-	- (ii) ``S^{\prime}\left(x_0\right)=f^{\prime}\left(x_0\right)`` and ``S^{\prime}\left(x_n\right)=f^{\prime}\left(x_n\right) \quad`` __(clamped boundary)__.
-	- (iii) ``S_0^{\prime\prime\prime}\left(x_1\right)=S_1^{\prime\prime\prime}\left(x_1\right)`` and ``S_{n-2}^{\prime\prime\prime}\left(x_{n-1}\right)=S_{n-1}^{\prime\prime\prime}\left(x_{n-1}\right)`` [or ``d_0=d_1`` and ``d_{n-2}=d_{n-1}``] __(Not-a-knot boundary)__.
-	
-"""
-
-# ╔═╡ 1fd86b21-8457-4c1f-961c-81a105bda5a3
-cm"""
-
-$(bth("3.11"))
-If ``f`` is defined at ``a=x_0 < x_1 < \cdots < x_n=b``, then ``f`` has a unique natural spline interpolant ``S`` on the nodes ``x_0, x_1, \ldots, x_n``; that is, a spline interpolant that satisfies the natural boundary conditions ``S^{\prime \prime}(a)=0`` and ``S^{\prime \prime}(b)=0``.
-$(eth())
-"""
-
-# ╔═╡ cc599ac5-7000-45c9-bb5a-4529df717046
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/3d3jjo4a5uh2spth11dlm/algo3.4.png?rlkey=jvgva2sh5ysyif9d5y3sy1ez0&raw=1",700))
-"""
-
-# ╔═╡ 4177166a-d638-4739-91e7-d0c42a80392d
-cm"""
-$(ex(1)) Construct a natural cubic spline that passes through the points ``(1,2),(2,3)``, and ``(3,5)``.
-"""
-
-
-# ╔═╡ be8b89bb-e38f-423d-80b3-fa00fac7ad9a
-cm"""
-$(bbl("MATLAB",""))
-We can use the MATLAB built-in function __`csape`__ (Cubic spline interpolation with end condition)
-
-
-The `csape` function in MATLAB is used for cubic spline interpolation with specified end conditions. Here's a detailed explanation of the provided code snippet:
-
-
-__Natural Boundary Conditions__
-```matlab
-xs = [1 2 3];
-ys =[2 3 5];
-pp = csape(xs,[0 ys 0],[2 2]);
-```
-##### Explanations:
-
-1. **Vectors Definition**:
-    - `xs = [1 2 3];` defines the `x` coordinates of the data points.
-    - `ys =[2 3 5];` defines the corresponding `y` coordinates of the data points.
-
-2. **csape Function Call**:
-    - `pp = csape(xs,[0 ys' 0],[2 2]);` performs the cubic spline interpolation.
-    - `csape` stands for "Cubic Spline with End Conditions".
-
-##### Arguments:
-- `xs`: The `x` coordinates of the data points.
-- `[0 ys 0]`: The `y` coordinates are augmented by appending a `0` at the start and the end, `[0, ys', 0]`. 
-    - The zeros (`0`) at the start and end are used to specify the boundary conditions.
-- `[2 2]`: Specifies the boundary conditions type. 
-    - The value `2` (second derivative) indicates that natural spline boundary conditions are used at both ends.
-    - Natural spline boundary conditions ensure that the second derivatives at the end points are zero.
-
-##### outputs
-__`pp` Structure__ 
-```{=matlab}
-pp = 
-  struct with fields:
-    form: 'pp'
-    breaks: [1 2 3]
-    coefs: [2x4 double]
-    pieces: 2
-    order: 4
-    dim: 1
-```
-
-The output `pp` is a piecewise polynomial structure that can be used for evaluating the spline at any desired point within the range of `xs`.
-
-The `pp` structure is a MATLAB data type that contains information about a piecewise polynomial, including splines. It typically includes the following fields:
-
-**form**: A string that specifies the form of the piecewise polynomial. For cubic splines, this is usually 'pp' (for piecewise polynomial). 
-```{=matlab}
-pp.form
-``` 
-This would output `'pp'`, indicating that this is a piecewise polynomial.
-
-**breaks**: A vector of points where the pieces of the polynomial meet. These are the `x` coordinates of the data points provided for interpolation.
-```{=matlab}
-pp.breaks
-```
-This would output `[1 2 3]`, which are the x-coordinates of the original data points.
-
-**coefs**: A matrix where each row contains the coefficients of the polynomial for a specific interval. For cubic splines, each row contains four coefficients corresponding to the cubic, quadratic, linear, and constant terms of the polynomial in that interval.
-```{=matlab}
-pp.coefs
-```
-This would output a 2x4 matrix, where each row contains the coefficients `[a, b, c, d]` of the polynomial for the corresponding interval. For example:
-```{=matlab}
-pp.coefs
-ans =
-	1.0000   -0.5000    0.5000    2.0000
-	1.5000   -0.2500    0.7500    3.0000
-```
-Each row represents a cubic polynomial of the form:
-```math
-    p(x) = a(x - x_i)^3 + b(x - x_i)^2 + c(x - x_i) + d
-```
-for the corresponding interval ``[x_i, x_{i+1}]``.
-
-**pieces**: The number of polynomial pieces, which is typically one less than the number of break points.
-```{=matlab}
-pp.pieces
-```
-This would output `2`, indicating there are 2 polynomial pieces.
-
-**order**: The order of the polynomial. For cubic splines, this is 4 because the polynomial includes cubic, quadratic, linear, and constant terms.
-```{=matlab}
-pp.order
-```
-This would output `4`, indicating the polynomial is cubic (four coefficients).
-
-
-**dim**: The dimension of the target. For univariate splines, this is 1.
-```{=matlab}
-pp.dim
-```
-This would output `1`, indicating the dimension of the target is univariate (one-dimensional).
-
-##### Evaluating the Spline:
-
-To evaluate the spline at a given point, you can use the `ppval` function:
-
-```{=matlab}
-x_eval = 1.5;
-y_eval = ppval(pp, x_eval);
-```
-
-
-##### Example Usage:
-To evaluate the spline at specific points, you can use the `ppval` function:
-
-```{=matlab}
-% Example evaluation points
-evaluation_points = linspace(min(xs), max(xs), 100);
-
-% Evaluate the spline at the desired points
-spline_values = ppval(pp, evaluation_points);
-
-% Plot the original data points and the interpolated spline
-plot(xs, ys, 'o', evaluation_points, spline_values, '-');
-legend('Data Points', 'Cubic Spline');
-title('Cubic Spline Interpolation with Natural Boundary Conditions');
-```
-
-This script will plot the original data points along with the interpolated cubic spline, showing how the spline fits the data under natural boundary conditions.
-$(ebl())
-"""
-
-# ╔═╡ 2482f975-0c63-45ab-8f9a-a2752809b192
-cm"""
-$(ex(2))
-At the beginning of Chapter 3, we gave some Taylor polynomials to approximate the exponential ``f(x)=e^x``. Use the data points ``(0,1),(1, e),\left(2, e^2\right)``, and ``\left(3, e^3\right)`` to form a natural spline ``S(x)`` that approximates ``f(x)=e^x``.
-"""
-
-# ╔═╡ 755a1304-ec77-4ed8-806e-c287f13fdb89
-cm"""
-$(example("Example",""))
-Approximate the integral of ``f(x)=e^x`` on ``[0,3]``
-"""
-
-# ╔═╡ 1e34cf47-8338-484e-b27a-fabfc7ef1b0b
-cm"""
-$(ex(3)) 
-In Example 1, we found a natural spline ``S`` that passes through the points (1, 2), (2, 3), and ``(3,5)``. Construct a clamped spline ``s`` through these points that has ``s^{\prime}(1)=2`` and ``s^{\prime}(3)=1``.
-
-"""
-
-# ╔═╡ f0d5e130-d667-4f38-bfef-5aca795b880f
-cm"""
-$(bbl("MATLAB",""))
-```{=matlab}
-	xs =[1 2 3]
-	ys = [2 3 5]
-	% clamped with f'(1)=2 and f'(3)=1
- 	pp = csape(xs,[2 ys 1],[1 1])
-```
-$(ebl())
-"""
-
-# ╔═╡ 766a993a-b41e-4de3-b511-6fa6e4b092e7
-cm"""
-$(ex(2))
-Example 2 Fit the following data with the discrete least squares polynomial of degree at most 2 .
-| ``i`` | ``x_i`` | ``y_i`` |
-| :---: | :---: | :---: |
-| 1 | 0 | 1.0000 |
-| 2 | 0.25 | 1.2840 |
-| 3 | 0.50 | 1.6487 |
-| 4 | 0.75 | 2.1170 |
-| 5 | 1.00 | 2.7183 |
-"""
-
-# ╔═╡ 3ade9674-04a8-4592-bb30-e807ffb0e17d
-cm"""
-$(ex(3)) Find exponential least squares for
-| ``x_i`` | ``y_i`` |
-| :---: | :---: |
-| 1.00 | 5.10 |
-| 1.25 | 5.79 |
-| 1.50 | 6.53 |
-| 1.75 | 7.45 |
-| 2.00 | 8.46 |
-"""
-
-# ╔═╡ ac719200-b17f-4be9-be43-43b37b5c4018
-cm"""
-$(bbl("MATLAB",""))
-The `fit` function in MATLAB is used to fit curves or surfaces to data. When using the `fit` function with different `fittype` options, you specify the type of model you want to fit to your data. Here is a brief explanation of using `fit` with the `fittype` options 'poly1', 'poly2', 'exp1', and 'power1':
-
-##### Syntax
-```{=matlab}
-f = fit(xs, ys, 'fittype')
-```
-
-Here, `xs` and `ys` are vectors containing your data points, and `'fittype'` specifies the type of curve you want to fit.
-
-##### `fittype` Options:
-
-1. **'poly1'** (Linear Polynomial)
-   - Fits a linear polynomial of the form `` f(x) = p1 \cdot x + p2 ``
-   - **Example Usage**:
-     ```{=matlab}
-     f = fit(xs, ys, 'poly1');
-     ```
-   - **Description**: This fits a straight line to the data points, where `p1` is the slope and `p2` is the intercept.
-
-2. **'poly2'** (Quadratic Polynomial)
-   - Fits a quadratic polynomial of the form `` f(x) = p1 \cdot x^2 + p2 \cdot x + p3 ``
-   - **Example Usage**:
-     ```{=matlab}
-     f = fit(xs, ys, 'poly2');
-     ```
-   - **Description**: This fits a parabola to the data points, where `p1`, `p2`, and `p3` are the coefficients of the quadratic, linear, and constant terms, respectively.
-
-3. **'exp1'** (Single-Term Exponential)
-   - Fits an exponential function of the form `` f(x) = a \cdot e^{b \cdot x} ``
-   - **Example Usage**:
-     ```{=matlab}
-     f = fit(xs, ys, 'exp1');
-     ```
-   - **Description**: This fits an exponential curve to the data points, where `a` and `b` are the coefficients.
-
-4. **'power1'** (Single-Term Power)
-   - Fits a power function of the form `` f(x) = a \cdot x^b ``
-   - **Example Usage**:
-     ```{=matlab}
-     f = fit(xs, ys, 'power1');
-     ```
-   - **Description**: This fits a power-law curve to the data points, where `a` is the coefficient and `b` is the exponent.
-
-##### Example
-
-Given data points in vectors `xs` and `ys`:
-```{=matlab}
-xs = [1; 2; 3; 4; 5];
-ys = [2; 4; 6; 8; 10];
-```
-
-###### Linear Polynomial Fit:
-```{=matlab}
-f = fit(xs, ys, 'poly1');
-```
-
-###### Quadratic Polynomial Fit:
-```{=matlab}
-f = fit(xs, ys, 'poly2');
-```
-
-###### Exponential Fit:
-```{=matlab}
-f = fit(xs, ys, 'exp1');
-```
-
-###### Power Fit:
-```{=matlab}
-f = fit(xs, ys, 'power1');
-```
-
-In each case, the `fit` function will return a fit object `f` that contains the coefficients of the fitted model, which can be used to evaluate the model, plot it, or analyze its properties.
-$(ebl())
-"""
-
-# ╔═╡ 34a1ae00-ae62-4782-bb03-9de7a8d26d1f
-cm"""
-$(ex(1)) Use the forward-difference formula to approximate the derivative of ``f(x)=\ln x`` at ``x_0=1.8`` using ``h=0.1, h=0.05``, and ``h=0.01`` and determine bounds for the approximation errors.
-"""
-
-# ╔═╡ bf7b6d08-4801-4757-87f0-c61e8966fec3
-cm"""
-```math
-\displaystyle f^{\prime}\left(x_0\right)=\frac{1}{2 h}\left[-3 f\left(x_0\right)+4 f\left(x_0+h\right)-f\left(x_0+2 h\right)\right]+\frac{h^2}{3} f^{(3)}\left(\xi_0\right),
-```
-
-$(add_space(22)) where ``\xi_0`` lies between ``x_0`` and ``x_0+2 h``.
-
-"""
-
-# ╔═╡ 4f4fcb2c-a636-40e3-b82e-a2b8888ca7ae
-cm"""
-```math
-f^{\prime}\left(x_0\right)=\frac{1}{2 h}\left[f\left(x_0+h\right)-f\left(x_0-h\right)\right]-\frac{h^2}{6} f^{(3)}\left(\xi_1\right),
-```
-$(add_space(22))where ``\xi_1`` lies between ``x_0-h`` and ``x_0+h``.
-"""
-
-
-# ╔═╡ b6163d7f-1447-461b-8912-f3c152fad7d5
-cm"""
-$(ex(2)) Values for ``f(x)=x e^x`` are given in below. Use all the applicable three-point formulas to approximate ``f^{\prime}(2.0)``.
-| ``x`` | ``f(x)`` |
-| :--- | :---: |
-| 1.8 | 10.889365 |
-| 1.9 | 12.703199 |
-| 2.0 | 14.778112 |
-| 2.1 | 17.148957 |
-| 2.2 | 19.855030 |
-"""
-
-# ╔═╡ c6947376-99f5-4564-822c-0578f136b54a
-cm"""
-```math
-f^{\prime \prime}\left(x_0\right)=\frac{1}{h^2}\left[f\left(x_0-h\right)-2 f\left(x_0\right)+f\left(x_0+h\right)\right]-\frac{h^2}{12} f^{(4)}(\xi),
-```
-$(add_space(15))for some ``\xi``, where ``x_0-h < \xi < x_0+h``.
-
-$(add_space(10)) If ``f^{(4)}`` is continuous on ``\left[x_0-h, x_0+h\right]``, it is also bounded, and the approximation is ``O\left(h^2\right)``.
-"""
-
-# ╔═╡ f69d01bf-9832-4624-9c19-6c6eb024d24a
-cm"""
-$(ex(3)) Using the data from Example 2, use second derivative Midpoint formula to approximate ``f''(2.0)``
-"""
-
-# ╔═╡ c1894e87-0df3-431f-8ce6-f4dab38349c7
-cm"""
-$(bbl("MATLAB","<strong>diff</strong>"))
-
-The `diff` function in MATLAB is used to calculate the difference between adjacent elements of an array. This function can be employed to approximate the first and second derivatives of a data set. Here is a brief explanation:
-
-##### Syntax
-```{=matlab}
-Y = diff(X)
-```
-
-##### Description
-- `Y = diff(X)` returns the differences between adjacent elements of `X`. If `X` is a vector, `Y` will be a vector of length `length(X)-1`. If `X` is a matrix, `Y` will be a matrix of the same number of rows, but with one less column, containing the differences between adjacent elements in each column.
-
-##### Approximating the First Derivative
-To approximate the first derivative of a function given by discrete data points, you can use the `diff` function to calculate the differences between consecutive data points.
-
-### Example and Explanation
-
-We will approximate the first and second derivatives of the sine function using finite differences.
-
-#### Code:
-```{=matlab}
-h = 0.001;       % step size
-X = -pi:h:pi;    % domain
-f = sin(X);      % range
-Y = diff(f)/h;   % first derivative
-Z = diff(Y)/h;   % second derivative
-plot(X(1:end-2), Z, 'k', X(1:end-1), Y, 'r', X, f, 'b')
-legend('Second Derivative', 'First Derivative', 'Function')
-```
-
-#### Explanation:
-
-1. **Step Size and Domain**:
-    ```{=matlab}
-    h = 0.001;       % step size
-    X = -pi:h:pi;    % domain
-    ```
-    - `h` is the step size for the finite difference method.
-    - `X` is a vector containing values from `-π` to `π` with increments of `h`.
-
-2. **Function Values**:
-    ```{=matlab}
-    f = sin(X);      % range
-    ```
-    - `f` computes the sine of each value in `X`. This gives us the y-values of the sine function over the interval from `-π` to `π`.
-
-3. **First Derivative Approximation**:
-    ```{=matlab}
-    Y = diff(f)/h;   % first derivative
-    ```
-    - `diff(f)` computes the difference between consecutive elements of `f`.
-    - Dividing by `h` approximates the first derivative \( f'(x) \) using the central difference method.
-
-4. **Second Derivative Approximation**:
-    ```{=matlab}
-    Z = diff(Y)/h;   % second derivative
-    ```
-    - `diff(Y)` computes the difference between consecutive elements of `Y`.
-    - Dividing by `h` approximates the second derivative \( f''(x) \).
-
-5. **Plotting the Results**:
-    ```{=matlab}
-    plot(X(1:end-2), Z, 'k', X(1:end-1), Y, 'r', X, f, 'b')
-    legend('Second Derivative', 'First Derivative', 'Function')
-    ```
-    - `X(1:end-2)` is used for the second derivative because `Z` has two fewer elements than `X`.
-    - `X(1:end-1)` is used for the first derivative because `Y` has one fewer element than `X`.
-    - `X` is used for the original function `f`.
-    - The plot shows the original sine function in blue, the first derivative (cosine) in red, and the second derivative (-sine) in black.
-
-#### Explanation of Derivatives with the `diff` Function
-
-##### First Derivative:
-The `diff` function calculates the difference between consecutive elements in the vector `f`. This difference, divided by the step size `h`, gives an approximation of the first derivative using the finite difference method:
-
-```math
-Y_i = \frac{f_{i+1} - f_i}{h} 
-```
-
-This is essentially the slope of the line connecting two adjacent points on the sine curve, giving an estimate of the derivative at each point.
-
-##### Second Derivative:
-The second derivative is calculated by applying the `diff` function again to the first derivative `Y`. This provides the rate of change of the first derivative, which approximates the second derivative:
-
-```math
-Z_i = \frac{Y_{i+1} - Y_i}{h} = \frac{\left(\frac{f_{i+2} - f_{i+1}}{h}\right) - \left(\frac{f_{i+1} - f_i}{h}\right)}{h} 
-```
-
-Simplifying the above, we get:
-
-```math
-Z_i = \frac{f_{i+2} - 2f_{i+1} + f_i}{h^2} 
-```
-
-This represents the concavity or the rate of change of the slope, which is the second derivative of the function.
-
-#### Conclusion
-
-By using the `diff` function iteratively, we can approximate both the first and second derivatives of a function. The above example demonstrates this method for the sine function, showing how `diff` and finite differences can be used to estimate derivatives in MATLAB.
-
-$(ebl())
-
-
-"""
-
-# ╔═╡ 979c7a6f-dd1d-4eb2-a862-7f370d654058
-cm"""
-- The need often arises for evaluating the definite integral of a function that has 
-1. __no explicit antiderivative__ or 
-2. whose __antiderivative is not easy to obtain__. 
-
-- The basic method involved in approximating ``\int_a^b f(x) d x`` is called __numerical quadrature__. It uses a sum 
-```math
-\sum_{i=0}^n a_i f\left(x_i\right) \quad \text{to approximate}\quad \int_a^b f(x) d x.
-```
-
-- The methods of quadrature in this section are based on the interpolation polynomials given in Chapter 3. The basic idea is to select a set of distinct nodes ``\left\{x_0, \ldots, x_n\right\}`` from the interval ``[a, b]``. Then integrate the Lagrange interpolating polynomial
-```math
-P_n(x)=\sum_{i=0}^n f\left(x_i\right) L_i(x)
-```
-$(add_space(15))and its truncation error term over ``[a, b]`` to obtain
-```math
-\begin{aligned}
-\int_a^b f(x) d x & =\int_a^b \sum_{i=0}^n f\left(x_i\right) L_i(x) d x+\int_a^b \prod_{i=0}^n\left(x-x_i\right) \frac{f^{(n+1)}(\xi(x))}{(n+1)!} d x \\
-& =\sum_{i=0}^n a_i f\left(x_i\right)+\frac{1}{(n+1)!} \int_a^b \prod_{i=0}^n\left(x-x_i\right) f^{(n+1)}(\xi(x)) d x
-\end{aligned}
-```
-"""
-
-# ╔═╡ 6e52e8cf-5b78-41bd-b8fd-390e37614b76
-cm"""
-Consequently, 
-```math
-\begin{aligned}
-\int_a^b f(x) d x & =\left[\frac{\left(x-x_1\right)^2}{2\left(x_0-x_1\right)} f\left(x_0\right)+\frac{\left(x-x_0\right)^2}{2\left(x_1-x_0\right)} f\left(x_1\right)\right]_{x_0}^{x_1}-\frac{h^3}{12} f^{\prime \prime}(\xi) \\
-& =\frac{\left(x_1-x_0\right)}{2}\left[f\left(x_0\right)+f\left(x_1\right)\right]-\frac{h^3}{12} f^{\prime \prime}(\xi)
-\end{aligned}
-```
-Using the notation ``h=x_1-x_0`` gives the following rule:
-$(bbl("Trapezoidal Rule:",""))
-```math
-\int_a^b f(x) d x=\frac{h}{2}\left[f\left(x_0\right)+f\left(x_1\right)\right]-\frac{h^3}{12} f^{\prime \prime}(\xi) .
-```
-$(ebl())
-"""
-
-# ╔═╡ de6d1d86-94d3-4b8f-966c-4681dc4c5e2c
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/g1ejkkhsp9r0pya7buwzq/fig4.4.png?rlkey=zk35qvb4qfxxj0nqxib3ezjxy&raw=1",700))
-"""
-
-# ╔═╡ d426f020-40fe-4f10-a366-5ec99c11900b
-cm"""
-$(bbl("Simpson's Rule:",""))
-```math
-\int_{x_0}^{x_2} f(x) d x=\frac{h}{3}\left[f\left(x_0\right)+4 f\left(x_1\right)+f\left(x_2\right)\right]-\frac{h^5}{90} f^{(4)}(\xi) .
-```
-$(ebl())
-"""
-
-# ╔═╡ 00f5e3a3-dce4-4478-bf7c-2d1845205a71
-cm"""
-$(ex(1)) Compare the Trapezoidal rule and Simpson's rule approximations to ``\int_0^2 f(x) d x`` when ``f(x)`` is
-- (a) ``x^2``
-- (b) ``x^4``
-- (c) ``(x+1)^{-1}``
-- (d) ``\sqrt{1+x^2}``
-- (e) ``\sin x``
-- (f) ``e^x``
-"""
-
-# ╔═╡ dda247d8-e3b5-4d0f-a072-4a6f0dc262b5
-cm"""
-$(define("Degree of Accuracy"))
-The degree of accuracy, or precision, of a quadrature formula is the largest positive integer ``n`` such that the formula is exact for ``x^k``, for each ``k=0,1, \ldots, n``.
-"""
-
-# ╔═╡ 8e77e17a-99a0-4c5d-8aa3-6e86f89f6292
-cm"""
-$(ex(1)) Use Simpson's rule to approximate ``\int_0^4 e^x d x`` and compare this to the results obtained by adding the Simpson's rule approximations for ``\int_0^2 e^x d x`` and ``\int_2^4 e^x d x`` and adding those for ``\int_0^1 e^x d x, \int_1^2 e^x d x, \int_2^3 e^x d x``, and ``\int_3^4 e^x d x``
-"""
-
-# ╔═╡ b086377d-2be1-485f-a241-12df11cde33e
-cm"""
-$(bth("4.4")) Let ``f \in C^4[a, b], n`` be even, ``h=(b-a) / n``, and ``x_j=a+j h``, for each ``j=0,1, \ldots, n``. There exists a ``\mu \in(a, b)`` for which the Composite Simpson's rule for ``n`` subintervals can be written with its error term as
-```math
-\int_a^b f(x) d x=\frac{h}{3}\left[f(a)+2 \sum_{j=1}^{(n / 2)-1} f\left(x_{2 j}\right)+4 \sum_{j=1}^{n / 2} f\left(x_{2 j-1}\right)+f(b)\right]-\frac{b-a}{180} h^4 f^{(4)}(\mu) \text {. }
-```
-$(eth())
-"""
-
-# ╔═╡ 4f1c3f5a-1490-4a1d-b26b-679773b90fac
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/ang29vx7rp1qly35kpss6/algo4.1.png?rlkey=g6b3yz0ew3habpwkvdut8vmld&raw=1",700))
-"""
-
-# ╔═╡ ab5d5e0d-afb3-457d-a169-e34608c1a93e
-cm"""
-$(bth("4.5"))
-Let ``f \in C^2[a, b], h=(b-a) / n``, and ``x_j=a+j h``, for each ``j=0,1, \ldots, n``. There exists a ``\mu \in(a, b)`` for which the Composite Trapezoidal rule for ``n`` subintervals can be written with its error term as
-```math
-\int_a^b f(x) d x=\frac{h}{2}\left[f(a)+2 \sum_{j=1}^{n-1} f\left(x_j\right)+f(b)\right]-\frac{b-a}{12} h^2 f^{\prime \prime}(\mu)
-```
-"""
-
-# ╔═╡ 17bcabbc-02c5-451e-9cbe-6e964cd306ef
-cm"""
-$(ex(2))
-Determine values of ``h`` that will ensure an approximation error of less than 0.00002 when approximating ``\displaystyle\int_0^\pi \sin x d x`` and employing
-<div style="display:flex;justify-content:space-evenly;">
-<div>(a) Composite Trapezoidal rule and </div>
-<div>(b) Composite Simpson's rule.</div>
-</div>
-"""
-
-# ╔═╡ 07786494-0587-436d-a270-6f8e43d944e2
-cm"""
-$(bbl("MATLAB","integral"))
-The MATLAB function `q = integral(fun,xmin,xmax)` is used to compute the numerical integral of a function over a specified interval. This function employs adaptive quadrature methods to evaluate the integral with high accuracy.
-
-##### Syntax
-```{=atlab}
-q = integral(fun, xmin, xmax)
-```
-
-##### Description
-- **`fun`**: A function handle representing the integrand, the function to be integrated. It should be of the form `fun = @(x) expression`.
-- **`xmin`**: The lower limit of integration.
-- **`xmax`**: The upper limit of integration.
-
-##### Output
-- **`q`**: The computed value of the integral over the interval `[xmin, xmax]`.
-
-##### Example
-
-Consider the following integral:
-```math
-\int_0^1 \sin(x) \, dx 
-```
-
-Let's compute this integral using `integral`.
-
-###### Step-by-Step Solution
-
-1. **Define the integrand function:**
-    ```{=atlab}
-    fun = @(x) sin(x);
-    ```
-
-2. **Set the limits of integration:**
-    ```{=atlab}
-    xmin = 0;
-    xmax = 1;
-    ```
-
-3. **Call `integral` to compute the integral:**
-    ```{=atlab}
-    q = integral(fun, xmin, xmax);
-    ```
-
-4. **Display the result:**
-    ```{=atlab}
-    disp(['The integral of sin(x) from 0 to 1 is: ', num2str(q)])
-    ```
-
-##### Full Example Code
-```{=atlab}
-% Define the integrand function
-fun = @(x) sin(x);
-
-% Set the limits of integration
-xmin = 0;
-xmax = 1;
-
-% Compute the integral
-q = integral(fun, xmin, xmax);
-
-% Display the result
-disp(['The integral of sin(x) from 0 to 1 is: ', num2str(q)])
-```
-
-##### Explanation of the Example
-- **`fun`**: This defines the integrand function \( \sin(x) \).
-- **`xmin`**: The lower limit of integration is \( 0 \).
-- **`xmax`**: The upper limit of integration is \( 1 \).
-- **`integral`**: The function is called with the integrand, lower limit, and upper limit to compute the integral.
-- **`disp`**: The result is displayed, showing the value of the integral.
-
-##### Variations with Different Integrands
-
-1. **Polynomial Integrand (fittype 'poly1'):**
-    ```{=atlab}
-    fun = @(x) x.^2;
-    q = integral(fun, 0, 1);
-    disp(['The integral of x^2 from 0 to 1 is: ', num2str(q)])
-    ```
-
-2. **Exponential Integrand (fittype 'exp1'):**
-    ```{=atlab}
-    fun = @(x) exp(x);
-    q = integral(fun, 0, 1);
-    disp(['The integral of exp(x) from 0 to 1 is: ', num2str(q)])
-    ```
-
-3. **Power Integrand (fittype 'power1'):**
-    ```{=atlab}
-    fun = @(x) x.^3;
-    q = integral(fun, 0, 1);
-    disp(['The integral of x^3 from 0 to 1 is: ', num2str(q)])
-    ```
-
-This example demonstrates how `integral` can be used to compute and display the value of an integral in MATLAB. By defining different integrand functions, you can use `integral` to compute various types of integrals over specified intervals.
-$(ebl())
-"""
-
-# ╔═╡ 47d7efd0-48f6-479c-836a-f19c45d1318a
-cm"""
-$(define("5.1")) A function ``f(t, y)`` is said to satisfy a Lipschitz condition in the variable ``y`` on a set ``D \subset \mathbb{R}^2`` if a constant ``L>0`` exists with
-```math
-\left|f\left(t, y_1\right)-f\left(t, y_2,\right)\right| \leq L\left|y_1-y_2\right|,
-```
-whenever ``\left(t, y_1\right)`` and ``\left(t, y_2\right)`` are in ``D``. The constant ``L`` is called a Lipschitz constant for ``f``.
-$(ebl())
-
-$(ex(1)) Show that ``f(t, y)=t|y|`` satisfies a Lipschitz condition on the interval ``D=\{(t, y) \mid 1 \leq`` ``t \leq 2`` and ``-3 \leq y \leq 4\}``.
-"""
-
-# ╔═╡ ba9178c0-677b-470e-8164-7f54bd2438b5
-cm"""
-$(define("5.2"))
-A set ``D \subset \mathbb{R}^2`` is said to be convex if whenever ``\left(t_1, y_1\right)`` and ``\left(t_2, y_2\right)`` belong to ``D``, then 
-```math
-\left((1-\lambda) t_1+\lambda t_2,(1-\lambda) y_1+\lambda y_2\right) \in D \quad\text{ for every }\lambda \in [0,1].
-``` 
-$(ebl())
-
-$(post_img("https://www.dropbox.com/scl/fi/vtp12m6zn8yyz2tefl01s/fig5.1.png?rlkey=99r5x45z32zy51ozjfsqtkpdo&raw=1",700))
-"""
-
-# ╔═╡ 9ad7f65f-1e92-425c-9aa0-9804bbf1911d
-cm"""
-$(bth("5.3"))
-Suppose ``f(t, y)`` is defined on a convex set ``D \subset \mathbb{R}^2``. If a constant ``L>0`` exists with
-```math
-\left|\frac{\partial f}{\partial y}(t, y)\right| \leq L, \quad \text { for all }(t, y) \in D,
-```
-then ``f`` satisfies a Lipschitz condition on ``D`` in the variable ``y`` with Lipschitz constant ``L``.
-$(eth())
-"""
-
-# ╔═╡ e60aaf53-b008-40aa-8403-1f619b81e5b7
-cm"""
-$(theorem("5.4")) Suppose that ``D=\{(t, y) \mid a \leq t \leq b`` and ``-\infty < y < \infty\}`` and that ``f(t, y)`` is continuous on ``D``. If ``f`` satisfies a Lipschitz condition on ``D`` in the variable ``y``, then the initial-value problem
-```math
-y^{\prime}(t)=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha,
-```
-has a unique solution ``y(t)`` for ``a \leq t \leq b``.
-$(eth())
-
-$(ex(2)) Use Theorem 5.4 to show that there is a unique solution to the initial-value problem
-```math
-y^{\prime}=1+t \sin (t y), \quad 0 \leq t \leq 2, \quad y(0)=0
-```
-"""
-
-# ╔═╡ 427b3198-6485-462b-8d13-23322c96a8ac
-cm"""
-$(bbl("Exercise",""))
-Use Theorem 5.4 to show that  the following initial-value problems has a unique solution and find the solution.
-```math
-y^{\prime}=-\frac{2}{t} y+t^2 e^t, 1 \leq t \leq 2, y(1)=\sqrt{2} e.
-```
-"""
-
-# ╔═╡ 0a5b7cc2-a84e-403e-bc7d-b40f94550383
-cm"""
-$(define("5.5")) The initial-value problem
-```math
-\frac{d y}{d t}=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha,
-```
-is said to be a __well-posed problem__ if:
-- A unique solution, ``y(t)``, to the problem exists, and
-- There exist constants ``\varepsilon_0>0`` and ``k>0`` such that for any ``\varepsilon``, in ``\left(0, \varepsilon_0\right)``, whenever ``\delta(t)`` is continuous with ``|\delta(t)|<\varepsilon`` for all ``t`` in ``[a, b]``, and when ``\left|\delta_0\right|<\varepsilon``, the initial-value problem
-$(texeq"
-\frac{d z}{d t}=f(t, z)+\delta(t), \quad a \leq t \leq b, \quad z(a)=\alpha+\delta_0,
-\label{five_three}")
-$(add_space(10))has a unique solution ``z(t)`` that satisfies
-```math
-|z(t)-y(t)| < k \varepsilon \quad \text { for all } t \text { in }[a, b]
-```
-"""
-
-# ╔═╡ 4c56c9df-9186-4369-9021-c049a2eefdd0
-cm"""
-$(theorem("5.6"))
-Suppose ``D=\{(t, y) \mid a \leq t \leq b`` and ``-\infty < y <\infty\}``. If ``f`` is continuous and satisfies a Lipschitz condition in the variable ``y`` on the set ``D``, then the initial-value problem
-```math
-\frac{d y}{d t}=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha
-```
-is well posed.
-$(eth())
-
-$(ex(3)) Show that the initial-value problem
-```math
-\frac{d y}{d t}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5,
-```
-is well posed on ``D=\{(t, y) \mid 0 \leq t \leq 2`` and ``-\infty < y <\infty\}``.
-"""
-
-# ╔═╡ 3d590d35-f866-404d-9c2a-e8dc17712113
-cm"""
-$(bbl("Illustrations",""))
-As an illustration, consider the solution to the perturbed problem
-```math
-\frac{d z}{d t}=z-t^2+1+\delta, \quad 0 \leq t \leq 2, \quad z(0)=0.5+\delta_0
-```
-$(ebl())
-"""
-
-# ╔═╡ cf37eeeb-7317-4050-8218-2a67a2432852
-cm"""
-$(post_img("https://www.dropbox.com/scl/fi/lug6uovsoetnx45f5dwwt/algo5.1.png?rlkey=p2r5n84k6jhp4nts5mvrah03h&raw=1",700))
-"""
-
-# ╔═╡ 8566080c-a6bc-4823-b1f2-747687cdada1
-cm"""
-$(ex(1)) Euler's method was used in the first illustration with ``h=0.5`` to approximate the solution to the initial-value problem
-```math
-y^{\prime}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5 .
-```
-
-Use Algorithm 5.1 with ``N=10`` to determine approximations and compare these with the exact values given by ``y(t)=(t+1)^2-0.5 e^t``.
-"""
-
-# ╔═╡ 66820a81-3ad6-4905-9810-0ab5dd38ce69
-cm"""
-$(theorem("5.9")) Suppose ``f`` is continuous and satisfies a Lipschitz condition with constant ``L`` on
-```math
-D=\{(t, y) \mid a \leq t \leq b \text { and }-\infty < y< \infty\}
-```
-and that a constant ``M`` exists with
-```math
-\left|y^{\prime \prime}(t)\right| \leq M, \quad \text { for all } t \in[a, b]
-```
-where ``y(t)`` denotes the unique solution to the initial-value problem
-```math
-y^{\prime}=f(t, y), \quad a \leq t \leq b, \quad y(a)=\alpha .
-```
-
-Let ``w_0, w_1, \ldots, w_N`` be the approximations generated by Euler's method for some positive integer ``N``. Then, for each ``i=0,1,2, \ldots, N``,
-```math
-\left|y\left(t_i\right)-w_i\right| \leq \frac{h M}{2 L}\left[e^{L\left(t_i-a\right)}-1\right]
-```
-"""
-
-# ╔═╡ 91cf0689-7e38-4c5d-b718-b444c73853f6
-cm"""
-$(ex(2)) The solution to the initial-value problem
-```math
-y^{\prime}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5,
-```
-was approximated in Example 1 using Euler's method with ``h=0.2``. Use the inequality in Theorem 5.9 to find a bound for the approximation errors and compare these to the actual errors.
-"""
-
-# ╔═╡ fc5b69cd-eddd-4f1a-92c4-df4d26939821
-cm"""
-$(ex(2)) Use the Midpoint method  with ``N=10, h=0.2, t_i=0.2 i``, and ``w_0=0.5`` to approximate the solution to our usual example,
-```math
-y^{\prime}=y-t^2+1, \quad 0 \leq t \leq 2, \quad y(0)=0.5
-```
-"""
-
-# ╔═╡ 767b00e9-3d6c-413c-8a82-1e9152aa5052
-cm"""
-$(bbl("MATLAB","ode45"))
-The MATLAB function `[t,y] = ode45(odefun,tspan,y0)` is used to solve ordinary differential equations (ODEs) numerically using the Dormand-Prince method, which is a method of the Runge-Kutta family. This function is particularly useful for solving non-stiff differential equations.
-
-##### Syntax
-```{=matlab}
-[t,y] = ode45(odefun, tspan, y0)
-```
-
-##### Description
-- **`odefun`**: A function handle that defines the differential equation to be solved. It should be of the form `dy/dt = f(t,y)`.
-- **`tspan`**: A vector specifying the interval of integration `[t0 tf]`. The solver will return the solution at each time step within this interval.
-- **`y0`**: A vector specifying the initial conditions for the ODE.
-
-##### Outputs
-- **`t`**: A column vector of time points at which the solution was evaluated.
-- **`y`**: A matrix where each row corresponds to the solution at a time point in `t`.
-
-##### Example
-
-Consider the following differential equation:
-```math
-\frac{dy}{dt} = -2y + t 
-```
-
-Let's solve this ODE using `ode45` over the interval [0, 5] with the initial condition `` y(0) = 1 ``.
-
-###### Step-by-Step Solution
-
-1. **Define the ODE function:**
-    ```{=matlab}
-    function dydt = odefun(t, y)
-        dydt = -2*y + t;
-    end
-    ```
-
-2. **Set the time span and initial condition:**
-    ```{=matlab}
-    tspan = [0 5];
-    y0 = 1;
-    ```
-
-3. **Call `ode45` to solve the ODE:**
-    ```{=matlab}
-    [t, y] = ode45(@odefun, tspan, y0);
-    ```
-
-4. **Plot the results:**
-    ```{=matlab}
-    plot(t, y)
-    xlabel('Time t')
-    ylabel('Solution y')
-    title('Solution of dy/dt = -2y + t using ode45')
-    ```
-
-##### Full Example Code
-```{=matlab}
-% Define the ODE function
-function dydt = odefun(t, y)
-    dydt = -2*y + t;
-end
-
-% Set the time span and initial condition
-tspan = [0 5];
-y0 = 1;
-
-% Solve the ODE
-[t, y] = ode45(@odefun, tspan, y0);
-
-% Plot the results
-plot(t, y)
-xlabel('Time t')
-ylabel('Solution y')
-title('Solution of dy/dt = -2y + t using ode45')
-```
-
-##### Explanation of the Example
-- **`odefun`**: This function defines the ODE `` \frac{dy}{dt} = -2y + t ``.
-- **`tspan`**: The solver integrates the ODE from `` t = 0 `` to `` t = 5 ``.
-- **`y0`**: The initial condition is `` y(0) = 1 ``.
-- **`ode45`**: The function is called with the ODE function handle, time span, and initial condition to compute the solution.
-- **`plot`**: The solution is plotted with time on the x-axis and the solution on the y-axis.
-
-This example demonstrates how `ode45` can be used to solve and visualize the solution of an ODE in MATLAB.
-
-
-$(ebl())
-
-"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
