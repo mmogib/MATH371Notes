@@ -2254,6 +2254,290 @@ w_{i+1} & =w_i+\frac{1}{6}\left(k_1+2 k_2+2 k_3+k_4\right),
 ```
 """
 
+# ╔═╡ 33ad0ba4-f987-431c-bfc1-4bb879768887
+md"# 6.1 Linear Systems of Equations"
+
+# ╔═╡ d97d58c0-0446-414f-9b43-d33306fd62bd
+md"## Elementrary Row Operations"
+
+# ╔═╡ b7dd7cff-360f-4b53-a95f-8cdba0d2e3eb
+cm"""
+__We use three operations to simplify the linear system__
+1. Equation ``E_i`` can be multiplied by any nonzero constant ``\lambda`` with the resulting equation used in place of ``E_i``. This operation is denoted ``\left(\lambda E_i\right) \rightarrow\left(E_i\right)``.
+2. Equation ``E_j`` can be multiplied by any constant ``\lambda`` and added to equation ``E_i`` with the resulting equation used in place of ``E_i``. This operation is denoted ``\left(E_i+\lambda E_j\right) \rightarrow`` ``\left(E_i\right)``.
+3. Equations ``E_i`` and ``E_j`` can be transposed in order. This operation is denoted ``\left(E_i\right) \leftrightarrow`` ``\left(E_j\right)``.
+
+"""
+
+# ╔═╡ 20ad7c2d-4df6-42aa-b6cd-97845cbd7c64
+md"## Linear Systems and Matrix Notation"
+
+# ╔═╡ 1997f2e8-5875-4997-b586-84f2af07c427
+md"## The general Gaussian elimination procedure"
+
+# ╔═╡ 97176fd0-5811-4054-9b46-a0017d6cd65a
+cm"""
+The general Gaussian elimination procedure applied to the linear system
+```math
+\begin{array}{cc}
+E_1: & a_{11} x_1+a_{12} x_2+\cdots+a_{1 n} x_n=b_1, \\
+E_2: & a_{21} x_1+a_{22} x_2+\cdots+a_{2 n} x_n=b_2, \\
+& \vdots \\
+E_n: & a_{n 1} x_1+a_{n 2} x_2+\cdots+a_{n n} x_n=b_n,
+\end{array}
+```
+1. First, form the augmented matrix ``\tilde{A}``,
+```math
+\tilde{A}=[A, \mathbf{b}]=\left[\begin{array}{cccc:c}
+a_{11} & a_{12} & \cdots & a_{1 n} & a_{1, n+1} \\
+a_{21} & a_{22} & \cdots & a_{2 n} & a_{2, n+1} \\
+\vdots & \vdots & & \vdots & \vdots \\
+a_{n 1} & a_{n 2} & \cdots & a_{n n} & a_{n, n+1}
+\end{array}\right] \text {, }
+```
+"""
+
+# ╔═╡ 2888ef2c-fd75-43d4-b019-4040720f1f77
+begin
+	function gaussian_elemination(A,b)
+		A, b = Float64.(A), Float64.(b)
+		rows, cols = size(A)
+		Aaug = [A b]
+		FLAG = :success
+		for i in 1:cols-1
+			p  = findfirst(x->x!=0,Aaug[i:end,i])
+			
+			if isnothing(p) 
+				FLAG=:no_unique_solution
+				return nothing,FLAG
+			end
+			p = p+i-1
+			if p!=i
+				Aaug[i,:],Aaug[p,:]=Aaug[p,:],Aaug[i,:]
+			end
+			for j in i+1:rows
+				mji = Aaug[j,i]/Aaug[i,i]
+				Aaug[j,:] = Aaug[j,:] - mji*Aaug[i,:]
+			end
+			
+		end
+		if Aaug[rows,cols]==0
+			FLAG=:no_unique_solution
+			return nothing,FLAG
+		end
+		x= Vector{Float64}(undef,cols)
+		x[cols]=Aaug[cols,cols+1]/Aaug[cols,cols]
+		for i in cols-1:-1:1
+			K = Aaug[i,cols+1]-sum(Aaug[i,j]*x[j] for j in i+1:cols)
+			x[i] = K/Aaug[i,i]
+		end
+		x,FLAG
+	end
+	
+end
+
+# ╔═╡ 576f550f-a66d-4051-8ba7-df3d22fab1df
+
+
+# ╔═╡ 3b50dfe3-6260-4b6b-b847-bd8fb9a75c23
+md"## Operation Counts"
+
+# ╔═╡ 00580f59-99de-4355-bf6f-3de92cc2fb83
+cm"""
+__Step 5 and 6__
+
+For each ``i=1,2, \ldots, n-1``, the operations required in Steps 5 and 6 are as follows.
+
+__Multiplications/divisions:__
+```math
+(n-i)+(n-i)(n-i+1)=(n-i)(n-i+2) .
+```
+
+__Additions/subtractions:__
+```math
+(n-i)(n-i+1)
+```
+In total
+__Multiplications/divisions:__
+```math
+\begin{aligned}
+\sum_{i=1}^{n-1}(n-i)(n-i+2) & =\sum_{i=1}^{n-1}\left(n^2-2 n i+i^2+2 n-2 i\right) \\
+& =\sum_{i=1}^{n-1}(n-i)^2+2 \sum_{i=1}^{n-1}(n-i)=\sum_{i=1}^{n-1} i^2+2 \sum_{i=1}^{n-1} i \\
+& =\frac{(n-1) n(2 n-1)}{6}+2 \frac{(n-1) n}{2}=\frac{2 n^3+3 n^2-5 n}{6}
+\end{aligned}
+```
+
+__Additions/subtractions:__
+```math
+\begin{aligned}
+\sum_{i=1}^{n-1}(n-i)(n-i+1) & =\sum_{i=1}^{n-1}\left(n^2-2 n i+i^2+n-i\right) \\
+& =\sum_{i=1}^{n-1}(n-i)^2+\sum_{i=1}^{n-1}(n-i)=\sum_{i=1}^{n-1} i^2+\sum_{i=1}^{n-1} i \\
+& =\frac{(n-1) n(2 n-1)}{6}+\frac{(n-1) n}{2}=\frac{n^3-n}{3}
+\end{aligned}
+```
+"""
+
+# ╔═╡ 10641b11-dd47-4e7b-8463-0cceb595603c
+cm"""
+__Steps 8 and 9__
+- Step 8 requires one division. 
+- Step 9 requires 
+	- ( ``n-i`` ) multiplications and 
+	- ``(n-i-1`` ) additions for each summation term and then 
+	- one subtraction and 
+	- one division. 
+The total number of operations in Steps 8 and 9 is as follows.
+
+__Multiplications/divisions__:
+```math
+\begin{aligned}
+1+\sum_{i=1}^{n-1}((n-i)+1) & =1+\left(\sum_{i=1}^{n-1}(n-i)\right)+n-1 \\
+& =n+\sum_{i=1}^{n-1}(n-i)=n+\sum_{i=1}^{n-1} i=\frac{n^2+n}{2} .
+\end{aligned}
+```
+
+__Additions/subtractions:__
+```math
+\sum_{i=1}^{n-1}((n-i-1)+1)=\sum_{i=1}^{n-1}(n-i)=\sum_{i=1}^{n-1} i=\frac{n^2-n}{2}
+```
+
+The total number of arithmetic operations in Algorithm 6.1 is, therefore:
+
+* __Multiplications/divisions:__
+```math
+\frac{2 n^3+3 n^2-5 n}{6}+\frac{n^2+n}{2}=\frac{n^3}{3}+n^2-\frac{n}{3} \text {. }
+```
+
+* __Additions/subtractions:__
+```math
+\frac{n^3-n}{3}+\frac{n^2-n}{2}=\frac{n^3}{3}+\frac{n^2}{2}-\frac{5 n}{6} .
+```
+"""
+
+# ╔═╡ 038f9ffd-0012-4547-9035-156225dccdaa
+let
+	as_count(n) = n^3/3 + n^2/2 - 5n/6 
+	dm_count(n) = n^3/3 + n^2 - n/3
+	szs = vec([3 10 50 100])
+	A1 = map(dm_count,szs) .|> Int
+	A2 = map(as_count,szs) .|> Int
+	A3 = map(n->n^3/3,szs)
+	T = hcat(szs,A1,A2,A3)
+	pretty_table(HTML,T,header=["`n`", "Multiplications/divisions", "Additions/subtractions","n^3/3"])
+	# plot(0:100,n->n^3,c=:red,label=L"n^3")
+	# scatter!(szs,A1,c=:blue,label=L"\div/ \times")
+	# scatter!(szs,A2,c=:orange,label=L"+/ -")
+	
+end
+
+# ╔═╡ 84c885ec-d76c-4866-91de-5514341bb238
+md"# 6.2 Pivoting Strategies"
+
+# ╔═╡ 3595be04-2597-4a21-a741-dd3ead589aea
+md"## Partial Pivoting"
+
+# ╔═╡ e887831f-1642-45fc-87bf-86494b42a349
+cm"""
+The simplest strategy, called partial pivoting, is to select an element in the same column that is below the diagonal and has the largest absolute value; specifically, we determine the smallest ``p \geq k`` such that
+```math
+\left|a_{p k}^{(k)}\right|=\max _{k \leq i \leq n}\left|a_{i k}^{(k)}\right|
+```
+and perform ``\left(E_k\right) \leftrightarrow\left(E_n\right)``. 
+"""
+
+# ╔═╡ 04a11ba5-2b5d-4821-8c7f-9a9c5cee53e9
+begin
+	function gaussian_elemination(A,b,pivot::Bool)
+		# A, b = Float64.(A), Float64.(b)
+		rows, cols = size(A)
+		Aaug = [A b]
+		FLAG = :success
+		for i in 1:cols-1
+			_ , p  = findmax(identity,abs.(Aaug[i:end,i]))
+			
+			if isnothing(p) 
+				FLAG=:no_unique_solution
+				return nothing,FLAG
+			end
+			p = p+i-1
+			
+			if p!=i
+				Aaug[i,:],Aaug[p,:]=Aaug[p,:],Aaug[i,:]
+			end
+			for j in i+1:rows
+				mji = Aaug[j,i]/Aaug[i,i]
+				Aaug[j,:] = Aaug[j,:] - mji*Aaug[i,:]
+			end
+			
+		end
+		if Aaug[rows,cols]==0
+			FLAG=:no_unique_solution
+			return nothing,FLAG
+		end
+		x= Vector{Float64}(undef,cols)
+		x[cols]=Aaug[cols,cols+1]/Aaug[cols,cols]
+		for i in cols-1:-1:1
+			K1 = sum(Aaug[i,i+1:cols] .* x[i+1:cols])
+			K = Aaug[i,cols+1]-K1
+			x[i] = K/Aaug[i,i]
+		end
+		x,FLAG
+	end
+	
+end
+
+# ╔═╡ 5022b48c-6b06-4bef-b720-5ab050182506
+let
+	A = [1 1 1
+	2 2 1
+	1 1 2
+	]
+	b=[4;6;6]
+	gaussian_elemination(A,b)
+	# A\b
+end
+
+# ╔═╡ 52608f23-8fc4-4880-961c-dfa5721d9dda
+let
+	A = [1 -1 2 -1
+	2 -2 3 -3
+	1 1 1 0
+	1 -1 4 3
+	]
+	b=[-8 ; -20 ; -2; 4]
+	gaussian_elemination(A,b)
+	# A\b
+end
+
+# ╔═╡ ca3190ea-9971-40b7-9565-606cf4bcb3b3
+cm"""
+Solve using __partial pivoting__
+
+```math
+\begin{aligned} 2.12 x_1-2.12 x_2+51.3 x_3+100 x_4 & =\pi \\ 0.333 x_1-0.333 x_2-12.2 x_3+19.7 x_4 & =\sqrt{2} \\ 6.19 x_1+8.20 x_2-1.00 x_3-2.01 x_4 & =0, \\ -5.73 x_1+6.12 x_2+x_3-\quad x_4 & =-1 .\end{aligned}
+```
+"""
+
+# ╔═╡ 64853934-3d74-4366-8cb3-bc87b4a6e0da
+let
+	A = [
+		2.12 -2.12 51.3  100  
+		0.333 -0.333 -12.2  19.7  
+		6.19 8.20 -1.00  -2.01  
+		-5.73  6.12 1 -1 
+	] 	
+	b = [π 
+		√(2) 
+		0 
+		-1] 	
+	x_e = A\b
+	x_ap1 = gaussian_elemination(A,b)
+	x_ap = gaussian_elemination(A,b,true)
+		
+	Dict(:e => x_e,:a1 => first(x_ap),:a2 => first(x_ap))
+	
+end
+
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 begin
 	function add_space(n=1)
@@ -3085,6 +3369,17 @@ $(example("Example",""))
 Approximate the integral of ``f(x)=e^x`` on ``[0,3]``
 """
 
+# ╔═╡ c8f61f4c-96c2-4d9d-8f09-36406f886a40
+cm"""
+__Clamped Splines__ gives the following system
+```math
+Ax = b
+```
+where 
+
+$(post_img("https://www.dropbox.com/scl/fi/j2clcj49gh16sx4pwuwnf/clamped_system.png?rlkey=vxf03nybpl519i9df6k4jkzx0&raw=1",700))
+"""
+
 # ╔═╡ 1e34cf47-8338-484e-b27a-fabfc7ef1b0b
 cm"""
 $(ex(3)) 
@@ -3821,6 +4116,163 @@ This example demonstrates how `ode45` can be used to solve and visualize the sol
 
 $(ebl())
 
+"""
+
+# ╔═╡ e90ec9c6-4d92-48f1-b410-0530d31254f7
+cm"""
+$(ex(1)) Write the following system in __Matrix Form__ and construct the __Augmented Matrix__
+```math
+\begin{array}{lclclclcl} 
+x_1&+&x_2&&&+&3x_4&=&4, \\ 
+2 x_1&+&x_2&-&x_3&+&x_4 & =&1 \\
+3 x_1&-&x_2&-&x_3&+&2 x_4 & =&-3, \\ 
+-x_1&+&2 x_2&+&3 x_3&-&x_4 & =&4,
+\end{array}
+```
+
+"""
+
+# ╔═╡ c57be354-7ac1-4bb6-8e97-f61889416d45
+cm"""
+$(ex(2)) Use the procedure of __Gaussian elimination with backward substitution__ to transform the system into a __triangular__ (__reduced__) __form__.
+```math
+\begin{array}{lclclclcl} 
+x_1&+&x_2&&&+&3x_4&=&4, \\ 
+2 x_1&+&x_2&-&x_3&+&x_4 & =&1 \\
+3 x_1&-&x_2&-&x_3&+&2 x_4 & =&-3, \\ 
+-x_1&+&2 x_2&+&3 x_3&-&x_4 & =&4,
+\end{array}
+```
+
+"""
+
+# ╔═╡ 7e2a3859-dc4a-4b64-8054-d519b7212384
+cm"""
+2. For ``i=1,2,3, \ldots, n-1`` and perform the operation
+```math
+\left(E_j-\left(a_{j i} / a_{i i}\right) E_i\right) \rightarrow\left(E_j\right) \text { for each } j=i+1, i+2, \ldots, n,
+```
+$(add_space(10))provided ``a_{i i} \neq 0``. 
+- This eliminates (changes the coefficient to zero) ``x_i`` in each row below the ``i`` th for all values of ``i=1,2, \ldots, n-1``. The resulting matrix has the form
+```math
+\tilde{\tilde{A}} =
+\begin{bmatrix}
+    a_{11} & a_{12} & \cdots & a_{1n} & a_{1,n+1} \\
+    0      & a_{22} & \cdots & a_{2n} & a_{2,n+1} \\
+    \vdots & \vdots & \ddots & \vdots & \vdots \\
+    0      & 0      & \cdots & a_{nn} & a_{n,n+1}
+\end{bmatrix}
+```
+where, except in the first row, the values of ``a_{i j}`` are not expected to agree with those in the original matrix ``\tilde{A}``. The matrix ``\tilde{\tilde{A}}`` represents a linear system with the same solution set as the original system.
+"""
+
+# ╔═╡ 3de9bd6f-7f84-470b-98ed-535dbe041d4e
+cm"""
+3. Use __backward substitution__ with
+```math
+x_i=\frac{a_{i, n+1}-a_{i, i+1} x_{i+1}-\cdots-a_{i, n-1} x_{n-1}-a_{i, n} x_n}{a_{i i}}=\frac{a_{i, n+1}-\sum_{j=i+1}^n a_{i j} x_j}{a_{i i}},
+```
+$(add_space(10))for each ``i=n,n-1, n-2, \ldots, 2,1``.
+"""
+
+# ╔═╡ 44940ebf-b94c-4ce1-b0c1-97d5d5dcb724
+cm"""
+- __Gaussian elimination procedure__ forms a sequence of augmented matrices 
+```math
+\tilde{A}^{(1)}, \tilde{A}^{(2)}, \ldots, \tilde{A}^{(n)}, \quad \text{where}\quad \tilde{A}^{(1)}=\tilde{A}
+```
+$(add_space(10))and ``\tilde{A}^{(k)}``, for each ``k=2,3, \ldots, n``, has entries ``a_{i j}^{(k)}``, where
+```math
+a_{i j}^{(k)}= \begin{cases}a_{i j}^{(k-1)}, & \text { when } i=1,2, \ldots, k-1 \text { and } j=1,2, \ldots, n+1, \\ 0, & \text { when } i=k, k+1, \ldots, n \text { and } j=1,2, \ldots, k-1, \\ a_{i j}^{(k-1)}-\frac{a_{i, k-1}^{(k-1)}}{a_{k-1, k-1}^{(k-1)}} a_{k-1, j}^{(k-1)}, & \text { when } i=k, k+1, \ldots, n \text { and } j=k, k+1, \ldots, n+1 .\end{cases}
+```
+Thus,
+```math
+\tilde{A}^{(k)}=\left[\begin{array}{cccccccccc}a_{11}^{(1)} & a_{12}^{(1)} & a_{13}^{(1)} & \cdots & a_{1, k-1}^{(1)} & a_{1 k}^{(1)} & \cdots & a_{1 n}^{(1)} & \vdots & a_{1, n+1}^{(1)} \\ 
+0 & a_{22}^{(2)} & a_{23}^{(2)} & \cdots & a_{2, k-1}^{(2)} & a_{2 k}^{(2)} & \cdots & a_{2 n}^{(2)} & \vdots & a_{2, n+1}^{(2)} \\ 
+\vdots & \ddots  & \vdots & \vdots &\vdots & \vdots & \vdots & \vdots \\ 
+\vdots & \ddots & \ddots & \ddots & & \\ \vdots & & & \ddots & a_{k-1, k-1}^{(k-1)} & a_{k-1, k}^{(k-1)} & \cdots & a_{k-1, n}^{(k-1)} & \vdots & a_{k-1, n+1}^{(k-1)} \\ \vdots & & & & 0 & a_{k k}^{(k)} & \cdots & a_{k n}^{(k)} & \vdots & a_{k, n+1}^{(k)} \\ \vdots & & & & \vdots & \vdots & & \vdots & \vdots & \vdots \\ 
+\vdots & & & & & & \\ 
+0 & \cdots \cdots \cdots \cdots \cdots \cdots &\cdots& & 0 & a_{n k}^{(k)}&  \cdots & a_{n n}^{(k)} & \vdots & a_{n, n+1}^{(k)}
+\end{array}
+\right]
+```
+"""
+
+# ╔═╡ 43e32443-6a9b-40bb-a0b1-fa4d2b2e3093
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/jkyad6a61s8loziblojwe/algo6.1.png?rlkey=z9lf6vjr873yu69qfvtxxg9bt&raw=1",700))
+"""
+
+# ╔═╡ 9b796ae3-fc31-48bb-b1c5-dff71deb5a5d
+cm"""
+$(ex(3)) Solve
+```math
+\begin{aligned} x_1+x_2+x_3 & =4, \\ 2 x_1+2 x_2+x_3 & =6, \\ x_1+x_2+2 x_3 & =6,\end{aligned}
+```
+"""
+
+# ╔═╡ e9b695c4-fc17-411f-92da-e486e5c5cce2
+cm"""
+$(ex(4))
+Solve 
+```math
+\begin{array}{rcccccccl}
+x_1 & - & x_2 & + & 2x_3 & - & x_4 & = & -8, \\
+2x_1 & - & 2x_2 & + & 3x_3 & - & 3x_4 & = & -20, \\
+x_1 & + & x_2 & + & x_3 & & & = & -2, \\
+x_1 & - & x_2 & + & 4x_3 & + & 3x_4 & = & 4,
+\end{array}
+```
+"""
+
+# ╔═╡ 0d02417f-b60f-4942-9768-12f6c30d5092
+cm"""
+
+In deriving Algorithm 6.1, 
+- we found that a row interchange was needed when one of the pivot elements ``a_{k k}^{(k)}`` is 0 . This row interchange has the form ``\left(E_k\right) \leftrightarrow\left(E_p\right)``, where ``p`` is the smallest integer greater than ``k`` with ``a_{p k}^{(k)} \neq 0``. 
+
+- To reduce round-off error, it is often necessary to perform row interchanges even when the pivot elements are not zero.
+- If ``a_{k k}^{(k)}`` is small in magnitude compared to ``a_{j k}^{(k)}``, then the magnitude of the multiplier
+```math
+m_{j k}=\frac{a_{j k}^{(k)}}{a_{k k}^{(k)}}
+```
+$(add_space(10))will be much larger than 1 . 
+- __Round-off error__ introduced in the computation of one of the terms ``a_{k l}^{(k)}`` is multiplied by ``m_{j k}`` when computing ``a_{j l}^{(k+1)}``, which compounds the original error. 
+- Also, when performing the backward substitution for
+```math
+x_k=\frac{a_{k, n+1}^{(k)}-\sum_{j=k+1}^n a_{k j}^{(k)}}{a_{k k}^{(k)}}
+```
+$(add_space(10))with a small value of ``a_{k k}^{(k)}``, any error in the numerator can be dramatically increased because of 
+$(add_space(10)) the division by ``a_{k k}^{(k)}``. 
+"""
+
+# ╔═╡ 065a03cc-25b1-49cd-b98f-2fa74723307e
+cm"""
+$(ex(1)) Apply Gaussian elimination to the system
+```math
+\begin{array}{rr}
+E_1: & 0.003000 x_1+59.14 x_2=59.17 \\
+E_2: & 5.291 x_1-6.130 x_2=46.78,
+\end{array}
+```
+using __four-digit arithmetic__ with rounding and compare the results to the exact solution ``x_1=10.00`` and ``x_2=1.000``.
+"""
+
+# ╔═╡ c7050619-076c-46c6-8e16-023f543062d6
+cm"""
+$(ex(2)) Apply Gaussian elimination to the system
+```math
+\begin{array}{rr}
+E_1: & 0.003000 x_1+59.14 x_2=59.17 \\
+E_2: & 5.291 x_1-6.130 x_2=46.78,
+\end{array}
+```
+using __partial pivoting__ and __four-digit arithmetic__ with rounding and compare the results to the exact solution ``x_1=10.00`` and ``x_2=1.000``.
+"""
+
+# ╔═╡ e8dd7a86-c8d7-48c2-8aea-3c000997b46c
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/uxo5o9fkji33chbpnv1ot/algo6.2.png?rlkey=olef2mq4pdsk1ff54osb6v0ix&raw=1",700))
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -6566,6 +7018,7 @@ version = "1.4.1+1"
 # ╟─01b33b12-1dad-45e9-a191-8f9619b2fac5
 # ╟─b39bcd45-dfc3-4ddb-95e8-7272ba591682
 # ╟─eb60c5be-bad0-4c39-9842-3210dbaba8d3
+# ╟─c8f61f4c-96c2-4d9d-8f09-36406f886a40
 # ╟─1e34cf47-8338-484e-b27a-fabfc7ef1b0b
 # ╠═0c695eed-ebe3-4a26-9a32-7054bf1a51c3
 # ╟─f0d5e130-d667-4f38-bfef-5aca795b880f
@@ -6663,7 +7116,39 @@ version = "1.4.1+1"
 # ╠═99eefc06-0c8a-4326-af71-45aa94814703
 # ╟─008d89d6-7cdc-4d37-bf36-50efed0d03be
 # ╟─c2169908-379d-4e5d-9f7f-d6fcecdf8f20
-# ╠═767b00e9-3d6c-413c-8a82-1e9152aa5052
+# ╟─767b00e9-3d6c-413c-8a82-1e9152aa5052
+# ╟─33ad0ba4-f987-431c-bfc1-4bb879768887
+# ╟─d97d58c0-0446-414f-9b43-d33306fd62bd
+# ╟─b7dd7cff-360f-4b53-a95f-8cdba0d2e3eb
+# ╟─20ad7c2d-4df6-42aa-b6cd-97845cbd7c64
+# ╟─e90ec9c6-4d92-48f1-b410-0530d31254f7
+# ╟─c57be354-7ac1-4bb6-8e97-f61889416d45
+# ╟─1997f2e8-5875-4997-b586-84f2af07c427
+# ╟─97176fd0-5811-4054-9b46-a0017d6cd65a
+# ╟─7e2a3859-dc4a-4b64-8054-d519b7212384
+# ╟─3de9bd6f-7f84-470b-98ed-535dbe041d4e
+# ╟─44940ebf-b94c-4ce1-b0c1-97d5d5dcb724
+# ╟─43e32443-6a9b-40bb-a0b1-fa4d2b2e3093
+# ╠═2888ef2c-fd75-43d4-b019-4040720f1f77
+# ╟─9b796ae3-fc31-48bb-b1c5-dff71deb5a5d
+# ╠═5022b48c-6b06-4bef-b720-5ab050182506
+# ╠═576f550f-a66d-4051-8ba7-df3d22fab1df
+# ╟─e9b695c4-fc17-411f-92da-e486e5c5cce2
+# ╠═52608f23-8fc4-4880-961c-dfa5721d9dda
+# ╟─3b50dfe3-6260-4b6b-b847-bd8fb9a75c23
+# ╟─00580f59-99de-4355-bf6f-3de92cc2fb83
+# ╟─10641b11-dd47-4e7b-8463-0cceb595603c
+# ╟─038f9ffd-0012-4547-9035-156225dccdaa
+# ╟─84c885ec-d76c-4866-91de-5514341bb238
+# ╟─0d02417f-b60f-4942-9768-12f6c30d5092
+# ╟─065a03cc-25b1-49cd-b98f-2fa74723307e
+# ╟─3595be04-2597-4a21-a741-dd3ead589aea
+# ╟─e887831f-1642-45fc-87bf-86494b42a349
+# ╟─c7050619-076c-46c6-8e16-023f543062d6
+# ╟─e8dd7a86-c8d7-48c2-8aea-3c000997b46c
+# ╠═04a11ba5-2b5d-4821-8c7f-9a9c5cee53e9
+# ╟─ca3190ea-9971-40b7-9565-606cf4bcb3b3
+# ╠═64853934-3d74-4366-8cb3-bc87b4a6e0da
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
