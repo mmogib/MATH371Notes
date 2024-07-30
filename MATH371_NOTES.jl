@@ -2526,17 +2526,138 @@ let
 		6.19 8.20 -1.00  -2.01  
 		-5.73  6.12 1 -1 
 	] 	
-	b = [π 
-		√(2) 
-		0 
-		-1] 	
-	x_e = A\b
-	x_ap1 = gaussian_elemination(A,b)
-	x_ap = gaussian_elemination(A,b,true)
+	# b = [π 
+	# 	√(2) 
+	# 	0 
+	# 	-1] 	
+	# x_e = A\b
+	# x_ap1 = gaussian_elemination(A,b)
+	# x_ap = gaussian_elemination(A,b,true)
 		
-	Dict(:e => x_e,:a1 => first(x_ap),:a2 => first(x_ap))
+	# Dict(:e => x_e,:a1 => first(x_ap),:a2 => first(x_ap))
 	
 end
+
+# ╔═╡ a788fa40-940b-4101-8c68-60afd56b01d4
+md"# 6.5 Matrix Factorization"
+
+# ╔═╡ 4978e693-2d35-40bc-b668-78bdb31430f3
+cm"""
+Suppose that ``A`` has been factored into the triangular form 
+```math
+A=L U \quad , \text{where } L\text{ is lower triangular and }U \text{ is upper triangular.}
+``` 
+Then we can solve for ``\mathbf{x}`` more easily by using a two-step process.
+- First, we let ``\mathbf{y}=U \mathbf{x}`` and solve the lower-triangular system ``L \mathbf{y}=\mathbf{b}`` for ``\mathbf{y}``. Since ``L`` is triangular, determining ``\mathbf{y}`` from this equation requires only ``O\left(n^2\right)`` operations.
+- Once ``\mathbf{y}`` is known, the upper-triangular system ``U \mathbf{x}=\mathbf{y}`` requires only an additional ``O\left(n^2\right)`` operations to determine the solution ``\mathbf{x}``.
+
+
+"""
+
+# ╔═╡ 138cbb79-cc87-487a-b055-004723eb479e
+let 
+	A = [3 -3 -1; 0 1 -3; -3 2 2]
+	L,U =  lu(A)
+	
+end
+
+
+# ╔═╡ 7c63901b-41fa-41cb-93b1-252a846f569b
+cm"""
+To see which matrices have an ``L U`` factorization and to find how it is determined, 
+- first suppose that __Gaussian elimination can be performed on the system ``A \mathbf{x}=\mathbf{b}`` without row interchanges__. With the notation in Section 6.1, this is equivalent to having nonzero pivot elements ``a_{i i}^{(i)}``, for each ``i=1,2, \ldots, n``.
+
+- The __first step__ in the Gaussian elimination process consists of performing, for each ``j=2,3, \ldots, n``, the operations
+```math
+\left(E_j-m_{j, 1} E_1\right) \rightarrow\left(E_j\right), \text { where } \quad m_{j, 1}=\frac{a_{j 1}^{(1)}}{a_{11}^{(1)}} .
+```
+
+These operations transform the system into one in which all the entries in the first column below the diagonal are zero.
+"""
+
+# ╔═╡ f649aa15-c35c-46f7-8af2-b463dfc98b09
+cm"""
+- It is simultaneously accomplished by multiplying the original matrix ``A`` on the left by the matrix
+```math
+M^{(1)}=\left[\begin{array}{ccccc}1 & 0 & \cdots \ldots \ldots & 0 \\ -m_{21} & 1 & \ddots & & \vdots \\ \vdots & 0 & \ddots & \ddots & \vdots \\ \vdots & \vdots & \ddots & \ddots & 0 \\ -m_{n 1} & 0 & \cdots & 0 & 1\end{array}\right]
+```
+This is called the __first Gaussian transformation matrix__. We denote the product of this matrix with ``A^{(1)} \equiv A`` by ``A^{(2)}`` and with ``\mathbf{b}`` by ``\mathbf{b}^{(2)}``, so
+```math
+A^{(2)} \mathbf{x}=M^{(1)} A \mathbf{x}=M^{(1)} \mathbf{b}=\mathbf{b}^{(2)} .
+```
+"""
+
+# ╔═╡ a5627f05-947f-433f-9350-76c0e06805ff
+cm"""
+- The lower-triangular matrix ``L`` in the factorization of ``A``, then, is the product of the matrices ``L^{(k)}`` :
+```math
+L=L^{(1)} L^{(2)} \cdots L^{(n-1)}=\left[\begin{array}{ccccc}
+1 & & \cdots \cdots \cdots & 0 \\
+m_{21} & 1 & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & 0 \\
+\dot{m}_{n 1} & \cdots & m_{n, n-1} & 1
+\end{array}\right],
+```
+since the product of ``L`` with the upper-triangular matrix ``U=M^{(n-1)} \cdots M^{(2)} M^{(1)} A`` gives
+```math
+\begin{aligned}
+L U & =L^{(1)} L^{(2)} \cdots L^{(n-3)} L^{(n-2)} L^{(n-1)} \cdot M^{(n-1)} M^{(n-2)} M^{(n-3)} \cdots M^{(2)} M^{(1)} A \\
+& =\left[M^{(1)}\right]^{-1}\left[M^{(2)}\right]^{-1} \cdots\left[M^{(n-2)}\right]^{-1}\left[M^{(n-1)}\right]^{-1} \cdot M^{(n-1)} M^{(n-2)} \cdots M^{(2)} M^{(1)} A=A
+\end{aligned}
+```
+"""
+
+# ╔═╡ 97207282-b859-40b7-a403-658a4e30796a
+let
+	A = [1 1 0 3;2 1 -1 1;3 -1 -1 2;-1 2 3 -1]
+	U = [1 1 0 3;0 -1 -1 -5;0 0 3 13;0 0 0 -13]
+	L = [1 0 0 0;2 1 0 0;3 4 1 0;-1 -3 0 1]
+	b =[4;1;-3;4]
+	A\b
+end
+
+# ╔═╡ 196d1622-a0ac-4b6f-ba2c-87eb422d007b
+let 
+	A = [1 1 0 3;2 1 -1 1;3 -1 -1 2;-1 2 3 -1]
+	L, U, P = lu(A)
+	P
+	# P
+end
+
+# ╔═╡ c446a308-9f40-4b17-97ea-c1fc210d3e3b
+md"## Permutation Matrices"
+
+# ╔═╡ 516cf85a-7132-4d33-bcd0-4eff1ec9b6db
+let
+	A = [0 0 -1 2;1 1 -1 2;-1 -1 2 0;1 2 0 2]
+	P =[0 1 0 0;0 0 0 1;0 0 1 0;1 0 0 0]
+	U = [1 1 -1 2;0 1 1 0;0 0 1 2;0 0 0 4]
+	L = [1 0 0 0;1 1 0 0;-1 0 1 0;0 0 -1 1]
+	P*A , L*U, A
+	# F = lu(A)
+	# F.L,F.U,F.P,P
+	
+end
+
+# ╔═╡ 09606afc-74bc-43da-ba05-331c83d6b384
+cm"""
+Two useful properties of permutation matrices relate to Gaussian elimination, the first of which is illustrated in the previous example. Suppose ``k_1, \ldots, k_n`` is a permutation of the integers ``1, \ldots, n`` and the permutation matrix ``P=\left(p_{i j}\right)`` is defined by
+```math
+p_{i j}= \begin{cases}1, & \text { if } j=k_i, \\ 0, & \text { otherwise. }\end{cases}
+```
+
+Then
+- ``P A`` permutes the rows of ``A``; that is,
+```math
+P A=\left[\begin{array}{cccc}
+a_{k_1 1} & a_{k_1 2} & \cdots & a_{k_1 n} \\
+a_{k_2 1} & a_{k_2 2} & \cdots & a_{k_2 n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{k_n 1} & a_{k_n 2} & \cdots & a_{k_n n}
+\end{array}\right] .
+```
+- ``P^{-1}`` exists and ``P^{-1}=P^t``.
+"""
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 begin
@@ -4273,6 +4394,109 @@ using __partial pivoting__ and __four-digit arithmetic__ with rounding and compa
 # ╔═╡ e8dd7a86-c8d7-48c2-8aea-3c000997b46c
 cm"""
 $(post_img("https://www.dropbox.com/scl/fi/uxo5o9fkji33chbpnv1ot/algo6.2.png?rlkey=olef2mq4pdsk1ff54osb6v0ix&raw=1",700))
+"""
+
+# ╔═╡ c21ed810-3695-410a-b54b-539a21339a9f
+cm"""
+$(example("Example",""))
+Find `LU` factorization of ``A`` where 
+```math
+A= \left[
+\begin{array}{ccc}
+3 & -3 & -1 \\
+0 & 1 & -3 \\
+-3 & 2 & 2 \\
+\end{array}
+\right]
+```
+"""
+
+# ╔═╡ b56b4d66-e667-4085-9bde-ebc7ad5877df
+cm"""
+Solving a linear system ``A \mathbf{x}=\mathbf{b}`` in factored form means that the number of operations needed to solve the system ``A \mathbf{x}=\mathbf{b}`` is reduced from ``O\left(n^3 / 3\right)`` to ``O\left(2 n^2\right)``.
+
+$(ex(1))
+Compare the approximate number of operations required to determine the solution to a linear system using a technique requiring ``O\left(n^3 / 3\right)`` operations and one requiring ``O\left(2 n^2\right)`` when ``n=20, n=100``, and ``n=1000``.
+Solution Table 6.3 gives the results of these calculations.
+Table 6.3
+| ``n`` | ``n^3 / 3`` | ``2 n^2`` | % Reduction |
+| :---: | :---: | :---: | :---: |
+| 10 | ``3 . \overline{3} \times 10^2`` | ``2 \times 10^2`` | 40 |
+| 100 | ``3 . \overline{3} \times 10^5`` | ``2 \times 10^4`` | 94 |
+| 1000 | ``3 . \overline{3} \times 10^8`` | ``2 \times 10^6`` | 99.4 |
+"""
+
+# ╔═╡ eaecacde-6d42-4cfa-8457-e84484197f7f
+cm"""
+In general, with ``A^{(k)} \mathbf{x}=\mathbf{b}^{(k)}`` already formed, multiply by the ``k`` th Gaussian transformation matrix
+$(post_img("https://www.dropbox.com/scl/fi/u1myheeopworfyxrhaqzt/eq_651.png?rlkey=30n0i20m3hhvtvvea79gaobnx&dl=1",700))
+to obtain
+```math
+A^{(k+1)} \mathbf{x}=M^{(k)} A^{(k)} \mathbf{x}=M^{(k)} \cdots M^{(1)} A \mathbf{x}=M^{(k)} \mathbf{b}^{(k)}=\mathbf{b}^{(k+1)}=M^{(k)} \cdots M^{(1)} \mathbf{b}
+```
+"""
+
+# ╔═╡ 3790a72a-2104-4746-97c9-2cee0999e889
+cm"""
+The process ends with the formation of ``A^{(n)} \mathbf{x}=\mathbf{b}^{(n)}``, where ``A^{(n)}`` is the upper-triangular matrix
+$(post_img("https://www.dropbox.com/scl/fi/6592q5bs54rqvw3wmwsm7/eq_652.png?rlkey=sxhhpm88lald9yw16ju7ydemz&dl=1",500))
+given by
+```math
+A^{(n)}=M^{(n-1)} M^{(n-2)} \cdots M^{(1)} A .
+```
+"""
+
+# ╔═╡ b88eb523-b7e7-47e0-912e-0fd84ed59044
+cm"""
+- This process forms the ``U=A^{(n)}`` portion of the matrix factorization ``A=L U``. 
+- To determine the complementary lower-triangular matrix ``L``, first recall the multiplication of ``A^{(k)} \mathbf{x}=\mathbf{b}^{(k)}`` by the Gaussian transformation of ``M^{(k)}`` used to obtain Eq. (6.9):
+```math
+A^{(k+1)} \mathbf{x}=M^{(k)} A^{(k)} \mathbf{x}=M^{(k)} \mathbf{b}^{(k)}=\mathbf{b}^{(k+1)},
+```
+$(add_space(10))where ``M^{(k)}`` generates the row operations
+```math
+\left(E_j-m_{j, k} E_k\right) \rightarrow\left(E_j\right), \quad \text { for } j=k+1, \ldots, n .
+```
+- To reverse the effects of this transformation and return to ``A^{(k)}`` requires that the operations ``\left(E_j+m_{j, k} E_k\right) \rightarrow\left(E_j\right)`` be performed for each ``j=k+1, \ldots, n``. This is equivalent to multiolving by the inverse of the matrix ``M^{(k)}`` the matrix
+$(post_img("https://www.dropbox.com/scl/fi/n8omgcf3w3rl0hx4uquxr/eq_653.png?rlkey=6gevr5pu4kbyk2s5b2apvfwej&dl=1",500))
+"""
+
+# ╔═╡ 6f2565c6-55e1-4aa1-8e75-48f5f72c8c19
+cm"""
+$(bth("6.19")) If Gaussian elimination can be performed on the linear system ``A \mathbf{x}=\mathbf{b}`` without row interchanges, then the matrix ``A`` can be factored into the product of a lower-triangular matrix ``L`` and an upper-triangular matrix ``U``, that is, ``A=L U``, where ``m_{j i}=a_{j i}^{(i)} / a_{i i}^{(i)}``,
+$(eth())
+
+$(ex(2)) 
+- (a) Determine the ``L U`` factorization for the matrix ``A`` in the linear system ``A \mathbf{x}=\mathbf{b}``, where
+```math
+A=\left[\begin{array}{rrrr}
+1 & 1 & 0 & 3 \\
+2 & 1 & -1 & 1 \\
+3 & -1 & -1 & 2 \\
+-1 & 2 & 3 & -1
+\end{array}\right] \text { and } \mathbf{b}=\left[\begin{array}{r}
+4 \\
+1 \\
+-3 \\
+4
+\end{array}\right] \text {. }
+```
+- (b) Then use the factorization to solve the system
+```math
+\begin{aligned}
+x_1+x_2+3 x_4 & =8 \\
+2 x_1+x_2-x_3+x_4 & =7 \\
+3 x_1-x_2-x_3+2 x_4 & =14 \\
+-x_1+2 x_2+3 x_3-x_4 & =-7
+\end{aligned}
+```
+"""
+
+# ╔═╡ 543cb859-ff88-4144-b47f-993979043834
+cm"""
+$(define("Permutation Matrix"))
+An ``n \times n`` permutation matrix ``P=\left[p_{i j}\right]`` is a matrix obtained by rearranging the rows of ``I_n``, the identity matrix. This gives a matrix with precisely one nonzero entry in each row ind in each column, and each nonzero entry is a 1 .
+
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -7149,6 +7373,24 @@ version = "1.4.1+1"
 # ╠═04a11ba5-2b5d-4821-8c7f-9a9c5cee53e9
 # ╟─ca3190ea-9971-40b7-9565-606cf4bcb3b3
 # ╠═64853934-3d74-4366-8cb3-bc87b4a6e0da
+# ╟─a788fa40-940b-4101-8c68-60afd56b01d4
+# ╟─4978e693-2d35-40bc-b668-78bdb31430f3
+# ╟─c21ed810-3695-410a-b54b-539a21339a9f
+# ╠═138cbb79-cc87-487a-b055-004723eb479e
+# ╟─b56b4d66-e667-4085-9bde-ebc7ad5877df
+# ╟─7c63901b-41fa-41cb-93b1-252a846f569b
+# ╟─f649aa15-c35c-46f7-8af2-b463dfc98b09
+# ╟─eaecacde-6d42-4cfa-8457-e84484197f7f
+# ╟─3790a72a-2104-4746-97c9-2cee0999e889
+# ╟─b88eb523-b7e7-47e0-912e-0fd84ed59044
+# ╟─a5627f05-947f-433f-9350-76c0e06805ff
+# ╟─6f2565c6-55e1-4aa1-8e75-48f5f72c8c19
+# ╠═97207282-b859-40b7-a403-658a4e30796a
+# ╠═196d1622-a0ac-4b6f-ba2c-87eb422d007b
+# ╟─c446a308-9f40-4b17-97ea-c1fc210d3e3b
+# ╟─543cb859-ff88-4144-b47f-993979043834
+# ╠═516cf85a-7132-4d33-bcd0-4eff1ec9b6db
+# ╟─09606afc-74bc-43da-ba05-331c83d6b384
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
