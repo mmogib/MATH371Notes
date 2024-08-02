@@ -22,7 +22,7 @@ begin
     using Latexify
     using HypertextLiteral
     using Colors
-    using LinearAlgebra, Random, Printf
+    using LinearAlgebra, Random, Printf, SparseArrays
     using Symbolics
     using QRCoders
     using PrettyTables
@@ -30,6 +30,7 @@ begin
     # using ForwardDiff
     using Integrals
 	using OrdinaryDiffEq
+	
 end
 
 # ╔═╡ 8ca0d1c5-166d-44f0-a17e-a6207c19459a
@@ -2684,11 +2685,11 @@ let
 	b =[6;25;-11;15]
 	x0 = zeros(4)
 	ϵ =1e-3
-	iters = 0
+	iters = 1
 	while true
 		iters += 1
 		x = map(i->(1/A[i,i])*(sum(-A[i,j]*x0[j] for j in 1:4 if i!=j) + b[i]),1:4)
-		if norm(x-x0,Inf) < ϵ
+		if (norm(x-x0,Inf)/norm(x,Inf)) < ϵ
 			break
 		end
 		x0 = copy(x)
@@ -2711,7 +2712,7 @@ function jacobi_method(A,b,x0,N,TOL)
 			end
 			x[i] = (1/A[i,i])*(S+b[i])
 		end
-		if norm(x-x0,Inf)<TOL
+		if (norm(x-x0,Inf)/norm(x,Inf))<TOL
 			break
 		end
 		x0 = copy(x)
@@ -2736,16 +2737,17 @@ for each ``k=1,2,3, \ldots`` This should be reminiscent of the fixed-point itera
 let
 	A = [10 -1 2 0;-1 11 -1 3;2 -1 10 -1;0 3 -1 8]
 	b =[6;25;-11;15]
-	x0 = zeros(4)
+	x0 = ones(4)
 	ϵ =1e-3
 	L = -tril(A,-1)
 	U = -triu(A,1)
 	D = diagm(0=>diag(A))
+	D-L-U, A
 	T = (Rational.(D)\(Rational.(L)+Rational.(U)))
 	f(x) = T*x + D\b
-	reduce((c,_)->f(c),1:10,init=x0)
+	reduce((c,_)->f(c),1:17,init=x0)
 	# xss,ys = fixed_point(f,x0,ϵ)
-	T
+	# T
 end
 
 # ╔═╡ 02f1dc69-44a9-4a36-815a-14c2f6f9ca1e
@@ -2777,9 +2779,118 @@ let
 	T = (D-L)\U
 	f(x) = T*x + (D-L)\b
 	f(x0)
-	reduce((c,_)->f(c),1:5,init=x0)
+	reduce((c,_)->f(c),1:7,init=x0)
 	# xss,ys = fixed_point(f,x0,ϵ)
-	T
+	
+end
+
+# ╔═╡ be77b12f-3c2d-4a4b-a495-3c3592e66bcd
+md"# 11.3 Finite-Difference Methods for Linear Problemss"
+
+# ╔═╡ faa963ce-aec1-48e6-bda1-7b1c1f07446d
+cm"""
+__Finite difference Methods__ for *solving boundary-value problems* 
+- replace each of the derivatives in the differential equation with an appropriate difference-quotient approximation of the type considered in __Section 4.1__. 
+- The particular difference quotient and step size ``h`` are chosen to maintain a specified order of truncation error. However, ``h`` cannot be chosen too small because of the general instability of the derivative approximations.
+
+## Discrete Approximation
+"""
+
+# ╔═╡ 6dcf6cc8-9fd1-4d6a-a42f-0a0fb606e6a8
+cm"""
+The __finite difference method__ for the *linear second-order boundary-value problem*,
+```math
+y^{\prime \prime}=p(x) y^{\prime}+q(x) y+r(x), \quad \text { for } a \leq x \leq b \text {, with } y(a)=\alpha \text { and } y(b)=\beta,
+```
+requires that difference-quotient approximations be used to approximate both ``y^{\prime}`` and ``y^{\prime \prime}``.
+"""
+
+# ╔═╡ aa7273bd-3db7-4757-abeb-e11f5912548a
+cm"""
+1. Select an integer ``N>0`` and divide the interval ``[a, b]`` into ``(N+1)`` equal subintervals whose endpoints are the mesh points 
+```math
+x_i=a+i h, \quad \text{for } i=0,1, \ldots, N+1, \quad \text{where } h=\frac{b-a}{N+1}.
+``` 
+"""
+
+# ╔═╡ eee8569d-f7eb-4c60-b7ee-fc7ead955499
+cm"""
+3. So we get
+```math
+\frac{y\left(x_{i+1}\right)-2 y\left(x_i\right)+y\left(x_{i-1}\right)}{h^2}=p(x_i)\left[\frac{y\left(x_{i+1}\right)-y\left(x_{i-1}\right)}{2 h}\right]+q(x_i) y(x_i)+r(x_i), 
+```
+"""
+
+# ╔═╡ 954a443e-13fd-4b05-9799-40574e270a86
+cm"""
+A Finite-Difference method with truncation error of order ``O\left(h^2\right)`` results by  using this equation together with the boundary conditions ``y(a)=\alpha`` and ``y(b)=\beta`` to define the system of linear equations
+```math
+w_0=\alpha, \quad w_{N+1}=\beta
+```
+and
+```math
+\left(\frac{-w_{i+1}+2 w_i-w_{i-1}}{h^2}\right)+p\left(x_i\right)\left(\frac{w_{i+1}-w_{i-1}}{2 h}\right)+q\left(x_i\right) w_i=-r\left(x_i\right),
+```
+for each ``i=1,2, \ldots, N``
+and the resulting system of equations is expressed in the tridiagonal ``N \times N`` matrix form
+"""
+
+# ╔═╡ 028b1c0a-77d1-446e-acac-24e77acc32ce
+function finite_defference(p,q,r,α,β)
+	(a,b,N) -> begin
+		h=(b-a)/(N+1)
+		xi = a+h:h:b-h
+		ai = 2 .+ h^2 * q.(xi) 
+		h2p = (h/2) * p.(xi)
+		bi = -1 .+  h2p[1:end-1]
+		ci = -1 .- h2p[2:end]
+		di = -h^2*r.(xi)
+		di[1] = di[1] + (1+ (h/2)*p(xi[1]))*α
+		di[end] = di[end] + (1- (h/2)*p(xi[end]))*β
+		A = sparse(diagm(0=>ai,1=>bi,-1=>ci))
+		ws = A\di
+		vcat(α,ws,β)
+	end
+end
+
+# ╔═╡ cd3bdd26-b5de-4b79-a245-b5c02085599d
+let
+	p(x) = -2/x
+	q(x) = 2/x^2
+	r(x) = sin(log(x))/x^2
+	a , b , α, β, N = 1, 2, 1 ,2, 9
+	fd_method = finite_defference(p,q,r,α,β)
+	ws = fd_method(a,b,N)
+	hl_v = HtmlHighlighter(
+           (data, i, j) -> (j == 2) ,
+           HtmlDecoration(color = "blue")
+       )
+	hl_v2 = HtmlHighlighter(
+           (data, i, j) -> (j == 1),
+           HtmlDecoration()
+       )
+	hl_p = HtmlHighlighter(
+           (data, i, j) -> (j == 4) && data[i, 4] > 10,
+           HtmlDecoration(color = "red")
+       )
+	hl_e = HtmlHighlighter(
+           (data, i, j) -> true,
+           HtmlDecoration(style=Dict(
+			   	"padding"=>"1rem;",
+			   	"border"=>"1pt solid black;",
+		   ))
+       )
+	
+	mytable = pretty_table(HTML,hcat(1:N+2, ws),
+		formatters    = ft_printf(["%d","%5.8f"], [1,2]),
+		header=["x_i", "w_i"],
+		highlighters = (hl_e, hl_p, hl_v,hl_v2),
+        standalone = true
+	)
+
+	cm"""
+	$(mytable)
+	"""
 end
 
 # ╔═╡ 4dd7bade-7523-4fa6-a862-25d2c61dbf9a
@@ -4784,6 +4895,47 @@ starting with ``\mathrm{x}=(0,0,0,0)^t`` and iterating until
 ```
 """
 
+# ╔═╡ 1827436d-f6bf-4fba-852c-b1847eec813b
+cm"""
+2. At any interior mesh points, ``x_i``, for ``i=1,2, \ldots, N``, the differential equation to be approximated is
+```math
+y^{\prime \prime}\left(x_i\right)=p\left(x_i\right) y^{\prime}\left(x_i\right)+q\left(x_i\right) y\left(x_i\right)+r\left(x_i\right) .
+```
+$(add_space(10)) replace ``y^{\prime}(x_i)`` and ``y^{\prime\prime}(x_i)`` with
+```math
+y^{\prime}\left(x_i\right)=\frac{1}{2 h}\left[y\left(x_{i+1}\right)-y\left(x_{i-1}\right)\right]-\frac{h^2}{6} y^{\prime \prime \prime}\left(\eta_i\right)
+```
+$(add_space(10))where ``\eta_i\in (x_{i-1},x_{i+1})`` and
+```math
+y^{\prime \prime}\left(x_i\right)=\frac{1}{h^2}\left[y\left(x_{i+1}\right)-2 y\left(x_i\right)+y\left(x_{i-1}\right)\right]-\frac{h^2}{12} y^{(4)}\left(\xi_i\right),
+```
+$(add_space(10))where ``\xi_i\in (x_{i-1},x_{i+1})``.
+"""
+
+# ╔═╡ 396df6ea-4b86-4f3c-8b57-af1e93aa04a2
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/cgdf6xjg79yalxr3r9j89/eq_113_1.png?rlkey=pfofxttfxku1zqvcyq9m03dqn&dl=1",700))
+"""
+
+# ╔═╡ 640016f2-0b21-4153-b159-8504027fe883
+cm"""
+$(bth("11.3")) Suppose that ``p, q``, and ``r`` are continuous on ``[a, b]``. If ``q(x) \geq 0`` on ``[a, b]``, then the tridiagonal linear system (11.19) has a unique solution provided that ``h<2 / L``, where ``L=`` ``\max _{a \leq x \leq b}|p(x)|``.
+"""
+
+# ╔═╡ b3190821-5ba4-47d4-8433-d2df86003431
+cm"""
+$(post_img("https://www.dropbox.com/scl/fi/32t7p9dkczyykn4r6w17g/algo11.3.png?rlkey=d6s69i90q2o54mj9rrhzanf5d&dl=1",700))
+"""
+
+# ╔═╡ 90645230-df67-4456-bdd3-b73480b83064
+cm"""
+$(ex(1)) Use Algorithm 11.3 with ``N=9`` to approximate the solution to the linear boundary-value problem
+```math
+y^{\prime \prime}=-\frac{2}{x} y^{\prime}+\frac{2}{x^2} y+\frac{\sin (\ln x)}{x^2}, \quad \text { for } 1 \leq x \leq 2 \text {, with } y(1)=1 \text { and } y(2)=2 \text {, }
+```
+
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -4804,7 +4956,25 @@ PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 QRCoders = "f42e9828-16f3-11ed-2883-9126170b272d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
+[compat]
+Colors = "~0.12.11"
+CommonMark = "~0.8.12"
+HypertextLiteral = "~0.9.5"
+Integrals = "~4.4.1"
+LaTeXStrings = "~1.3.1"
+Latexify = "~0.16.3"
+NonlinearSolve = "~3.13.0"
+OrdinaryDiffEq = "~6.84.0"
+PlotThemes = "~3.2.0"
+Plots = "~1.40.4"
+PlutoExtras = "~0.7.12"
+PlutoUI = "~0.7.59"
+PrettyTables = "~2.3.2"
+QRCoders = "~1.4.5"
+Symbolics = "~5.30.4"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -4813,7 +4983,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "bee9ac6c13ea91562613eafd217676abd3afe64e"
+project_hash = "2d5592dced1bf40cf00aeea3a235e3b2238e8ee3"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "2314e58e823f0fd6ee02dbbecb997370f501dd4a"
@@ -7692,6 +7862,19 @@ version = "1.4.1+1"
 # ╟─05c665f5-b7d9-4a23-8daa-bb8bc5c0c75c
 # ╟─e1b3f052-5454-4023-837c-fc0c9405bd95
 # ╠═1b1993f8-f307-404d-99b7-fd2c5cb52f62
+# ╟─be77b12f-3c2d-4a4b-a495-3c3592e66bcd
+# ╟─faa963ce-aec1-48e6-bda1-7b1c1f07446d
+# ╟─6dcf6cc8-9fd1-4d6a-a42f-0a0fb606e6a8
+# ╟─aa7273bd-3db7-4757-abeb-e11f5912548a
+# ╟─1827436d-f6bf-4fba-852c-b1847eec813b
+# ╟─eee8569d-f7eb-4c60-b7ee-fc7ead955499
+# ╟─954a443e-13fd-4b05-9799-40574e270a86
+# ╟─396df6ea-4b86-4f3c-8b57-af1e93aa04a2
+# ╟─640016f2-0b21-4153-b159-8504027fe883
+# ╟─b3190821-5ba4-47d4-8433-d2df86003431
+# ╠═028b1c0a-77d1-446e-acac-24e77acc32ce
+# ╟─90645230-df67-4456-bdd3-b73480b83064
+# ╟─cd3bdd26-b5de-4b79-a245-b5c02085599d
 # ╠═65bdc140-2f92-11ef-1cbe-31065d820068
 # ╟─4dd7bade-7523-4fa6-a862-25d2c61dbf9a
 # ╟─00000000-0000-0000-0000-000000000001
